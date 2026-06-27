@@ -279,6 +279,18 @@ export default function Survey() {
                 <p className="text-xs text-bark/40">
                   Refundable anytime before launch. No charge until you confirm.
                 </p>
+                <p className="text-xs text-bark/35">
+                  Autari Ltd, a UK company registered in England and Wales, no.{" "}
+                  <a
+                    href="https://find-and-update.company-information.service.gov.uk/company/17105724"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 transition-colors hover:text-bark/70"
+                  >
+                    17105724
+                  </a>
+                  .
+                </p>
               </div>
             </div>
           )}
