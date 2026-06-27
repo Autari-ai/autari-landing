@@ -15,12 +15,19 @@
   --color-cream: #F5F7F6;       /* primary light background   -> Mist  */
   --color-linen: #E4E9E7;       /* cards / surfaces           -> Fog   */
 
-  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  /* Brand typography: Inter for body/UI, Space Grotesk for display/headings. */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+}
+
+/* Headings use Space Grotesk per the brand identity. */
+h1, h2, h3, h4 {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 ::selection {
