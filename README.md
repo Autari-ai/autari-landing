@@ -1,35 +1,49 @@
 # autari — validation landing page
 
-A Next.js landing page to **test real demand** for autari AI employees: multi-role "doors", a short multiple-choice survey per role, and a **fully-refundable Stripe deposit** as the call to action. The page is the validation instrument — no product is built yet.
+A Next.js landing page to **test real demand** for autari AI employees. A conversational, one-question-per-screen **survey** (UX modelled on Typeform / IxDF survey guidance) captures qualifying answers, saves them to a **Google Sheet**, then offers a **fully-refundable Stripe deposit** to reserve a founding spot. No product is built — the page is the validation instrument.
+
+Theme + save mechanism match the autari **partners** site: warm ember/cream palette, DM Sans, and a client-side POST to a Google Apps Script (works with a static export — no backend).
 
 ## Stack
-Next.js 14 (App Router) · TypeScript · Tailwind · Stripe Checkout. Brand: Pine `#0E7C66`, Spark `#19D3A2`, Ink `#14181F`, Mist `#F5F7F6`, Fog `#E4E9E7`; Space Grotesk + Inter.
+Next.js 15 (App Router, static export) · React 19 · Tailwind 4 · framer-motion · lucide-react · DM Sans. Brand: Bark `#1A1208`, Ember `#C84B0F`, Terracotta `#E8A87C`, Cream `#F7F4EF`, Linen `#EDE8E0`.
 
 ## Run locally
 ```bash
 npm install
-cp .env.local.example .env.local   # then paste your Stripe TEST secret key
-npm run dev                         # http://localhost:3000
+cp .env.local.example .env.local   # add your Google Apps Script URL (optional in dev)
+npm run dev                        # http://localhost:3000
 ```
-Without a Stripe key the page still runs and captures leads; the Reserve button just reports "payments not configured".
+Without the env var the survey still works and logs responses to the console.
 
-## Stripe
-1. Create a Stripe account → Developers → API keys → copy the **test** secret key into `.env.local` as `STRIPE_SECRET_KEY`.
-2. The deposit amount per role lives in `lib/roles.ts` (`depositGBP`). Edit roles/prices/surveys there — single source of truth.
-3. Checkout is created server-side in `app/api/checkout/route.ts`. Survey answers + email ride along as session metadata, so every payment is fully contextualised.
-4. Test card: `4242 4242 4242 4242`, any future expiry, any CVC.
-5. Go live: swap to live keys, set a real refund policy, and (optional) add a webhook to confirm payments.
+## Save responses to a Google Sheet (same as partners)
+1. Create a Google Sheet. Header row, e.g.: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`.
+2. Extensions → **Apps Script**, paste:
+   ```js
+   function doPost(e) {
+     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+     const data = JSON.parse(e.postData.contents);
+     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+     sheet.appendRow(headers.map(function (h) { return data[h] || ""; }));
+     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+       .setMimeType(ContentService.MimeType.JSON);
+   }
+   ```
+3. **Deploy → New deployment → Web app**, "Execute as: Me", "Who has access: Anyone". Copy the `/exec` URL.
+4. Put it in `.env.local` as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`. Submissions now append rows. (Requests use `mode:"no-cors"`, so the browser can't read the response — that's expected; the row still lands.)
 
-## Leads (non-payers too)
-`app/api/lead/route.ts` logs every survey submission — including people who choose "keep me posted". Those are your objection-interview leads. Wire it to a Google Sheet / Airtable / DB by replacing the `console.log`.
+## Stripe deposit (Payment Links — no backend)
+1. Stripe Dashboard → **Payment Links** → create one per role (one-time deposit, e.g. £99, collect email).
+2. Paste each URL into `src/lib/constants.ts` → `ROLES[].paymentLink`.
+3. The survey's final screen routes the chosen role to its link. Test card: `4242 4242 4242 4242`.
+4. Add your refund policy text before going live.
 
 ## Edit the offer
-- **Roles, prices, surveys** → `lib/roles.ts`
-- **Hero / copy** → `components/*.tsx`
-- **Brand tokens** → `tailwind.config.ts`
+- **Survey questions, roles, prices, FAQ, copy** → `src/lib/constants.ts`
+- **Sections** → `src/components/sections/*`
+- **Brand tokens** → `src/app/globals.css` (`@theme`)
 
 ## Deploy
-Vercel (easiest): push this repo, import, add `STRIPE_SECRET_KEY` env var, point `autari.com` at it.
+Static export (`output: "export"`). `npm run build` → deploy the `out/` folder to Netlify/Vercel/any static host. Point a domain at it.
 
 ---
 *Rule of the sprint: no autari product code until a stranger pays. This page is how you find that stranger.*
