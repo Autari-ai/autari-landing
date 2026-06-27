@@ -1,0 +1,21 @@
+# Netlify deploy config for the autari validation landing page.
+# This is a Next.js static export (next.config.ts: output: "export"),
+# so Netlify just serves the generated `out/` folder.
+
+[build]
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Static export already emits a 404.html; this makes Netlify use it.
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# NOTE on the apex domain (autari.co.uk):
+#   1. Deploy this repo to Netlify (it gives the site a <name>.netlify.app URL).
+#   2. Netlify → Domain settings → add custom domain "autari.co.uk" (+ www).
+#   3. In Cloudflare DNS add the records in README ("Deploy to autari.co.uk").

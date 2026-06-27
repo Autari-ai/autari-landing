@@ -40,8 +40,28 @@ Survey rows append to the **Survey** tab in this order: `submittedAt | role | fi
 - **Sections** → `src/components/sections/*`
 - **Brand tokens** → `src/app/globals.css` (`@theme`)
 
-## Deploy
-Static export (`output: "export"`). `npm run build` → deploy the `out/` folder to Netlify/Vercel/any static host. Point a domain at it.
+## Deploy to autari.co.uk (Netlify + Cloudflare)
+Static export (`output: "export"`) + `netlify.toml` is included (publishes `out/`).
+
+**1. Deploy to Netlify**
+- Push this repo to GitHub, then Netlify → "Add new site" → import it. Build/publish are read from `netlify.toml`.
+- Add env var in Netlify → Site settings → Environment: `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`.
+- Note the generated site name, e.g. `your-site-1234.netlify.app`.
+
+**2. Add the custom domain in Netlify**
+- Netlify → Domain management → Add domain → `autari.co.uk` (and `www.autari.co.uk`).
+
+**3. Cloudflare DNS — point the apex at Netlify** (do NOT touch the MX/TXT email records)
+Add two records (set both to **DNS only / grey cloud** so Netlify manages SSL, like the `partners` record):
+
+| Type  | Name | Target | Proxy |
+|-------|------|--------|-------|
+| CNAME | `autari.co.uk` (apex — Cloudflare flattens it) | `your-site-1234.netlify.app` | DNS only |
+| CNAME | `www` | `your-site-1234.netlify.app` | DNS only |
+
+(If Cloudflare won't accept a CNAME at the apex, use an A record `autari.co.uk → 75.2.60.5` instead — Netlify's load-balancer IP.)
+
+**Leave `partners.autari.co.uk` alone** unless you intend to take the partners site offline — the apex and that subdomain are independent.
 
 ---
 *Rule of the sprint: no autari product code until a stranger pays. This page is how you find that stranger.*
