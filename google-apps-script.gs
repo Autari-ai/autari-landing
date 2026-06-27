@@ -1,81 +1,97 @@
 /**
- * autari survey  ->  the SAME Google Sheet you use for the partners form
+ * autari — ONE endpoint for BOTH the partners form and the autari.co.uk survey.
  * ---------------------------------------------------------------------------
- * Writes survey responses into a dedicated "Survey" TAB of your existing
- * partners spreadsheet, so everything lives in one file without clashing with
- * the partners form's columns. Turnkey: it creates the tab and the header row
- * automatically on the first submission, and grows the headers if new keys
- * ever appear.
+ * Paste this into your EXISTING partners Apps Script project (the one bound to
+ * your partners spreadsheet) and re-deploy a NEW VERSION of the existing
+ * deployment — that keeps the same /exec URL.
  *
- * SETUP (one time, ~3 minutes — only you can do this in your Google account):
- *   1. Open your existing partners Google Sheet. Copy its ID from the URL:
- *        https://docs.google.com/spreadsheets/d/<THIS_IS_THE_ID>/edit
- *   2. Paste that ID into SPREADSHEET_ID below.
- *   3. Go to https://script.google.com  ->  New project. Paste this whole file.
- *      (A standalone script — do NOT edit the partners' bound script, so its
- *       form keeps working untouched.)
- *   4. Deploy  ->  New deployment  ->  type "Web app":
- *        - Execute as:  Me
- *        - Who has access:  Anyone
- *   5. Authorize when prompted (it needs access to your spreadsheet). Copy the
- *      Web app URL (ends in /exec).
- *   6. Put it in autari-landing/.env.local:
- *        NEXT_PUBLIC_GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/XXXX/exec
- *   7. Restart `npm run dev`. Survey responses now append to the "Survey" tab.
+ *   - Partner applications (old behaviour) -> appended to the first/active sheet,
+ *     exactly as before. Nothing about the partners form changes.
+ *   - Survey responses (from autari.co.uk) -> appended to a "Survey" tab, which
+ *     this script creates with its own header row automatically and grows if new
+ *     fields ever appear.
  *
- * Columns it creates, in order:
- *   submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email
+ * How it tells them apart: survey payloads carry a `role` field (or `form:"survey"`);
+ * partner payloads do not.
+ *
+ * RE-DEPLOY (keep the same URL):
+ *   Deploy -> Manage deployments -> pencil/Edit on the existing deployment ->
+ *   Version: New version -> Deploy. (Do NOT pick "New deployment" — that mints a
+ *   different URL.)
+ *   Then open the /exec URL in a browser: it should say
+ *   "autari survey endpoint is live."
  */
 
-// ---- Fill these in ----
-var SPREADSHEET_ID = "PASTE_YOUR_PARTNERS_SPREADSHEET_ID_HERE";
-var SHEET_NAME = "Survey"; // tab name inside that spreadsheet (created if missing)
-// -----------------------
+var SURVEY_SHEET_NAME = "Survey";
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
 
-    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
     var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    var headers;
-    if (sheet.getLastRow() === 0) {
-      // First ever submission — create the header row from the payload keys.
-      headers = Object.keys(data);
-      sheet.appendRow(headers);
-    } else {
-      headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-      // Grow the header row if a new key shows up later.
-      var added = false;
-      Object.keys(data).forEach(function (k) {
-        if (headers.indexOf(k) === -1) {
-          headers.push(k);
-          added = true;
-        }
-      });
-      if (added) {
-        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-      }
+    var isSurvey = data.role !== undefined || data.form === "survey";
+
+    if (isSurvey) {
+      appendDynamic_(ss, SURVEY_SHEET_NAME, data);
+      return json_({ ok: true });
     }
 
-    var row = headers.map(function (h) {
-      return data[h] !== undefined && data[h] !== null ? data[h] : "";
-    });
-    sheet.appendRow(row);
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+    // --- Original partners behaviour, unchanged ---
+    var sheet = ss.getActiveSheet();
+    sheet.appendRow([
+      new Date().toISOString(),
+      data.name,
+      data.email,
+      data.phone || "",
+      data.company || "",
+      data.expertise,
+      data.heardAboutUs || "",
+      data.message || "",
+    ]);
+    return json_({ status: "success" });
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return json_({ ok: false, error: String(err) });
   } finally {
     lock.releaseLock();
   }
+}
+
+// Appends to a named tab, creating it + a header row from the payload keys,
+// and adding any new columns that show up later.
+function appendDynamic_(ss, sheetName, data) {
+  var sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
+  var headers;
+
+  if (sheet.getLastRow() === 0) {
+    headers = Object.keys(data);
+    sheet.appendRow(headers);
+  } else {
+    headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var added = false;
+    Object.keys(data).forEach(function (k) {
+      if (headers.indexOf(k) === -1) {
+        headers.push(k);
+        added = true;
+      }
+    });
+    if (added) {
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    }
+  }
+
+  var row = headers.map(function (h) {
+    return data[h] !== undefined && data[h] !== null ? data[h] : "";
+  });
+  sheet.appendRow(row);
+}
+
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
 
 // Lets you open the /exec URL in a browser to confirm it's live.

@@ -11,14 +11,15 @@ npm run dev      # http://localhost:3000
 npm run build    # static export to out/ — must succeed before deploying
 ```
 
-## 1. 🔒 Google Sheet (survey responses → existing partners spreadsheet)
-The survey writes to a **"Survey" tab** of the Google Sheet you already use for partners — no clash with the partners columns.
+## 1. 🔒 Google Sheet (one endpoint for partners + survey)
+Reuses your existing partners Apps Script + spreadsheet. The merged script keeps the
+partners form working and routes survey rows to their own **"Survey" tab** (it
+tells them apart by the `role` field survey payloads carry).
 
-1. Open your partners Google Sheet. Copy its ID from the URL: `…/spreadsheets/d/<ID>/edit`.
-2. Paste `<ID>` into `SPREADSHEET_ID` in **`google-apps-script.gs`**.
-3. Go to [script.google.com](https://script.google.com) → **New project** (standalone — do NOT edit the partners' bound script). Paste the whole `google-apps-script.gs`.
-4. **Deploy → New deployment → Web app** → Execute as: **Me**, Who has access: **Anyone**. Authorize.
-5. Copy the Web app URL (ends in `/exec`). Open it in a browser — it should say *"autari survey endpoint is live."*
+1. Open the partners Apps Script: partners Google Sheet → **Extensions → Apps Script**.
+2. **Replace all the code** with **`google-apps-script.gs`** from this repo.
+3. **Deploy → Manage deployments → Edit (pencil) the existing deployment → Version: New version → Deploy.** Keeps the **same `/exec` URL**. (Do NOT choose "New deployment" — that creates a different URL.)
+4. Open the `/exec` URL in a browser — it should say *"autari survey endpoint is live."* (the old code wouldn't — that's your confirmation the new code is live).
 
 ## 2. 🔒 Stripe (refundable deposit)
 1. [dashboard.stripe.com](https://dashboard.stripe.com) → **Payment Links** → create one per role (one-time deposit, e.g. £99, collect email + name). Add your refund policy text.

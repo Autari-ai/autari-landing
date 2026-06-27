@@ -15,19 +15,20 @@ npm run dev                        # http://localhost:3000
 ```
 Without the env var the survey still works and logs responses to the console.
 
-## Save responses to your EXISTING partners spreadsheet
-The full script is in **`google-apps-script.gs`**. It writes survey rows into a
-dedicated **"Survey" tab** of the same Google Sheet you already use for the
-partners form — no clash with the partners columns, everything in one file. It
-**creates the tab + header columns itself** on the first submission.
+## Save responses — one endpoint for partners + survey
+The full script is in **`google-apps-script.gs`**. Paste it into your **existing
+partners Apps Script project** (bound to the partners spreadsheet) and re-deploy.
+It keeps the partners form working *and* sends survey rows to their own
+**"Survey" tab** (created automatically, with its own header row). It tells them
+apart by the `role` field that survey payloads carry.
 
-1. Open your partners Google Sheet, copy its ID from the URL
-   (`/spreadsheets/d/<ID>/edit`), and paste it into `SPREADSHEET_ID` in `google-apps-script.gs`.
-2. Go to [script.google.com](https://script.google.com) → **New project** (a *standalone* script — leave the partners' bound script untouched). Paste the whole file.
-3. **Deploy → New deployment → Web app** — "Execute as: Me", "Who has access: Anyone". Authorize (it needs access to your sheet), copy the `/exec` URL.
-4. Put it in `.env.local` as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`, restart `npm run dev`.
+1. Open the partners Apps Script (partners Sheet → Extensions → Apps Script).
+2. **Replace all the code** with `google-apps-script.gs` from this repo.
+3. **Deploy → Manage deployments → Edit (pencil) the existing deployment → Version: New version → Deploy.** This keeps the **same `/exec` URL**. (Do *not* pick "New deployment" — that mints a different URL.)
+4. Open the `/exec` URL in a browser → it should say *"autari survey endpoint is live."*
+5. Put that `/exec` URL in `.env.local` (and in Netlify env) as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`.
 
-Survey rows append to the **Survey** tab in this order: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`. (Requests use `mode:"no-cors"`, so the browser can't read the response — expected; the row still lands. Open the `/exec` URL in a browser to confirm the endpoint is live.)
+Survey rows append to the **Survey** tab in this order: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`. Partner applications keep going to the first sheet, unchanged. (Requests use `mode:"no-cors"`, so the browser can't read the response — expected; the row still lands.)
 
 ## Stripe deposit (Payment Links — no backend)
 1. Stripe Dashboard → **Payment Links** → create one per role (one-time deposit, e.g. £99, collect email).
