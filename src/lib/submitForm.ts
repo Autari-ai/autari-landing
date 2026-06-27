@@ -1,7 +1,7 @@
 import type { SurveyResponse } from "@/types";
 
 // Same mechanism as the partners site: POST JSON to a Google Apps Script
-// Web App, which appends a row to a Google Sheet. No backend required —
+// Web App, which appends a row to a Google Sheet. No backend required, and it
 // works with a static export. Set NEXT_PUBLIC_GOOGLE_SCRIPT_URL in .env.local.
 const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ?? "";
 
@@ -9,9 +9,9 @@ export async function submitSurvey(
   data: SurveyResponse
 ): Promise<{ success: boolean }> {
   if (!GOOGLE_SCRIPT_URL) {
-    // Not configured yet — log so nothing is silently lost in dev.
+    // Not configured yet, so log it so nothing is silently lost in dev.
     // eslint-disable-next-line no-console
-    console.warn("[autari] NEXT_PUBLIC_GOOGLE_SCRIPT_URL not set — survey:", data);
+    console.warn("[autari] NEXT_PUBLIC_GOOGLE_SCRIPT_URL not set. survey:", data);
     return { success: true };
   }
 

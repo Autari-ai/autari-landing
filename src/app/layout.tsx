@@ -17,13 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "autari — Hire work, not headcount",
+  title: "autari | Hire work, not headcount",
   description:
     "An AI employee for the role you need. It works in your tools, does the job, and only comes to you when it is genuinely stuck.",
   openGraph: {
-    title: "autari — Hire work, not headcount",
+    title: "autari | Hire work, not headcount",
     description:
-      "An AI employee for the role you need — built for your firm, working from day one.",
+      "An AI employee for the role you need, built for your firm and working from day one.",
     url: "https://autari.co.uk",
     siteName: "autari",
     type: "website",

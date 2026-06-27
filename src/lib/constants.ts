@@ -9,7 +9,7 @@ export const HERO = {
   label: "AI EMPLOYEES · ALWAYS ON",
   headline: "Hire work, not headcount.",
   subtext:
-    "An AI employee for the role you need. It works inside your tools, does the job end-to-end, and only comes to you when it’s genuinely stuck — like a junior teammate, at a fraction of the cost.",
+    "Pick the role you need and your AI employee gets to work inside your tools. It does the job, posts its own updates, and only comes to you when it’s genuinely stuck. Like a junior teammate, at a fraction of the cost.",
   cta: "Start the 60-second survey",
   secondary: "See how it works",
 };
@@ -19,7 +19,7 @@ export const STEPS: Step[] = [
     number: 1,
     title: "Tell us the role",
     description:
-      "60-second survey. Pick the role and the pain you want gone — we learn how your firm works today.",
+      "Take the 60-second survey. Tell us the role you need and the work you want off your plate, and we learn how your firm runs today.",
   },
   {
     number: 2,
@@ -31,7 +31,7 @@ export const STEPS: Step[] = [
     number: 3,
     title: "It starts working",
     description:
-      "It does the job, posts its own updates, and @mentions the right person only when it is blocked.",
+      "It does the job, posts its own updates, and @mentions the right person only when it’s blocked.",
   },
 ];
 
@@ -110,7 +110,7 @@ export const SURVEY: SurveyQuestion[] = [
       "A junior",
       "Outsourced / freelancer",
       "Me, the owner",
-      "Nobody — it’s a gap",
+      "No one yet (it’s a gap)",
     ],
   },
   {
@@ -134,7 +134,7 @@ export const SURVEY: SurveyQuestion[] = [
   {
     id: "tried",
     kind: "yesno",
-    label: "Have you tried to fix or automate it before?",
+    label: "Have you tried to solve this before?",
   },
   {
     id: "trust",
@@ -159,7 +159,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Is my data safe?",
     answer:
-      "Each AI employee runs isolated, with access only to what you explicitly grant — nothing more.",
+      "Each AI employee runs on its own, with access only to what you explicitly grant. Nothing more.",
   },
   {
     question: "How is this different from Copilot?",
@@ -174,6 +174,6 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Can I cancel?",
     answer:
-      "Your deposit is fully refundable before launch. After launch it’s monthly — cancel anytime.",
+      "Your deposit is fully refundable before launch. After launch it’s monthly, and you can cancel anytime.",
   },
 ];

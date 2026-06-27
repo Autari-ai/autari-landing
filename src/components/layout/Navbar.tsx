@@ -41,7 +41,7 @@ export default function Navbar() {
             </a>
           ))}
           <Button href="#survey" className="text-[11px] px-5 py-2.5">
-            Reserve a spot
+            Reserve my spot
           </Button>
         </div>
         <Button href="#survey" className="text-[11px] px-5 py-2.5 md:hidden">

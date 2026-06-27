@@ -35,8 +35,8 @@ export default function HowItWorks() {
           <p className="mx-auto mt-12 max-w-2xl rounded-2xl border border-bark/10 bg-cream p-5 text-center text-sm leading-relaxed text-bark/70">
             autari is in early access. The role you reserve is launching soon, and
             your deposit is <strong className="text-bark">100% refundable</strong>{" "}
-            if we don’t deliver. You’re funding and shaping something built for you
-            — not buying a finished box.
+            if we don’t deliver. You’re funding and shaping something built for
+            you, not buying a finished box.
           </p>
         </AnimatedSection>
       </div>

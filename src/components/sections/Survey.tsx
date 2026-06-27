@@ -158,7 +158,7 @@ export default function Survey() {
                                 onKeyDown={(e) =>
                                   e.key === "Enter" && submitOther()
                                 }
-                                placeholder="Tell us more — type your answer…"
+                                placeholder="Tell us more. Type it here…"
                                 autoFocus
                                 className="w-full rounded-xl border border-bark/10 bg-cream px-4 py-3.5 text-bark placeholder:text-bark/30 transition-colors focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
                               />
@@ -249,16 +249,16 @@ export default function Survey() {
                 <Check className="text-ember" size={28} />
               </div>
               <h3 className="mt-5 text-2xl font-bold tracking-[-0.02em]">
-                Thanks — that’s logged.
+                Thanks, that’s saved.
               </h3>
               <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-bark/60">
                 Want to lock in a founding spot for your{" "}
                 <strong className="text-bark">
                   {chosenRole?.title ?? "AI employee"}
                 </strong>
-                ? Put down a fully-refundable{" "}
+                ? Put down a fully refundable{" "}
                 <strong className="text-bark">£{chosenRole?.depositGBP}</strong>{" "}
-                deposit — founder rate{" "}
+                deposit. Founder rate{" "}
                 <strong className="text-bark">£{chosenRole?.monthlyGBP}/mo</strong>{" "}
                 at launch <span className="text-bark/40">(example)</span>.
               </p>
@@ -269,11 +269,11 @@ export default function Survey() {
                     href={chosenRole.paymentLink}
                     className="w-full py-4 text-sm sm:w-auto sm:px-10"
                   >
-                    Reserve my spot — £{chosenRole.depositGBP} →
+                    Reserve my spot for £{chosenRole.depositGBP}
                   </Button>
                 ) : (
                   <p className="rounded-xl bg-cream px-4 py-3 text-sm text-bark/50">
-                    Reservation link coming — we’ll email you to lock it in.
+                    We’ll email you to lock in your spot.
                   </p>
                 )}
                 <p className="text-xs text-bark/40">

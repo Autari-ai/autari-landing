@@ -11,7 +11,7 @@ export interface SurveyQuestion {
 export interface Role {
   slug: string;
   title: string;
-  /** Fully-refundable deposit in GBP (example — set your real figure). */
+  /** Fully refundable deposit in GBP (example, set your real figure). */
   depositGBP: number;
   /** Example founder monthly price (starting point only). */
   monthlyGBP: number;
