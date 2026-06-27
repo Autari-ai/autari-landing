@@ -15,21 +15,15 @@ npm run dev                        # http://localhost:3000
 ```
 Without the env var the survey still works and logs responses to the console.
 
-## Save responses to a Google Sheet (same as partners)
-1. Create a Google Sheet. Header row, e.g.: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`.
-2. Extensions → **Apps Script**, paste:
-   ```js
-   function doPost(e) {
-     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-     const data = JSON.parse(e.postData.contents);
-     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-     sheet.appendRow(headers.map(function (h) { return data[h] || ""; }));
-     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
-       .setMimeType(ContentService.MimeType.JSON);
-   }
-   ```
-3. **Deploy → New deployment → Web app**, "Execute as: Me", "Who has access: Anyone". Copy the `/exec` URL.
-4. Put it in `.env.local` as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`. Submissions now append rows. (Requests use `mode:"no-cors"`, so the browser can't read the response — that's expected; the row still lands.)
+## Save responses to a Google Sheet (turnkey — same mechanism as partners)
+The full script is in **`google-apps-script.gs`** and it **creates its own header columns** on the first submission — you don't set up the sheet manually.
+
+1. Create a blank Google Sheet.
+2. Extensions → **Apps Script**, delete the placeholder, paste all of `google-apps-script.gs`.
+3. **Deploy → New deployment → Web app** — "Execute as: Me", "Who has access: Anyone". Authorize, copy the `/exec` URL.
+4. Put it in `.env.local` as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`, restart `npm run dev`.
+
+Submissions append rows in this order: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`. (Requests use `mode:"no-cors"`, so the browser can't read the response — expected; the row still lands. Open the `/exec` URL in a browser to confirm the endpoint is live.)
 
 ## Stripe deposit (Payment Links — no backend)
 1. Stripe Dashboard → **Payment Links** → create one per role (one-time deposit, e.g. £99, collect email).

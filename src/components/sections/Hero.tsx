@@ -12,8 +12,8 @@ export default function Hero() {
         <AnimatedSection>
           <span className="inline-flex items-center gap-2">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-ember" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-spark opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-spark" />
             </span>
             <SectionLabel>{HERO.label}</SectionLabel>
           </span>

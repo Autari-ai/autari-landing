@@ -19,7 +19,7 @@ export async function submitSurvey(
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...data, submittedAt: new Date().toISOString() }),
+    body: JSON.stringify({ submittedAt: new Date().toISOString(), ...data }),
   });
 
   return { success: true };

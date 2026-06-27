@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "autari",
     type: "website",
   },
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/mark.png" },
   robots: { index: true, follow: true },
 };
 

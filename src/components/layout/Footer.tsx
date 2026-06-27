@@ -4,10 +4,9 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xl font-bold lowercase text-cream">
-              au<span className="text-ember">t</span>ari
-            </p>
-            <p className="mt-2 text-sm text-cream/40">Hire work, not headcount.</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo_dark.png" alt="autari" className="h-9 w-auto" />
+            <p className="mt-3 text-sm text-cream/40">Hire work, not headcount.</p>
           </div>
           <div className="flex flex-wrap gap-6 text-xs font-medium uppercase tracking-[0.08em] text-cream/40">
             <a

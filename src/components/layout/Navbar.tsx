@@ -6,8 +6,9 @@ import { NAV_LINKS } from "@/lib/constants";
 
 function Logo() {
   return (
-    <a href="#" className="text-xl font-bold tracking-tight lowercase">
-      au<span className="text-ember">t</span>ari
+    <a href="#" aria-label="autari" className="flex items-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo_light.png" alt="autari" className="h-8 w-auto" />
     </a>
   );
 }

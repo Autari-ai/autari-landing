@@ -1,11 +1,19 @@
 @import "tailwindcss";
 
+/* Official autari brand palette (from the brand identity doc). */
 @theme {
-  --color-bark: #1A1208;
-  --color-ember: #C84B0F;
-  --color-terracotta: #E8A87C;
-  --color-cream: #F7F4EF;
-  --color-linen: #EDE8E0;
+  --color-ink: #14181F;
+  --color-pine: #0E7C66;
+  --color-spark: #19D3A2;
+  --color-mist: #F5F7F6;
+  --color-fog: #E4E9E7;
+
+  /* Aliases: keep the component class names but render them in brand colours. */
+  --color-bark: #14181F;        /* dark text / dark surfaces  -> Ink   */
+  --color-ember: #0E7C66;       /* primary accent / buttons   -> Pine  */
+  --color-terracotta: #19D3A2;  /* highlight                  -> Spark */
+  --color-cream: #F5F7F6;       /* primary light background   -> Mist  */
+  --color-linen: #E4E9E7;       /* cards / surfaces           -> Fog   */
 
   --font-sans: var(--font-dm-sans), system-ui, sans-serif;
 }
@@ -16,6 +24,6 @@ html {
 }
 
 ::selection {
-  background: #C84B0F;
-  color: #F7F4EF;
+  background: #19D3A2;
+  color: #14181F;
 }
