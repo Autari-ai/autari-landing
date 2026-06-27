@@ -15,12 +15,29 @@ export default function Footer() {
             >
               Contact
             </a>
+            <a
+              href="https://find-and-update.company-information.service.gov.uk/company/17105724"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-cream"
+            >
+              Companies House
+            </a>
           </div>
         </div>
         <div className="mt-12 border-t border-cream/10 pt-8">
           <p className="text-xs text-cream/30">
-            &copy; {new Date().getFullYear()} Autari Ltd. Registered in England
-            &amp; Wales. All rights reserved.
+            &copy; {new Date().getFullYear()} Autari Ltd. A UK company registered
+            in England &amp; Wales, company no.{" "}
+            <a
+              href="https://find-and-update.company-information.service.gov.uk/company/17105724"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 transition-colors hover:text-cream/70"
+            >
+              17105724
+            </a>
+            . All rights reserved.
           </p>
         </div>
       </div>
