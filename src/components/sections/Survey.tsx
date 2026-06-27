@@ -244,54 +244,62 @@ export default function Survey() {
           )}
 
           {status === "done" && (
-            <div className="py-6 text-center">
+            <div className="py-8 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-ember/10">
                 <Check className="text-ember" size={28} />
               </div>
               <h3 className="mt-5 text-2xl font-bold tracking-[-0.02em]">
-                Thanks, that’s saved.
+                You’re on the list.
               </h3>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-bark/60">
-                Want to lock in a founding spot for your{" "}
+              <p className="mx-auto mt-2 max-w-xs text-sm text-bark/60">
+                Lock in your{" "}
                 <strong className="text-bark">
                   {chosenRole?.title ?? "AI employee"}
-                </strong>
-                ? Put down a fully refundable{" "}
-                <strong className="text-bark">£{chosenRole?.depositGBP}</strong>{" "}
-                deposit. Founder rate{" "}
-                <strong className="text-bark">£{chosenRole?.monthlyGBP}/mo</strong>{" "}
-                at launch <span className="text-bark/40">(example)</span>.
+                </strong>{" "}
+                as a founding customer.
               </p>
 
-              <div className="mt-7 flex flex-col items-center gap-3">
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                <span className="rounded-full bg-cream px-3 py-1 text-xs font-medium text-bark">
+                  £{chosenRole?.depositGBP} deposit
+                </span>
+                <span className="rounded-full bg-ember/10 px-3 py-1 text-xs font-medium text-ember">
+                  Fully refundable
+                </span>
+                <span className="rounded-full bg-cream px-3 py-1 text-xs font-medium text-bark/60">
+                  from £{chosenRole?.monthlyGBP}/mo
+                </span>
+              </div>
+
+              <div className="mt-7">
                 {chosenRole?.paymentLink ? (
                   <Button
                     href={chosenRole.paymentLink}
-                    className="w-full py-4 text-sm sm:w-auto sm:px-10"
+                    className="w-full py-4 text-sm sm:w-auto sm:px-12"
                   >
-                    Reserve my spot for £{chosenRole.depositGBP}
+                    Reserve my spot · £{chosenRole.depositGBP}
                   </Button>
                 ) : (
                   <p className="rounded-xl bg-cream px-4 py-3 text-sm text-bark/50">
                     We’ll email you to lock in your spot.
                   </p>
                 )}
-                <p className="text-xs text-bark/40">
-                  Refundable anytime before launch. No charge until you confirm.
-                </p>
-                <p className="text-xs text-bark/35">
-                  Autari Ltd, a UK company registered in England and Wales, no.{" "}
-                  <a
-                    href="https://find-and-update.company-information.service.gov.uk/company/17105724"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline underline-offset-2 transition-colors hover:text-bark/70"
-                  >
-                    17105724
-                  </a>
-                  .
+                <p className="mt-3 text-xs text-bark/40">
+                  No charge until you confirm at launch.
                 </p>
               </div>
+
+              <p className="mt-8 text-[11px] text-bark/30">
+                Autari Ltd · England &amp; Wales ·{" "}
+                <a
+                  href="https://find-and-update.company-information.service.gov.uk/company/17105724"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 transition-colors hover:text-bark/60"
+                >
+                  no. 17105724
+                </a>
+              </p>
             </div>
           )}
         </div>
