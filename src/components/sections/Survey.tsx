@@ -13,12 +13,18 @@ type Status = "asking" | "saving" | "done";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Options that should reveal a free-text box instead of just recording "Other".
+function isOtherOption(opt: string) {
+  return /^other\b/i.test(opt) || opt.toLowerCase() === "something else";
+}
+
 export default function Survey() {
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const [answers, setAnswers] = useState<SurveyResponse>({});
   const [status, setStatus] = useState<Status>("asking");
   const [emailInput, setEmailInput] = useState("");
+  const [otherText, setOtherText] = useState("");
   const [error, setError] = useState("");
 
   const q = SURVEY[index];
@@ -46,7 +52,23 @@ export default function Survey() {
     const updated = { ...answers, [q.id]: value };
     setAnswers(updated);
     setError("");
+    if (isOtherOption(value)) {
+      setOtherText(""); // reveal the free-text box; don't auto-advance
+      return;
+    }
     setTimeout(() => goNext(updated), 180);
+  }
+
+  function submitOther() {
+    const txt = otherText.trim();
+    if (!txt) {
+      setError("Please add a little detail.");
+      return;
+    }
+    const updated = { ...answers, [q.id]: txt }; // save what they typed
+    setAnswers(updated);
+    setError("");
+    goNext(updated);
   }
 
   function submitEmail() {
@@ -126,6 +148,28 @@ export default function Survey() {
                               {opt}
                             </OptionButton>
                           ))}
+
+                          {isOtherOption(answers[q.id] ?? "") && (
+                            <div className="mt-1 flex flex-col gap-3">
+                              <input
+                                type="text"
+                                value={otherText}
+                                onChange={(e) => setOtherText(e.target.value)}
+                                onKeyDown={(e) =>
+                                  e.key === "Enter" && submitOther()
+                                }
+                                placeholder="Tell us more — type your answer…"
+                                autoFocus
+                                className="w-full rounded-xl border border-bark/10 bg-cream px-4 py-3.5 text-bark placeholder:text-bark/30 transition-colors focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+                              />
+                              <Button
+                                onClick={submitOther}
+                                className="py-3.5 text-sm"
+                              >
+                                Continue →
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
 

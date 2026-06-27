@@ -15,15 +15,19 @@ npm run dev                        # http://localhost:3000
 ```
 Without the env var the survey still works and logs responses to the console.
 
-## Save responses to a Google Sheet (turnkey — same mechanism as partners)
-The full script is in **`google-apps-script.gs`** and it **creates its own header columns** on the first submission — you don't set up the sheet manually.
+## Save responses to your EXISTING partners spreadsheet
+The full script is in **`google-apps-script.gs`**. It writes survey rows into a
+dedicated **"Survey" tab** of the same Google Sheet you already use for the
+partners form — no clash with the partners columns, everything in one file. It
+**creates the tab + header columns itself** on the first submission.
 
-1. Create a blank Google Sheet.
-2. Extensions → **Apps Script**, delete the placeholder, paste all of `google-apps-script.gs`.
-3. **Deploy → New deployment → Web app** — "Execute as: Me", "Who has access: Anyone". Authorize, copy the `/exec` URL.
+1. Open your partners Google Sheet, copy its ID from the URL
+   (`/spreadsheets/d/<ID>/edit`), and paste it into `SPREADSHEET_ID` in `google-apps-script.gs`.
+2. Go to [script.google.com](https://script.google.com) → **New project** (a *standalone* script — leave the partners' bound script untouched). Paste the whole file.
+3. **Deploy → New deployment → Web app** — "Execute as: Me", "Who has access: Anyone". Authorize (it needs access to your sheet), copy the `/exec` URL.
 4. Put it in `.env.local` as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL`, restart `npm run dev`.
 
-Submissions append rows in this order: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`. (Requests use `mode:"no-cors"`, so the browser can't read the response — expected; the row still lands. Open the `/exec` URL in a browser to confirm the endpoint is live.)
+Survey rows append to the **Survey** tab in this order: `submittedAt | role | firm | size | who | hours | cost | pain | tried | trust | email`. (Requests use `mode:"no-cors"`, so the browser can't read the response — expected; the row still lands. Open the `/exec` URL in a browser to confirm the endpoint is live.)
 
 ## Stripe deposit (Payment Links — no backend)
 1. Stripe Dashboard → **Payment Links** → create one per role (one-time deposit, e.g. £99, collect email).
