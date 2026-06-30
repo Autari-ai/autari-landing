@@ -43,28 +43,28 @@ export const ROLES: Role[] = [
     title: "AI Draft Reviewer / Draftsman (Engineering)",
     depositGBP: 99,
     monthlyGBP: 149,
-    paymentLink: "https://buy.stripe.com/test_00w9AU17m4Ka9A08xO1B600",
+    paymentLink: "https://buy.stripe.com/bJe3cv1lvgzB2100fT4Vy00",
   },
   {
     slug: "bookkeeper",
     title: "AI Bookkeeper",
     depositGBP: 99,
     monthlyGBP: 99,
-    paymentLink: "https://buy.stripe.com/test_5kQcN6g2gccCfYo9BS1B601",
+    paymentLink: "https://buy.stripe.com/7sY9AT7JTabddJI1jX4Vy01",
   },
   {
     slug: "support",
     title: "AI Support Agent",
     depositGBP: 99,
     monthlyGBP: 99,
-    paymentLink: "https://buy.stripe.com/test_eVq4gA3fu4Ka3bCeWc1B602",
+    paymentLink: "https://buy.stripe.com/fZu00j0hr8354984w94Vy02",
   },
   {
     slug: "custom",
     title: "Something else",
     depositGBP: 99,
     monthlyGBP: 149,
-    paymentLink: "https://buy.stripe.com/test_bJe14o9DSb8y9A03du1B603",
+    paymentLink: "https://buy.stripe.com/4gM4gz6FP2ILcFE8Mp4Vy03",
   },
 ];
 
