@@ -11,6 +11,19 @@ import type { SurveyResponse } from "@/types";
 
 type Status = "asking" | "saving" | "done";
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+// Fire a GA4 event if analytics is loaded (no-op otherwise).
+function track(event: string, params?: Record<string, unknown>) {
+  if (typeof window !== "undefined" && typeof window.gtag === "function") {
+    window.gtag("event", event, params || {});
+  }
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Options that should reveal a free-text box instead of just recording "Other".
@@ -26,6 +39,7 @@ export default function Survey() {
   const [emailInput, setEmailInput] = useState("");
   const [otherText, setOtherText] = useState("");
   const [error, setError] = useState("");
+  const [started, setStarted] = useState(false);
 
   const q = SURVEY[index];
   const total = SURVEY.length;
@@ -49,6 +63,10 @@ export default function Survey() {
   }
 
   function choose(value: string) {
+    if (!started) {
+      track("survey_started");
+      setStarted(true);
+    }
     const updated = { ...answers, [q.id]: value };
     setAnswers(updated);
     setError("");
@@ -83,6 +101,7 @@ export default function Survey() {
 
   async function finish(updated: SurveyResponse) {
     setStatus("saving");
+    track("survey_completed", { role: updated.role });
     await submitSurvey(updated);
     setStatus("done");
   }
@@ -275,6 +294,12 @@ export default function Survey() {
                 {chosenRole?.paymentLink ? (
                   <Button
                     href={chosenRole.paymentLink}
+                    onClick={() =>
+                      track("reserve_clicked", {
+                        role: chosenRole.slug,
+                        deposit: chosenRole.depositGBP,
+                      })
+                    }
                     className="w-full py-4 text-sm sm:w-auto sm:px-12"
                   >
                     Reserve my spot · £{chosenRole.depositGBP}
