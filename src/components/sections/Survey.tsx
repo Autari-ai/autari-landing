@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import SectionLabel from "@/components/ui/SectionLabel";
-import { SURVEY, roleByTitle } from "@/lib/constants";
+import SectionBg from "@/components/ui/SectionBg";
+import { SURVEY, bookACallHref } from "@/lib/constants";
 import { submitSurvey } from "@/lib/submitForm";
 import type { SurveyResponse } from "@/types";
 
@@ -106,32 +107,32 @@ export default function Survey() {
     setStatus("done");
   }
 
-  const chosenRole = roleByTitle(answers.role ?? "");
-
   return (
-    <section id="survey" className="bg-cream py-24 sm:py-32">
-      <div className="mx-auto max-w-2xl px-6">
+    <section id="survey" className="relative isolate py-24 sm:py-32">
+      <SectionBg src="/media/bg-survey.mp4" opacity={0.22} />
+      <div className="aurora opacity-30" />
+      <div className="relative z-10 mx-auto max-w-2xl px-6">
         <div className="text-center">
-          <SectionLabel>60-SECOND SURVEY</SectionLabel>
-          <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
-            Tell us what you need.
+          <SectionLabel className="justify-center">60-SECOND SURVEY</SectionLabel>
+          <h2 className="mt-5 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
+            Not ready to talk yet? Tell us what eats your time.
           </h2>
         </div>
 
-        <div className="mt-10 rounded-3xl bg-linen p-6 shadow-sm sm:p-10">
+        <div className="glass-strong mt-10 rounded-3xl p-6 sm:p-10">
           {status !== "done" && (
             <>
               {/* progress */}
               <div className="mb-8">
-                <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-[0.08em] text-bark/40">
+                <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-[0.08em] text-fga/40">
                   <span>
                     Question {Math.min(index + 1, total)} of {total}
                   </span>
                   <span>{progress}%</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-bark/10">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                   <motion.div
-                    className="h-full rounded-full bg-ember"
+                    className="h-full rounded-full bg-spark"
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.35, ease: "easeOut" }}
                   />
@@ -179,7 +180,7 @@ export default function Survey() {
                                 }
                                 placeholder="Tell us more. Type it here…"
                                 autoFocus
-                                className="w-full rounded-xl border border-bark/10 bg-cream px-4 py-3.5 text-bark placeholder:text-bark/30 transition-colors focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-fga placeholder:text-fga/30 transition-colors focus:border-spark focus:outline-none focus:ring-1 focus:ring-spark"
                               />
                               <Button
                                 onClick={submitOther}
@@ -264,63 +265,40 @@ export default function Survey() {
 
           {status === "done" && (
             <div className="py-8 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-ember/10">
-                <Check className="text-ember" size={28} />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-spark/15">
+                <Check className="text-spark" size={28} />
               </div>
-              <h3 className="mt-5 text-2xl font-bold tracking-[-0.02em]">
-                You’re on the list.
+              <h3 className="mt-5 font-display text-2xl font-bold tracking-[-0.02em] text-fga">
+                Got it. Let’s talk.
               </h3>
-              <p className="mx-auto mt-2 max-w-xs text-sm text-bark/60">
-                Lock in your{" "}
-                <strong className="text-bark">
-                  {chosenRole?.title ?? "AI employee"}
+              <p className="mx-auto mt-2 max-w-sm text-sm text-fga/60">
+                Book a quick call and we’ll walk through automating{" "}
+                <strong className="text-fga">
+                  {answers.role?.toLowerCase() ?? "your busywork"}
                 </strong>{" "}
-                as a founding customer.
+                for your business. Your answers come with you.
               </p>
 
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-                <span className="rounded-full bg-cream px-3 py-1 text-xs font-medium text-bark">
-                  £{chosenRole?.depositGBP} deposit
-                </span>
-                <span className="rounded-full bg-ember/10 px-3 py-1 text-xs font-medium text-ember">
-                  Fully refundable
-                </span>
-                <span className="rounded-full bg-cream px-3 py-1 text-xs font-medium text-bark/60">
-                  from £{chosenRole?.monthlyGBP}/mo
-                </span>
-              </div>
-
               <div className="mt-7">
-                {chosenRole?.paymentLink ? (
-                  <Button
-                    href={chosenRole.paymentLink}
-                    onClick={() =>
-                      track("reserve_clicked", {
-                        role: chosenRole.slug,
-                        deposit: chosenRole.depositGBP,
-                      })
-                    }
-                    className="w-full py-4 text-sm sm:w-auto sm:px-12"
-                  >
-                    Reserve my spot · £{chosenRole.depositGBP}
-                  </Button>
-                ) : (
-                  <p className="rounded-xl bg-cream px-4 py-3 text-sm text-bark/50">
-                    We’ll email you to lock in your spot.
-                  </p>
-                )}
-                <p className="mt-3 text-xs text-bark/40">
-                  No charge until you confirm at launch.
+                <Button
+                  href={bookACallHref(answers)}
+                  onClick={() => track("book_call_clicked", { from: "survey" })}
+                  className="w-full py-4 text-sm sm:w-auto sm:px-12"
+                >
+                  Book a call
+                </Button>
+                <p className="mt-3 text-xs text-fga/40">
+                  Free, no commitment.
                 </p>
               </div>
 
-              <p className="mt-8 text-[11px] text-bark/30">
+              <p className="mt-8 text-[11px] text-fga/30">
                 Autari Ltd · England &amp; Wales ·{" "}
                 <a
                   href="https://find-and-update.company-information.service.gov.uk/company/17105724"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-2 transition-colors hover:text-bark/60"
+                  className="underline underline-offset-2 transition-colors hover:text-fga/60"
                 >
                   no. 17105724
                 </a>
@@ -354,8 +332,8 @@ function OptionButton({
         center ? "text-center" : "text-left"
       } ${
         selected
-          ? "border-ember bg-ember text-cream"
-          : "border-bark/10 bg-cream text-bark hover:border-ember hover:bg-ember/5"
+          ? "border-spark bg-spark text-ink"
+          : "border-white/10 bg-white/[0.03] text-fga hover:border-spark/60 hover:bg-spark/10"
       } ${className}`}
     >
       {children}
