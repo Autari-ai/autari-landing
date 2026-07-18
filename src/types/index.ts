@@ -8,15 +8,18 @@ export interface SurveyQuestion {
   options?: string[];
 }
 
-export interface Role {
+/** An automation area shown as a service card + survey option. */
+export interface UseCase {
   slug: string;
   title: string;
-  /** Fully refundable deposit in GBP (example, set your real figure). */
-  depositGBP: number;
-  /** Example founder monthly price (starting point only). */
-  monthlyGBP: number;
-  /** Stripe Payment Link URL for this role's deposit. */
-  paymentLink: string;
+  blurb: string;
+  tools: string;
+}
+
+export interface Stat {
+  value: string;
+  unit?: string;
+  label: string;
 }
 
 export interface FAQItem {
@@ -30,5 +33,5 @@ export interface Step {
   description: string;
 }
 
-/** A completed survey: questionId -> answer, plus email + chosen role. */
+/** A completed survey: questionId -> answer, plus email. */
 export type SurveyResponse = Record<string, string>;

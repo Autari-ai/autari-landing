@@ -7,8 +7,9 @@ export default function SectionLabel({
 }) {
   return (
     <span
-      className={`inline-block text-[10px] sm:text-xs font-medium tracking-[0.08em] uppercase text-ember ${className}`}
+      className={`eyebrow inline-flex items-center gap-3 text-[10px] sm:text-[11px] text-spark ${className}`}
     >
+      <span className="h-px w-7 bg-gradient-to-r from-spark to-spark/10" />
       {children}
     </span>
   );

@@ -1,97 +1,142 @@
-import type { FAQItem, Step, Role, SurveyQuestion } from "@/types";
+import type { FAQItem, Step, UseCase, Stat, SurveyQuestion } from "@/types";
+
+export const BOOK_EMAIL = "noor@autari.co.uk";
+
+/** Build a pre-filled mailto for "Book a call". */
+export function bookACallHref(answers?: Record<string, string>): string {
+  const subject = "Book a call — Autari automation";
+  let body =
+    "Hi Autari,\n\nI'd like to book a call about automating some of our work.\n\n";
+  if (answers && Object.keys(answers).length) {
+    body += "A bit about us:\n";
+    const order = ["role", "firm", "size", "who", "hours", "cost", "pain", "tried", "trust"];
+    for (const k of order) {
+      if (answers[k]) body += `- ${k}: ${answers[k]}\n`;
+    }
+    body += "\n";
+  }
+  body += "Best,\n";
+  return `mailto:${BOOK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 export const NAV_LINKS = [
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "What we do", href: "#what-we-do" },
+  { label: "How it works", href: "#how-it-works" },
   { label: "FAQ", href: "#faq" },
 ];
 
 export const HERO = {
-  label: "AI EMPLOYEES · ALWAYS ON",
-  headline: "Hire work, not headcount.",
+  label: "AUTOMATION, DONE FOR YOU",
+  headline: "Get your time back.",
   subtext:
-    "Pick the role you need and your AI employee gets to work inside your tools. It does the job, posts its own updates, and only comes to you when it’s genuinely stuck. Like a junior teammate, at a fraction of the cost.",
-  cta: "Start the 60-second survey",
+    "We automate the repetitive work your business does every day, invoices, data entry, reports, chasing updates, so your team stops doing it by hand.",
+  cta: "Book a call",
   secondary: "See how it works",
 };
 
-export const STEPS: Step[] = [
-  {
-    number: 1,
-    title: "Tell us the role",
-    description:
-      "Take the 60-second survey. Tell us the role you need and the work you want off your plate, and we learn how your firm runs today.",
-  },
-  {
-    number: 2,
-    title: "We build it to your firm",
-    description:
-      "Your standards, your tools (Microsoft Teams + Jira to start), your rules. Founding customers shape it.",
-  },
-  {
-    number: 3,
-    title: "It starts working",
-    description:
-      "It does the job, posts its own updates, and @mentions the right person only when it’s blocked.",
-  },
+// Floating glass stat chips over the hero (t22 / t28 / t38).
+export const STATS: Stat[] = [
+  { value: "40+", unit: "hrs/mo", label: "handed back to your team" },
+  { value: "24/7", label: "runs on its own" },
+  { value: "0", label: "manual steps left for you" },
 ];
 
-// Roles drive the reserve step. depositGBP / monthlyGBP are EXAMPLE figures.
-// paymentLink: paste a Stripe Payment Link per role (Dashboard → Payment Links).
-export const ROLES: Role[] = [
+// Tools it works inside (marquee) — broadens us past any single field.
+export const TOOLS: string[] = [
+  "Microsoft Teams",
+  "Slack",
+  "Jira",
+  "Gmail",
+  "Google Sheets",
+  "QuickBooks",
+  "Xero",
+  "HubSpot",
+  "Notion",
+  "Outlook",
+];
+
+// The automation areas — the "What we do, across your business" grid.
+export const USE_CASES: UseCase[] = [
   {
-    slug: "draft-reviewer",
-    title: "AI Draft Reviewer / Draftsman (Engineering)",
-    depositGBP: 99,
-    monthlyGBP: 149,
-    paymentLink: "https://buy.stripe.com/bJe3cv1lvgzB2100fT4Vy00",
-  },
-  {
-    slug: "bookkeeper",
-    title: "AI Bookkeeper",
-    depositGBP: 99,
-    monthlyGBP: 99,
-    paymentLink: "https://buy.stripe.com/7sY9AT7JTabddJI1jX4Vy01",
+    slug: "finance",
+    title: "Finance & bookkeeping",
+    blurb: "Invoices, reconciliations, expense entry, and chasing late payments.",
+    tools: "QuickBooks · Xero · Sheets",
   },
   {
     slug: "support",
-    title: "AI Support Agent",
-    depositGBP: 99,
-    monthlyGBP: 99,
-    paymentLink: "https://buy.stripe.com/fZu00j0hr8354984w94Vy02",
+    title: "Customer support",
+    blurb: "First replies, ticket triage, FAQs, and following up so nothing slips.",
+    tools: "Gmail · Slack · Zendesk",
+  },
+  {
+    slug: "ops",
+    title: "Ops & admin",
+    blurb: "Data entry, scheduling, reporting, and the onboarding checklist.",
+    tools: "Sheets · Notion · Teams",
+  },
+  {
+    slug: "sales",
+    title: "Sales & CRM",
+    blurb: "Lead capture, keeping the CRM clean, follow-ups, and quotes.",
+    tools: "HubSpot · Gmail",
+  },
+  {
+    slug: "engineering",
+    title: "Engineering & docs",
+    blurb: "Draft review, drawing checks, and prepping documents.",
+    tools: "Jira · Teams",
   },
   {
     slug: "custom",
     title: "Something else",
-    depositGBP: 99,
-    monthlyGBP: 149,
-    paymentLink: "https://buy.stripe.com/4gM4gz6FP2ILcFE8Mp4Vy03",
+    blurb: "If your team repeats it every week, we can probably automate it.",
+    tools: "Your stack",
   },
 ];
 
-export function roleByTitle(title: string): Role | undefined {
-  return ROLES.find((r) => r.title === title) ?? ROLES.find((r) => r.slug === "custom");
-}
+export const STEPS: Step[] = [
+  {
+    number: 1,
+    title: "Tell us the process",
+    description:
+      "Book a call and walk us through the repetitive work you want gone. We learn how your business actually runs.",
+  },
+  {
+    number: 2,
+    title: "We build the automation",
+    description:
+      "Mapped to your tools and your rules. You see it working and sign off before it goes anywhere near your customers.",
+  },
+  {
+    number: 3,
+    title: "It runs on its own",
+    description:
+      "It handles the work day and night, and flags a person only when something genuinely needs a human decision.",
+  },
+];
 
-// One question per screen (conversational). Personal question (email) is last.
+// One question per screen (conversational). Field-agnostic. Email is last.
 export const SURVEY: SurveyQuestion[] = [
   {
     id: "role",
     kind: "single",
-    label: "Which AI employee would help your business most?",
-    help: "Pick the one that would take the most off your plate.",
-    options: ROLES.map((r) => r.title),
+    label: "What work would you love to stop doing by hand?",
+    help: "Pick the one that eats the most time.",
+    options: USE_CASES.map((u) => u.title),
   },
   {
     id: "firm",
     kind: "single",
     label: "What does your business do?",
     options: [
-      "Structural engineering",
-      "MEP / building services",
-      "Civil engineering",
-      "Architecture",
-      "Other engineering",
       "Agency / services",
+      "Professional services",
+      "E-commerce / retail",
+      "SaaS / tech",
+      "Construction / engineering",
+      "Healthcare",
+      "Finance",
       "Other",
     ],
   },
@@ -139,41 +184,41 @@ export const SURVEY: SurveyQuestion[] = [
   {
     id: "trust",
     kind: "single",
-    label: "Would you let an AI do it, with a human reviewing at first?",
+    label: "Happy for software to handle it, with a person checking at first?",
     options: ["Yes", "Maybe, need to see it", "No"],
   },
   {
     id: "email",
     kind: "email",
     label: "Where should we reach you?",
-    help: "We’ll only use this to follow up about your AI employee.",
+    help: "Only to follow up about automating your work.",
   },
 ];
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    question: "Is it built yet?",
+    question: "How does this start?",
     answer:
-      "It’s in early access. The role you reserve launches soon. We’re transparent: you’re a founding customer shaping it, and your deposit is fully refundable.",
+      "With a quick call. You show us the repetitive work you want gone, we scope it, then we build the automation for your business. You see it working before it goes live.",
   },
   {
     question: "Is my data safe?",
     answer:
-      "Each AI employee runs on its own, with access only to what you explicitly grant. Nothing more.",
+      "Each automation runs with access only to what you explicitly grant it, and nothing more.",
   },
   {
-    question: "How is this different from Copilot?",
+    question: "How is this different from buying software?",
     answer:
-      "Copilot is an assistant you have to drive. An autari employee owns a task end-to-end and only comes to you when it’s blocked.",
+      "Off-the-shelf tools make you do the setup and the work. We build the automation around your process and run it for you, done for you, not another dashboard to learn.",
   },
   {
     question: "What if it gets something wrong?",
     answer:
-      "Early on, a human reviews its output. It improves as it learns your standards.",
+      "At first a person reviews the output, and the automation flags anything that needs a human decision. It gets more hands-off as it earns your trust.",
   },
   {
-    question: "Can I cancel?",
+    question: "How much does it cost?",
     answer:
-      "Your deposit is fully refundable before launch. After launch it’s monthly, and you can cancel anytime.",
+      "It depends on the work involved, so we price it on the call once we understand the process. Booking a call costs nothing and there’s no commitment.",
   },
 ];

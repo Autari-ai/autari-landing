@@ -1,21 +1,30 @@
 @import "tailwindcss";
 
-/* Official autari brand palette (from the brand identity doc). */
+/* ------------------------------------------------------------------ */
+/* Autari — dark cinematic + green glow theme                          */
+/* ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #14181F;
-  --color-pine: #0E7C66;
-  --color-spark: #19D3A2;
-  --color-mist: #F5F7F6;
-  --color-fog: #E4E9E7;
+  /* Core palette */
+  --color-ink: #0B0E12;        /* page base (near-black)        */
+  --color-ink-800: #101722;    /* raised surface               */
+  --color-ink-700: #161d29;    /* card surface                 */
+  --color-pine: #0E7C66;       /* deep green                   */
+  --color-spark: #19D3A2;      /* bright green (primary accent) */
+  --color-mint: #5FF3C9;       /* bright tip / highlights      */
+  --color-violet: #7C5CFF;     /* secondary accent (sparingly) */
 
-  /* Aliases: keep the component class names but render them in brand colours. */
-  --color-bark: #14181F;        /* dark text / dark surfaces  -> Ink   */
-  --color-ember: #0E7C66;       /* primary accent / buttons   -> Pine  */
-  --color-terracotta: #19D3A2;  /* highlight                  -> Spark */
-  --color-cream: #F5F7F6;       /* primary light background   -> Mist  */
-  --color-linen: #E4E9E7;       /* cards / surfaces           -> Fog   */
+  /* Text */
+  --color-fga: #EAF2EF;        /* primary text                 */
 
-  /* Brand typography: Inter for body/UI, Space Grotesk for display/headings. */
+  /* Legacy aliases remapped to the dark palette so any not-yet-restyled
+     class (bg-cream, text-bark, bg-linen, bg-ember...) renders on-theme. */
+  --color-bark: #EAF2EF;       /* was dark text -> light text  */
+  --color-ember: #19D3A2;      /* accent -> spark              */
+  --color-terracotta: #19D3A2; /* highlight -> spark           */
+  --color-cream: #0B0E12;      /* light bg -> ink              */
+  --color-linen: #101722;      /* surface -> ink-800           */
+
+  /* Typography */
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
 }
@@ -23,14 +32,128 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  background: #0B0E12;
+  color-scheme: dark;
 }
 
-/* Headings use Space Grotesk per the brand identity. */
+body {
+  background: #0B0E12;
+  color: #EAF2EF;
+  overflow-x: hidden;
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 ::selection {
   background: #19D3A2;
-  color: #14181F;
+  color: #0B0E12;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reusable classes                                                    */
+/* ------------------------------------------------------------------ */
+
+/* Frosted glass surface (t21 / t28 / t22) */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+.glass-strong {
+  background: rgba(16, 23, 34, 0.72);
+  backdrop-filter: blur(24px) saturate(130%);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 24px 70px -24px rgba(0, 0, 0, 0.7);
+}
+.glass-hover {
+  transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.glass-hover:hover {
+  border-color: rgba(25, 211, 162, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 60px -10px rgba(25, 211, 162, 0.30),
+    0 24px 70px -24px rgba(0, 0, 0, 0.7);
+}
+
+/* Green glow helpers */
+.glow-green { box-shadow: 0 0 80px rgba(25, 211, 162, 0.25); }
+.text-glow { text-shadow: 0 0 40px rgba(25, 211, 162, 0.35); }
+
+/* Wide thin uppercase eyebrow (t08 / t21) */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-weight: 500;
+}
+
+/* Aurora background blobs (very slow drift) */
+.aurora {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 120%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(40% 40% at 20% 30%, rgba(14, 124, 102, 0.28), transparent 70%),
+    radial-gradient(38% 38% at 80% 20%, rgba(25, 211, 162, 0.20), transparent 70%),
+    radial-gradient(45% 45% at 60% 80%, rgba(124, 92, 255, 0.12), transparent 70%);
+  filter: blur(30px);
+  animation: aurora-drift 24s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  100% { transform: translate3d(2%, -3%, 0) scale(1.08); }
+}
+
+/* Film grain overlay (fixed, subtle) */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Radial "always-on" motion badge dots (t21) handled in component. */
+
+/* Marquee */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 34s linear infinite;
+}
+
+/* Ken Burns slow pan/zoom for still cinematic images */
+@keyframes kenburns {
+  0%   { transform: scale(1.05) translate3d(0, 0, 0); }
+  100% { transform: scale(1.14) translate3d(-1.5%, -1.5%, 0); }
+}
+.kenburns { animation: kenburns 26s ease-in-out infinite alternate; will-change: transform; }
+
+/* Floating micro-motion for chips/cards (OV / t38) */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(-0.6deg); }
+}
+.float-soft { animation: float-soft 7s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora, .marquee-track, .float-soft { animation: none !important; }
+  html { scroll-behavior: auto; }
 }

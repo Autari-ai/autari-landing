@@ -20,13 +20,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "autari | Hire work, not headcount",
+  title: "Autari — Get your time back",
   description:
-    "An AI employee for the role you need. It works in your tools, does the job, and only comes to you when it is genuinely stuck.",
+    "We automate the repetitive work your business does every day, so your team stops doing it by hand. Done-for-you business and workflow automation. Book a call.",
   openGraph: {
-    title: "autari | Hire work, not headcount",
+    title: "Autari — Get your time back",
     description:
-      "An AI employee for the role you need, built for your firm and working from day one.",
+      "We automate the repetitive work your business does every day, so your team stops doing it by hand.",
     url: "https://autari.co.uk",
     siteName: "autari",
     type: "website",
@@ -45,7 +45,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${inter.variable}`}
     >
-      <body className="font-sans text-bark bg-cream antialiased">
+      <body className="font-sans text-fga bg-ink antialiased grain">
         {children}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
