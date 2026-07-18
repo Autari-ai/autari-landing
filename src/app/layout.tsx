@@ -31,7 +31,13 @@ export const metadata: Metadata = {
     siteName: "autari",
     type: "website",
   },
-  icons: { icon: "/mark.png" },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   robots: { index: true, follow: true },
 };
 
