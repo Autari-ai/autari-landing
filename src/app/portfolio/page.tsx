@@ -135,32 +135,6 @@ const STATS = [
   { value: "10k+", label: "automated executions/day" },
 ];
 
-const SERVICES = [
-  {
-    icon: "⚡",
-    title: "ETL & Data Pipelines",
-    desc: "End-to-end ingestion, transformation, and reporting pipelines. PostgreSQL as system of record, Airflow for orchestration, integrated with accounting and operations APIs.",
-    tags: ["Python", "Airflow", "PostgreSQL", "Xero", "HMRC"],
-  },
-  {
-    icon: "🤖",
-    title: "AI Agents & Automation",
-    desc: "Multi-tenant agent services with persistent memory, MCP-based tool integration, and schema-grounded query planners that write and execute SQL from natural language.",
-    tags: ["CrewAI", "MCP", "FastAPI", "Python"],
-  },
-  {
-    icon: "🔌",
-    title: "Backend & API Systems",
-    desc: "Production-grade FastAPI backends with PostgreSQL, Redis, Docker, and CI/CD pipelines. Payroll modules, license servers, and high-throughput scraping systems.",
-    tags: ["FastAPI", "PostgreSQL", "Redis", "Docker", "Go"],
-  },
-  {
-    icon: "📊",
-    title: "Analytics & Reporting",
-    desc: "Grafana operational dashboards, Pandas/Seaborn analytics pipelines, and BI systems that turn raw platform data into actionable business reporting.",
-    tags: ["Grafana", "Pandas", "Matplotlib", "Seaborn"],
-  },
-];
 
 const ALL_WORK_CATEGORIES = [
   {
@@ -410,33 +384,6 @@ const PROJECTS = [
   },
 ];
 
-const SCREENSHOTS = [
-  {
-    src: "/media/portfolio/autari-portal-dashboard.png",
-    caption: "Autari customer portal — account & active device",
-    system: "Autari Web Portal",
-  },
-  {
-    src: "/media/portfolio/autari-portal-billing.png",
-    caption: "Billing — individual & org license purchase with invoice history",
-    system: "Autari Web Portal",
-  },
-  {
-    src: "/media/portfolio/autari-portal-admin.png",
-    caption: "Staff admin console — accounts table, license issue/revoke, seat management",
-    system: "Autari Web Portal",
-  },
-  {
-    src: "/media/portfolio/autari-portal-fulfill.png",
-    caption: "Fulfill a sale — org order creation with live license activation",
-    system: "Autari Web Portal",
-  },
-  {
-    src: "/media/portfolio/autari-ai-employee-abilities.png",
-    caption: "Autari AI employee — configurable abilities and per-role skill sets",
-    system: "Autari AI Employees",
-  },
-];
 
 const CERTS = [
   { name: "AI Engineer for Developers — Associate", issuer: "DataCamp", url: "https://www.datacamp.com/certificate/AIEDA0010363096562" },
