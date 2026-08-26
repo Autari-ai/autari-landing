@@ -189,7 +189,11 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "AI Agent Platforms",
     items: [
-      { name: "Jagent", desc: "Headless multi-tenant AI agent service. persistent memory, isolated per-session code execution, credential vault that keeps secrets out of the LLM context" },
+      {
+        name: "Jagent",
+        desc: "Ask it anything about your data. It queries the database, picks the right chart, and reports back in the chat. No dashboards to learn, no SQL to write.",
+        customComponent: "jagent-flow",
+      },
       { name: "MCP Host + Query Planner", desc: "MCP host (stdio + streamable-HTTP) and a schema-grounded query planner that turns natural language into a validated SQL/Python execution plan, runs it, and reports results in chat" },
       { name: "Auronexus", desc: "CrewAI-based visual agent orchestration platform for building and running AI employee workflows" },
       { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
@@ -499,6 +503,46 @@ function BigChangeXeroFlow() {
   );
 }
 
+const JAGENT_SCREENSHOTS = [
+  { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Jagent embedded in a live analytics dashboard — ask questions while looking at the data" },
+  { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Plain English question, structured table back — office locations and active staff counts from the database" },
+  { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Ask for charts, get charts — Jagent picks the right visualisation automatically" },
+  { src: "/media/portfolio/jagent/jagent-office-query.png", caption: "Drill into the data across turns — each answer cites the exact SQL source it used" },
+];
+
+function JagentFlow() {
+  const features = [
+    { label: "Natural language", flow: "Type a question, get a table or chart — no SQL needed" },
+    { label: "Persistent memory", flow: "Remembers context across turns in the same session" },
+    { label: "Credential vault", flow: "Secrets stay out of the LLM context entirely" },
+    { label: "MCP tools", flow: "Connects to any MCP server as a native tool" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">AI agent service</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="flex flex-col gap-2">
+        {features.map((f) => (
+          <div key={f.label} className="flex items-center gap-3 glass rounded-xl px-4 py-3">
+            <div className="shrink-0 w-32 flex items-center justify-center">
+              <span className="text-[10px] font-semibold text-spark/80">{f.label}</span>
+            </div>
+            <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0">
+              <line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/>
+              <polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.6)"/>
+            </svg>
+            <div className="text-[10px] text-fga/50 leading-snug flex-1">{f.flow}</div>
+          </div>
+        ))}
+      </div>
+      <Carousel images={JAGENT_SCREENSHOTS} />
+    </div>
+  );
+}
+
 const BIGCHANGE_SCREENSHOTS = [
   { src: "/media/portfolio/bigchange-xero/bigchange-tracking.webp", caption: "Live tracking: see every engineer on the map in real time" },
   { src: "/media/portfolio/bigchange-xero/bigchange-crm.png", caption: "Customer records: contact, location, and job history in one place" },
@@ -774,6 +818,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "invoice-po-flow" && (
                           <div className="p-4"><InvoicePOFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "jagent-flow" && (
+                          <div className="p-4"><JagentFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
