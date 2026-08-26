@@ -490,7 +490,7 @@ function APIPlatformsFlow() {
           <div key={p.label} className={`flex flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-3 h-16 ${p.bg}`}>
             {p.logo
               ? <img src={p.logo} alt={p.label} className={`${p.logoClass} object-contain max-h-8`} />
-              : <span className={`text-sm font-bold ${p.color}`}>{p.label}</span>}
+              : <span className="text-sm font-bold text-fga/70">{p.label}</span>}
           </div>
         ))}
       </div>
