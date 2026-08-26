@@ -162,6 +162,113 @@ const SERVICES = [
   },
 ];
 
+const ALL_WORK_CATEGORIES = [
+  {
+    title: "Telecom & ISP Systems",
+    items: [
+      { name: "ET System", desc: "Full DSL customer inquiry portal automation for a major Egyptian ISP — Python FastAPI backend, Go Windows tray proxy agent, React/TS frontend with 8 views, queue worker, smart discovery, proxy pool failover, session caching cut round-trips from 4 to 1" },
+    ],
+  },
+  {
+    title: "Field Service & Operations Automation",
+    items: [
+      { name: "BigChange + Xero ETL", desc: "Airflow pipeline integrating BigChange field service platform with Xero accounting — job, quote, invoice, and PO workflows end to end (Hybrid Solutions Group)" },
+      { name: "BigChange Automation Suite", desc: "Job scheduling, quoting, and invoicing automation for a UK field service company (Upwork)" },
+      { name: "OCR Document Pipeline", desc: "PyMuPDF, Tesseract, and OpenCV pipeline extracting structured data from scanned PDFs into the workflow (Hybrid Solutions Group)" },
+    ],
+  },
+  {
+    title: "Accounting & Finance Automation",
+    items: [
+      { name: "HMRC Payroll Module", desc: "FPS/CIS-compliant payroll submission system built on FastAPI + Docker (Jigsol Business Solutions)" },
+      { name: "Multi-Platform API Integrations", desc: "Automation across Xero, WFM, Glofox, Acorn, and JISR — replacing manual data entry and reporting for UK and international clients (Autari)" },
+      { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation (Hybrid Solutions Group)" },
+    ],
+  },
+  {
+    title: "AI Agent Platforms",
+    items: [
+      { name: "Jagent", desc: "Headless multi-tenant AI agent service — persistent memory, isolated per-session code execution, credential vault that keeps secrets out of the LLM context" },
+      { name: "MCP Host + Query Planner", desc: "MCP host (stdio + streamable-HTTP) and a schema-grounded query planner that turns natural language into a validated SQL/Python execution plan, runs it, and reports results in chat" },
+      { name: "Auronexus", desc: "CrewAI-based visual agent orchestration platform for building and running AI employee workflows" },
+      { name: "Autari Brain", desc: "AI query engine (MindsDB fork) — natural-language queries over connected data sources via HTTP and MySQL interfaces" },
+      { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram — approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
+    ],
+  },
+  {
+    title: "Developer & Engineering Tools",
+    items: [
+      { name: "claude-ops-bot", desc: "AI agent that converts Jira tickets into feature branches with resumable, AI-assisted review sessions and documented cutover/deploy runbooks" },
+      { name: "jigsolos_systemdeployer", desc: "Ansible-based deployment automation across production, staging, and testing environments on AWS Lightsail, with Grafana task monitoring" },
+      { name: "job-ops", desc: "DevOps principles applied to job hunting — a self-hosted pipeline to track, analyse, and assist the application process" },
+      { name: "OffensiveSET", desc: "MCP server for generating high-quality pentesting conversation datasets for LLM fine-tuning" },
+    ],
+  },
+  {
+    title: "Data & Analytics Platforms",
+    items: [
+      { name: "Cannabis Market Concentration", desc: "HHI market-concentration pipeline over California cannabis license and sales registries 2018–2024, ported from Stata to Python with Matplotlib/Seaborn visualisations" },
+      { name: "jigsolos_intelligence", desc: "Celery-backed analytics and intelligence service with its own REST API (Jigsol)" },
+      { name: "jigsolos_analytics", desc: "Python analytics service for Jigsol OS data" },
+      { name: "mda-analytics", desc: "Laravel/Vue management analytics dashboard" },
+      { name: "Jigsol OS ETL", desc: "End-to-end data ingestion, transformation, and reporting pipeline with PostgreSQL as system of record" },
+      { name: "E-commerce BI & Forecasting", desc: "Analytics reports, dashboards, predictive modelling on inventory and sales data, and automated demand-forecasting pipelines for e-commerce clients (Fiverr)" },
+      { name: "Stock Monitoring System", desc: "Automated stock monitoring across 20+ e-commerce stores" },
+      { name: "Image Data Pipeline", desc: "Excel-driven Google image search pipeline that filters and ranks results by resolution and colour" },
+    ],
+  },
+  {
+    title: "SaaS & Products (Autari)",
+    items: [
+      { name: "autari-landing", desc: "Next.js validation landing page with a conversational survey, Stripe refundable deposit flow, and Google Sheets capture — deployed at autari.co.uk" },
+      { name: "autari-web-portal", desc: "Customer + staff web portal — account dashboard, billing, device-locked license management, staff admin with fulfill/revoke/refund/seat-adjust flows" },
+      { name: "autari-license-server", desc: "License backend — seat management, device-locking, signed activation tokens, payments" },
+      { name: "autari-desktop", desc: "Tauri + React desktop app with per-device activation" },
+      { name: "autari-employee", desc: "Packaging, installer (NSIS), and backend sidecar for the desktop product" },
+    ],
+  },
+  {
+    title: "Consumer & Personal Tools",
+    items: [
+      { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions — fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
+      { name: "Game Pass Search", desc: "Desktop app syncing the Xbox Game Pass catalog into SQLite with on-device AI genre/tag classification and Steam-style faceted filters" },
+      { name: "Gig Radar", desc: "Upwork job intelligence tool — OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
+      { name: "FormForge", desc: "Desktop form filler for scanned paper templates — bulk generation from Excel, Arabic RTL + English in the same field box" },
+      { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
+      { name: "worldmonitor", desc: "Real-time global intelligence dashboard — AI-powered news aggregation and geopolitical monitoring" },
+      { name: "youtube-automation", desc: "YouTube channel and content automation system" },
+      { name: "metaai-api", desc: "FastAPI wrapper for Meta AI with chat, image generation, and video generation via cookie-based auth" },
+    ],
+  },
+  {
+    title: "PlayStation Platform",
+    items: [
+      { name: "PlayStation Backend + Frontend", desc: "Full-stack PlayStation platform — Node.js/JavaScript backend and frontend application" },
+    ],
+  },
+  {
+    title: "Cybersecurity & Reverse Engineering",
+    items: [
+      { name: "NoPhishyZeta", desc: "Phishing email scanner that uses an ML model to classify URLs and moves malicious emails to trash automatically" },
+      { name: "MalwareDB", desc: "Automated malware sample download, extraction, and SHA-256 hashing pipeline from Malware Bazaar with multithreading and multiprocessing" },
+      { name: "CVE-2018-15473 Exploit", desc: "Python exploit for the OpenSSH username enumeration vulnerability with threading and multiple export formats" },
+      { name: "CTF Writeups", desc: "Writeups for competitive Capture the Flag challenges — top 10 global ranking on CTFtime" },
+      { name: "CrackMe Writeups", desc: "Step-by-step reverse engineering solutions for CrackMe challenges (x86 ASM, C++)" },
+      { name: "Bug Hunting", desc: "Active security research on HackerOne across web applications and APIs" },
+    ],
+  },
+  {
+    title: "Infrastructure & Monitoring",
+    items: [
+      { name: "Grafana Dashboards", desc: "Operational monitoring dashboards for Jigsol OS (Celery tasks, system metrics) and Hybrid Solutions Group" },
+      { name: "GitHub Actions CI/CD", desc: "CI/CD pipelines set up across Jigsol services" },
+      { name: "Docker Containerisation", desc: "Multi-service Docker setup across the Jigsol OS platform" },
+      { name: "F5 VPN Container", desc: "Containerised F5 VPN setup" },
+      { name: "jigsolos_data", desc: "Third-party API integration layer and data contracts (TypeScript + PLpgSQL)" },
+    ],
+  },
+];
+
 const WORK = [
   {
     company: "Jigsol Business Solutions",
@@ -453,6 +560,39 @@ export default function PortfolioPage() {
                   <div className="p-4">
                     <div className="text-[10px] font-medium uppercase tracking-[0.1em] text-spark mb-1">{s.system}</div>
                     <p className="text-sm text-fga/60 leading-snug">{s.caption}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── All work by category ── */}
+        <section className="py-24 border-t border-white/8">
+          <div className="mx-auto max-w-6xl px-6">
+            <SectionLabel>Everything built</SectionLabel>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">All work, by system.</h2>
+            <div className="mt-12 flex flex-col gap-10">
+              {ALL_WORK_CATEGORIES.map((cat, ci) => (
+                <motion.div
+                  key={cat.title}
+                  custom={ci}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: "-40px" }}
+                  variants={fadeUp}
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-spark">{cat.title}</span>
+                    <span className="flex-1 h-px bg-gradient-to-r from-spark/30 to-transparent" />
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {cat.items.map((item) => (
+                      <div key={item.name} className="glass glass-hover rounded-xl px-5 py-4">
+                        <div className="text-sm font-semibold text-fga mb-1">{item.name}</div>
+                        <div className="text-xs leading-relaxed text-fga/50">{item.desc}</div>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               ))}
