@@ -174,7 +174,8 @@ const ALL_WORK_CATEGORIES = [
       },
       {
         name: "OCR Document Pipeline",
-        desc: "Scanned paper forms and PDFs go in, structured data comes out. Built for Hybrid Solutions Group to stop people from retyping information from documents by hand.",
+        desc: "Scanned paper forms and PDFs go in, structured data comes out. Built to stop people retyping information from documents by hand.",
+        customComponent: "ocr-flow",
       },
     ],
   },
@@ -463,6 +464,61 @@ const BIGCHANGE_SCREENSHOTS = [
   { src: "/media/portfolio/bigchange-xero/bigchange-alerts.png", caption: "Alerts: the system flags issues before anyone misses them" },
 ];
 
+const OCR_SCREENSHOTS = [
+  { src: "/media/portfolio/ocr/ocr-process.jpg", caption: "What the pipeline does: scanned documents and PDFs go in, structured data comes out" },
+];
+
+function OCRPipelineFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* Tool row */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full flex items-center justify-center bg-white/5 border border-white/10 rounded-lg px-2 py-2 h-12">
+            <img src="/media/portfolio/ocr/opencv-logo.png" alt="OpenCV" className="h-7 w-auto object-contain" />
+          </div>
+          <span className="text-[9px] text-fga/40">OpenCV</span>
+        </div>
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full flex items-center justify-center bg-white/5 border border-white/10 rounded-lg px-2 py-2 h-12">
+            <span className="text-sm font-bold text-fga/80">Tesseract</span>
+          </div>
+          <span className="text-[9px] text-fga/40">OCR engine</span>
+        </div>
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full flex items-center justify-center bg-white/5 border border-white/10 rounded-lg px-2 py-2 h-12">
+            <span className="text-sm font-bold text-fga/80">PyMuPDF</span>
+          </div>
+          <span className="text-[9px] text-fga/40">PDF parser</span>
+        </div>
+      </div>
+      {/* Flow: PDF → Read → Extract → Data */}
+      <div className="flex items-center gap-1">
+        {[
+          { icon: "📄", label: "PDF in" },
+          { icon: "🔍", label: "Read" },
+          { icon: "📝", label: "Extract" },
+          { icon: "🗄️", label: "Data out" },
+        ].map((s, i, arr) => (
+          <React.Fragment key={s.label}>
+            <div className="flex-1 flex flex-col items-center gap-0.5">
+              <span className="text-lg">{s.icon}</span>
+              <span className="text-[9px] text-fga/50">{s.label}</span>
+            </div>
+            {i < arr.length - 1 && (
+              <svg viewBox="0 0 14 10" width="14" height="10" className="shrink-0 mb-3">
+                <line x1="0" y1="5" x2="10" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5"/>
+                <polygon points="8,2 12,5 8,8" fill="rgba(25,211,162,0.4)"/>
+              </svg>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      <Carousel images={OCR_SCREENSHOTS} />
+    </div>
+  );
+}
+
 function BigChangeFlow() {
   return (
     <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
@@ -618,6 +674,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "bigchange-flow" && (
                           <div className="p-4"><BigChangeFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "ocr-flow" && (
+                          <div className="p-4"><OCRPipelineFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
