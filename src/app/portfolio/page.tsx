@@ -200,13 +200,6 @@ const ALL_WORK_CATEGORIES = [
       { name: "autari-desktop", desc: "Tauri + React desktop app with per-device activation" },
       { name: "autari-employee", desc: "Packaging, installer (NSIS), and backend sidecar for the desktop product" },
     ],
-    screenshots: [
-      { src: "/media/portfolio/autari-portal-dashboard.png", caption: "Customer portal — account & active device" },
-      { src: "/media/portfolio/autari-portal-billing.png", caption: "Billing — license purchase & invoice history" },
-      { src: "/media/portfolio/autari-portal-admin.png", caption: "Staff admin — accounts, license issue/revoke" },
-      { src: "/media/portfolio/autari-portal-fulfill.png", caption: "Fulfill a sale — org order with live activation" },
-      { src: "/media/portfolio/autari-ai-employee-abilities.png", caption: "AI employee — abilities & per-role skills" },
-    ],
   },
   {
     title: "Consumer & Personal Tools",
@@ -494,18 +487,6 @@ export default function PortfolioPage() {
                       </div>
                     ))}
                   </div>
-                  {"screenshots" in cat && Array.isArray(cat.screenshots) && (
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {(cat.screenshots as {src:string;caption:string}[]).map((s) => (
-                        <div key={s.src} className="glass rounded-xl overflow-hidden">
-                          <div className="relative w-full aspect-[16/10] bg-ink-800">
-                            <Image src={s.src} alt={s.caption} fill className="object-cover object-top" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
-                          </div>
-                          <p className="px-4 py-2.5 text-xs text-fga/50 leading-snug">{s.caption}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </motion.div>
               ))}
             </div>
