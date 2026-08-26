@@ -457,10 +457,10 @@ function BigChangeXeroFlow() {
 }
 
 const BIGCHANGE_SCREENSHOTS = [
-  { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "Job scheduling: every engineer, every job, in one view" },
-  { src: "/media/portfolio/bigchange-xero/bigchange-quotes.png", caption: "Quotes sent to customers without anyone typing them up" },
-  { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoice raised the moment a job is completed" },
-  { src: "/media/portfolio/bigchange-xero/bigchange-reporting.png", caption: "Reporting dashboard updated in real time" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-tracking.webp", caption: "Live tracking: see every engineer on the map in real time" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-crm.png", caption: "Customer records: contact, location, and job history in one place" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-sales.png", caption: "Sales pipeline: every opportunity tracked automatically" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-alerts.png", caption: "Alerts: the system flags issues before anyone misses them" },
 ];
 
 function BigChangeFlow() {
