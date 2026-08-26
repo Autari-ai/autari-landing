@@ -154,7 +154,6 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Accounting & Finance Automation",
     items: [
-      { name: "HMRC Payroll Module", desc: "FPS/CIS-compliant payroll submission system built on FastAPI + Docker (Jigsol Business Solutions)" },
       { name: "Multi-Platform API Integrations", desc: "Automation across Xero, WFM, Glofox, Acorn, and JISR — replacing manual data entry and reporting for UK and international clients (Autari)" },
       { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation (Hybrid Solutions Group)" },
     ],
