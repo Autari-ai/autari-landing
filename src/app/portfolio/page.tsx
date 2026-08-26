@@ -196,17 +196,7 @@ const ALL_WORK_CATEGORIES = [
       },
       { name: "MCP Host + Query Planner", desc: "You type a question. It reads the database schema, plans exactly which queries to run, runs them, and writes the answer back in the chat with charts if they help.", customComponent: "mcp-query-flow" },
       { name: "Auronexus", desc: "Give each AI agent a role and a channel. They pick up jobs, collaborate in chat, and get things done. No code to write, just define what each agent does.", customComponent: "auronexus-flow" },
-      { name: "Autari Brain", desc: "Connect your databases, spreadsheets, and APIs. Ask questions in plain English, get answers. Works over HTTP or MySQL, so any SQL tool can talk to it.", customComponent: "autari-brain-flow" },
       { name: "Gig Copilot", desc: "The AI drafts the artifact. You get a Telegram message with approve, revise, or reject buttons. Your GitHub activity gets turned into portfolio case studies automatically.", customComponent: "gig-copilot-flow" },
-    ],
-  },
-  {
-    title: "Developer & Engineering Tools",
-    items: [
-      { name: "claude-ops-bot", desc: "AI agent that converts Jira tickets into feature branches with resumable, AI-assisted review sessions and documented cutover/deploy runbooks" },
-      { name: "jigsolos_systemdeployer", desc: "Ansible-based deployment automation across production, staging, and testing environments on AWS Lightsail, with Grafana task monitoring" },
-      { name: "job-ops", desc: "DevOps principles applied to job hunting. a self-hosted pipeline to track, analyse, and assist the application process" },
-      { name: "OffensiveSET", desc: "MCP server for generating high-quality pentesting conversation datasets for LLM fine-tuning" },
     ],
   },
   {
