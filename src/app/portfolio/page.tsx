@@ -140,8 +140,9 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Telecom & ISP Systems",
     items: [
-      { name: "ET System", desc: "Full DSL customer inquiry portal automation for a major Egyptian ISP — Python FastAPI backend, Go Windows tray proxy agent, React/TS frontend with 8 views, queue worker, smart discovery, proxy pool failover, session caching cut round-trips from 4 to 1" },
+      { name: "ET System", desc: "Paste in a list of phone numbers, pick what you want to check, and come back when it is done. The system runs everything in the background, checking DSL availability, submitting leads, pulling line details, and running migration checks at scale. 2.4 million numbers processed at 99.7% success. Results download as Excel whenever you are ready. Each team gets their own workspace with their own credentials, and an admin controls who can access what." },
     ],
+    featured: "et-system",
   },
   {
     title: "Field Service & Operations Automation",
@@ -383,6 +384,18 @@ const CERTS = [
 /* Helpers                                                              */
 /* ------------------------------------------------------------------ */
 
+const ET_SCREENSHOTS = [
+  { src: "/media/portfolio/et-system/dashboard.png", caption: "Dashboard showing 2.4M numbers processed at 99.7% success" },
+  { src: "/media/portfolio/et-system/modules.png", caption: "Application modules with live success and error counts per task type" },
+  { src: "/media/portfolio/et-system/scrape.png", caption: "Scrape module — paste numbers, queue them, watch results live" },
+  { src: "/media/portfolio/et-system/lead-old.png", caption: "Lead submission module with queue controls and Excel export" },
+  { src: "/media/portfolio/et-system/proxy-pool.png", caption: "Proxy pool — residential agents route traffic through real local IPs" },
+  { src: "/media/portfolio/et-system/admin-users.png", caption: "Admin panel — user accounts with per-app access control" },
+  { src: "/media/portfolio/et-system/admin-access.png", caption: "Granular access configuration per user per application" },
+  { src: "/media/portfolio/et-system/applications.png", caption: "Applications list — each team runs their own isolated workspace" },
+  { src: "/media/portfolio/et-system/login.png", caption: "ET System login" },
+];
+
 function Tag({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center rounded-full border border-spark/20 bg-spark/8 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-spark">
@@ -479,6 +492,18 @@ export default function PortfolioPage() {
                       </div>
                     ))}
                   </div>
+                  {"featured" in cat && cat.featured === "et-system" && (
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {ET_SCREENSHOTS.map((s) => (
+                        <div key={s.src} className="glass rounded-xl overflow-hidden">
+                          <div className="relative w-full aspect-video bg-ink-800">
+                            <Image src={s.src} alt={s.caption} fill className="object-cover object-top" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                          </div>
+                          <p className="px-4 py-2.5 text-xs text-fga/50 leading-snug">{s.caption}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
