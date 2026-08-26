@@ -215,7 +215,7 @@ const ALL_WORK_CATEGORIES = [
       { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions. fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
       { name: "Game Pass Search", desc: "Browses the full Xbox Game Pass catalog of 600+ games with AI genre tags, color-coded theme filters, and tier badges. Runs offline, no API key needed.", customComponent: "gamepass-flow" },
       { name: "Gig Radar", desc: "Upwork job intelligence tool. OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
-      { name: "FormForge", desc: "Desktop form filler for scanned paper templates. bulk generation from Excel, Arabic RTL + English in the same field box" },
+      { name: "FormForge", desc: "Upload a scanned paper form, draw boxes over each field, and generate filled copies. Works for Arabic and English in the same form. Bulk-fill hundreds from an Excel sheet.", customComponent: "formforge-flow" },
       { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
       { name: "worldmonitor", desc: "Real-time global intelligence dashboard. AI-powered news aggregation and geopolitical monitoring" },
       { name: "youtube-automation", desc: "YouTube channel and content automation system" },
@@ -476,6 +476,38 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const FORMFORGE_SCREENSHOTS = [
+  { src: "/media/portfolio/formforge/demo.gif", caption: "FormForge filling a registration form: Full Name, Date of Birth with separate day/month/year cells, ID number cells, and gender checkboxes" },
+];
+
+function FormForgeFlow() {
+  const steps = [
+    { label: "Upload template", flow: "Scan or photograph the blank paper form" },
+    { label: "Draw field boxes", flow: "Click to place boxes over each field in the UI" },
+    { label: "Paste your data", flow: "Type one entry or load an Excel sheet for bulk" },
+    { label: "Get filled copies", flow: "Each row becomes a completed form, ready to print" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · Pillow · Arabic RTL + English</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="flex flex-col gap-2">
+        {steps.map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+            <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i + 1}</span>
+            <span className="text-[10px] font-semibold text-fga/70 w-28 shrink-0">{s.label}</span>
+            <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={FORMFORGE_SCREENSHOTS} />
     </div>
   );
 }
@@ -1086,6 +1118,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "gamepass-flow" && (
                           <div className="p-4"><GamepassFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "formforge-flow" && (
+                          <div className="p-4"><FormForgeFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
