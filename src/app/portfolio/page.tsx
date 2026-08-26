@@ -238,7 +238,7 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Infrastructure & Monitoring",
     items: [
-      { name: "Grafana Dashboards", desc: "Operational monitoring dashboards for Jigsol OS (Celery tasks, system metrics) and Hybrid Solutions Group" },
+      { name: "Grafana Dashboards", desc: "Production observability across every API integration: span rates, p95 latency, error rates, and distributed traces per service. Covers Xero, Glofox, JISR, and WorkflowMax pipelines live.", customComponent: "grafana-flow" },
       { name: "F5 VPN Container", desc: "Containerised F5 VPN setup" },
     ],
   },
@@ -476,6 +476,36 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const GRAFANA_SCREENSHOTS = [
+  { src: "/media/portfolio/grafana/grafana-013838.png", caption: "Dashboard library: Glofox, JISR, WorkflowMax, and Xero request pipelines with OTel traces and RED metrics" },
+  { src: "/media/portfolio/grafana/grafana-013848.png", caption: "Glofox pipeline: span rate, p95 latency, error rate, and live distributed traces" },
+  { src: "/media/portfolio/grafana/grafana-013857.png", caption: "Xero pipeline: API span rate by service, p95 duration per operation, error traces" },
+  { src: "/media/portfolio/grafana/grafana-013914.png", caption: "Service RED metrics: rate, errors, and latency across all Jigsol OS services" },
+  { src: "/media/portfolio/grafana/grafana-013924.png", caption: "Infrastructure hosts: system-level metrics across production servers" },
+];
+
+function GrafanaFlow() {
+  const services = ["Xero", "Glofox", "JISR", "WorkflowMax", "PostgreSQL", "Infra"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Grafana · OpenTelemetry · RED metrics</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {services.map((s) => (
+          <div key={s} className="glass rounded-xl px-3 py-2 flex items-center gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-spark/70 shrink-0" />
+            <span className="text-[10px] font-semibold text-fga/70">{s}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={GRAFANA_SCREENSHOTS} />
     </div>
   );
 }
@@ -1121,6 +1151,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "formforge-flow" && (
                           <div className="p-4"><FormForgeFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "grafana-flow" && (
+                          <div className="p-4"><GrafanaFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
