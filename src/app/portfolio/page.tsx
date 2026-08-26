@@ -213,7 +213,7 @@ const ALL_WORK_CATEGORIES = [
     title: "Consumer & Personal Tools",
     items: [
       { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions. fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
-      { name: "Game Pass Search", desc: "Desktop app syncing the Xbox Game Pass catalog into SQLite with on-device AI genre/tag classification and Steam-style faceted filters" },
+      { name: "Game Pass Search", desc: "Browses the full Xbox Game Pass catalog of 600+ games with AI genre tags, color-coded theme filters, and tier badges. Runs offline, no API key needed.", customComponent: "gamepass-flow" },
       { name: "Gig Radar", desc: "Upwork job intelligence tool. OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
       { name: "FormForge", desc: "Desktop form filler for scanned paper templates. bulk generation from Excel, Arabic RTL + English in the same field box" },
       { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
@@ -476,6 +476,33 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const GAMEPASS_SCREENSHOTS = [
+  { src: "/media/portfolio/gamepass/demo.gif", caption: "Full catalog browser: 626 games, genre filters, tier badges, live counts" },
+  { src: "/media/portfolio/gamepass/screenshot-browse.png", caption: "Browse view: AI-classified genre and theme tags, paginated grid with artwork" },
+  { src: "/media/portfolio/gamepass/screenshot-filter.png", caption: "Faceted filtering: include or exclude genres and themes simultaneously" },
+  { src: "/media/portfolio/gamepass/screenshot-modal.png", caption: "Game detail: full description, tags, and tier information" },
+];
+
+function GamepassFlow() {
+  const tech = ["Electron", "React", "SQLite", "Transformers.js", "Xbox API"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <img src="/media/portfolio/gamepass/icon.svg" alt="Game Pass" className="h-8 w-8 object-contain" />
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Desktop · Offline · 600+ games</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {tech.map((t) => (
+          <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>
+        ))}
+      </div>
+      <Carousel images={GAMEPASS_SCREENSHOTS} />
     </div>
   );
 }
@@ -1056,6 +1083,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "ps-platform-flow" && (
                           <div className="p-4"><PSPlatformFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "gamepass-flow" && (
+                          <div className="p-4"><GamepassFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
