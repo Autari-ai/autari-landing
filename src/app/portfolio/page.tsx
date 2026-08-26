@@ -470,6 +470,11 @@ const OCR_SCREENSHOTS = [
   { src: "/media/portfolio/ocr/ocr-process.jpg", caption: "The pipeline: scanned documents and PDFs go in, text and database records come out" },
 ];
 
+const API_SCREENSHOTS = [
+  { src: "/media/portfolio/api-integrations/automation-trigger-action.jpg", caption: "Every integration follows the same logic: something happens in one system, something happens automatically in another" },
+  { src: "/media/portfolio/api-integrations/automation-outline.jpg", caption: "The workflow before we automate it — people filling in blanks by hand. After: nothing to fill in." },
+];
+
 function APIPlatformsFlow() {
   const platforms = [
     { label: "Xero", logo: "/media/portfolio/api-integrations/xero.svg", bg: "#fff", flow: "Invoices, bills, POs sync automatically" },
@@ -492,16 +497,13 @@ function APIPlatformsFlow() {
       <div className="flex flex-col gap-2">
         {platforms.map((p) => (
           <div key={p.label} className="flex items-center gap-3 glass rounded-xl px-4 py-3">
-            {/* Logo */}
             <div className="shrink-0 w-20 h-9 flex items-center justify-center rounded-lg px-2" style={{ background: p.bg }}>
               <img src={p.logo} alt={p.label} className="max-h-6 w-auto object-contain" />
             </div>
-            {/* Arrow */}
             <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0">
               <line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/>
               <polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.6)"/>
             </svg>
-            {/* What flows */}
             <div className="flex-1 min-w-0">
               <div className="text-[10px] font-semibold text-fga/70 mb-0.5">{p.label}</div>
               <div className="text-[10px] text-fga/40 leading-snug">{p.flow}</div>
@@ -509,6 +511,9 @@ function APIPlatformsFlow() {
           </div>
         ))}
       </div>
+
+      {/* Automation concept carousel */}
+      <Carousel images={API_SCREENSHOTS} />
     </div>
   );
 }
