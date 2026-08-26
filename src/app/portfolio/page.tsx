@@ -225,7 +225,7 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "PlayStation Platform",
     items: [
-      { name: "PlayStation Backend + Frontend", desc: "Full-stack PlayStation platform. Node.js/JavaScript backend and frontend application" },
+      { name: "PlayStation Cafe Manager", desc: "Full management system for a PlayStation gaming cafe. Book rooms, track sessions with live timers, manage PS4/PS5 devices, run a kitchen, handle stock, and generate daily financial reports. Arabic RTL interface.", customComponent: "ps-platform-flow" },
     ],
   },
   {
@@ -476,6 +476,48 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const PS_SCREENSHOTS = [
+  { src: "/media/portfolio/ps-platform/ps-012448.png", caption: "Rooms: live session timers, single and multiplayer modes, device selector per room" },
+  { src: "/media/portfolio/ps-platform/ps-012504.png", caption: "Devices: PS4 and PS5 inventory with per-room assignment and pricing" },
+  { src: "/media/portfolio/ps-platform/ps-012510.png", caption: "Kitchen: menu items with quantities and prices, PDF print button" },
+  { src: "/media/portfolio/ps-platform/ps-012456.png", caption: "Store: invoice creation with food and drinks added per session" },
+  { src: "/media/portfolio/ps-platform/ps-012539.png", caption: "Reports: daily financial summary with discounts and net profit" },
+  { src: "/media/portfolio/ps-platform/ps-012602.png", caption: "Stock: warehouse inventory management with original vs current price" },
+  { src: "/media/portfolio/ps-platform/ps-012515.png", caption: "Accounting panel" },
+  { src: "/media/portfolio/ps-platform/ps-012522.png", caption: "Expenses tracking" },
+  { src: "/media/portfolio/ps-platform/ps-012556.png", caption: "Invoices list" },
+  { src: "/media/portfolio/ps-platform/ps-012609.png", caption: "Admin dashboard" },
+];
+
+function PSPlatformFlow() {
+  const modules = [
+    { ar: "الغرف", en: "Rooms" },
+    { ar: "الأجهزة", en: "Devices" },
+    { ar: "المطبخ", en: "Kitchen" },
+    { ar: "المخزن", en: "Stock" },
+    { ar: "التقارير", en: "Reports" },
+    { ar: "الفواتير", en: "Invoices" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Arabic RTL · Node.js + JavaScript</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {modules.map((m) => (
+          <div key={m.en} className="glass rounded-xl px-3 py-2.5 flex flex-col items-end gap-0.5">
+            <span className="text-sm font-bold text-fga/80">{m.ar}</span>
+            <span className="text-[9px] text-fga/40">{m.en}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={PS_SCREENSHOTS} />
     </div>
   );
 }
@@ -1011,6 +1053,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "autari-brain-flow" && (
                           <div className="p-4"><AutariBrainFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "ps-platform-flow" && (
+                          <div className="p-4"><PSPlatformFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
