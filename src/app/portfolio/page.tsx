@@ -182,7 +182,7 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Accounting & Finance Automation",
     items: [
-      { name: "Multi-Platform API Integrations", desc: "Automation across Xero, WFM, Glofox, Acorn, and JISR. replacing manual data entry and reporting for UK and international clients (Autari)" },
+      { name: "Multi-Platform API Integrations", desc: "Xero, WorkflowMax, Glofox, Acorn, and JISR all connected. Every piece of data that used to be moved by hand between systems now moves on its own.", customComponent: "api-platforms" },
       { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation (Hybrid Solutions Group)" },
     ],
   },
@@ -470,6 +470,50 @@ const OCR_SCREENSHOTS = [
   { src: "/media/portfolio/ocr/ocr-process.jpg", caption: "The pipeline: scanned documents and PDFs go in, text and database records come out" },
 ];
 
+const API_SCREENSHOTS = [
+  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero: accounting dashboard fed automatically from client operations" },
+  { src: "/media/portfolio/bigchange-xero/xero-po-create.svg", caption: "Xero: purchase orders created and synced without manual entry" },
+];
+
+function APIPlatformsFlow() {
+  const platforms = [
+    { label: "Xero", logo: "/media/portfolio/api-integrations/xero.svg", bg: "bg-white", logoClass: "h-6 w-auto" },
+    { label: "WorkflowMax", logo: "/media/portfolio/api-integrations/wfm.svg", bg: "bg-[#0A2F28]", logoClass: "h-5 w-auto" },
+    { label: "Glofox", logo: "/media/portfolio/api-integrations/glofox.svg", bg: "bg-[#0d0d1a]", logoClass: "h-5 w-auto" },
+    { label: "Acorn", logo: "/media/portfolio/api-integrations/acorn.svg", bg: "bg-[#1a1a1a]", logoClass: "h-5 w-auto" },
+    { label: "JISR", logo: "/media/portfolio/api-integrations/jisr.webp", bg: "bg-[#1B2B5C]", logoClass: "h-5 w-auto" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="grid grid-cols-5 gap-2">
+        {platforms.map((p) => (
+          <div key={p.label} className={`flex flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-3 h-16 ${p.bg}`}>
+            {p.logo
+              ? <img src={p.logo} alt={p.label} className={`${p.logoClass} object-contain max-h-8`} />
+              : <span className={`text-sm font-bold ${p.color}`}>{p.label}</span>}
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-1.5">
+        {platforms.map((p, i) => (
+          <React.Fragment key={p.label}>
+            <div className="flex-1 text-center">
+              <span className="text-[9px] text-fga/40 font-medium">{p.label}</span>
+            </div>
+            {i < platforms.length - 1 && (
+              <svg viewBox="0 0 10 8" width="10" height="8" className="shrink-0">
+                <line x1="0" y1="4" x2="7" y2="4" stroke="rgba(25,211,162,0.35)" strokeWidth="1.5"/>
+                <polygon points="5,1.5 8,4 5,6.5" fill="rgba(25,211,162,0.35)"/>
+              </svg>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      <Carousel images={API_SCREENSHOTS} />
+    </div>
+  );
+}
+
 function OCRPipelineFlow() {
   return (
     <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
@@ -571,8 +615,8 @@ function Carousel({ images }: { images: { src: string; caption: string }[] }) {
         ))}
       </div>
       {images[idx].caption && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink/80 to-transparent px-4 pb-10 pt-6 pointer-events-none">
-          <p className="text-xs text-fga/70">{images[idx].caption}</p>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-9 pt-8 pointer-events-none">
+          <p className="text-xs text-white font-medium drop-shadow-sm">{images[idx].caption}</p>
         </div>
       )}
     </div>
@@ -678,6 +722,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "ocr-flow" && (
                           <div className="p-4"><OCRPipelineFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "api-platforms" && (
+                          <div className="p-4"><APIPlatformsFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
