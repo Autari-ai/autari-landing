@@ -226,6 +226,13 @@ const ALL_WORK_CATEGORIES = [
       { name: "autari-desktop", desc: "Tauri + React desktop app with per-device activation" },
       { name: "autari-employee", desc: "Packaging, installer (NSIS), and backend sidecar for the desktop product" },
     ],
+    screenshots: [
+      { src: "/media/portfolio/autari-portal-dashboard.png", caption: "Customer portal — account & active device" },
+      { src: "/media/portfolio/autari-portal-billing.png", caption: "Billing — license purchase & invoice history" },
+      { src: "/media/portfolio/autari-portal-admin.png", caption: "Staff admin — accounts, license issue/revoke" },
+      { src: "/media/portfolio/autari-portal-fulfill.png", caption: "Fulfill a sale — org order with live activation" },
+      { src: "/media/portfolio/autari-ai-employee-abilities.png", caption: "AI employee — abilities & per-role skills" },
+    ],
   },
   {
     title: "Consumer & Personal Tools",
@@ -512,66 +519,12 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* ── Services ── */}
-        <section className="py-24">
-          <div className="mx-auto max-w-6xl px-6">
-            <SectionLabel>What Autari builds</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Four areas, one result.</h2>
-            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {SERVICES.map((s, i) => (
-                <motion.div
-                  key={s.title} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
-                  className="glass glass-hover rounded-2xl p-6 flex flex-col gap-4"
-                >
-                  <span className="text-3xl">{s.icon}</span>
-                  <div>
-                    <h3 className="font-display text-base font-semibold text-fga">{s.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-fga/55">{s.desc}</p>
-                  </div>
-                  <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-                    {s.tags.map((t) => <Tag key={t} label={t} />)}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Screenshots ── */}
-        <section className="py-24 border-t border-white/8">
-          <div className="mx-auto max-w-6xl px-6">
-            <SectionLabel>System screenshots</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Real products, shipped.</h2>
-            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {SCREENSHOTS.map((s, i) => (
-                <motion.div
-                  key={s.src} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
-                  className="glass glass-hover rounded-2xl overflow-hidden flex flex-col"
-                >
-                  <div className="relative w-full aspect-[16/10] bg-ink-800 overflow-hidden">
-                    <Image
-                      src={s.src}
-                      alt={s.caption}
-                      fill
-                      className="object-cover object-top"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="text-[10px] font-medium uppercase tracking-[0.1em] text-spark mb-1">{s.system}</div>
-                    <p className="text-sm text-fga/60 leading-snug">{s.caption}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Screenshots moved into All Work section */}
 
         {/* ── All work by category ── */}
         <section className="py-24 border-t border-white/8">
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>Everything built</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">All work, by system.</h2>
             <div className="mt-12 flex flex-col gap-10">
               {ALL_WORK_CATEGORIES.map((cat, ci) => (
                 <motion.div
@@ -594,6 +547,18 @@ export default function PortfolioPage() {
                       </div>
                     ))}
                   </div>
+                  {"screenshots" in cat && Array.isArray(cat.screenshots) && (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {(cat.screenshots as {src:string;caption:string}[]).map((s) => (
+                        <div key={s.src} className="glass rounded-xl overflow-hidden">
+                          <div className="relative w-full aspect-[16/10] bg-ink-800">
+                            <Image src={s.src} alt={s.caption} fill className="object-cover object-top" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                          </div>
+                          <p className="px-4 py-2.5 text-xs text-fga/50 leading-snug">{s.caption}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
