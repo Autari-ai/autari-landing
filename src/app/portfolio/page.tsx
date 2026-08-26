@@ -183,7 +183,7 @@ const ALL_WORK_CATEGORIES = [
     title: "Accounting & Finance Automation",
     items: [
       { name: "Multi-Platform API Integrations", desc: "Xero, WorkflowMax, Glofox, Acorn, and JISR all connected. Every piece of data that used to be moved by hand between systems now moves on its own.", customComponent: "api-platforms" },
-      { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation. Jobs complete, invoices go out, POs get raised, all without anyone triggering it manually." },
+      { name: "Invoice, PO & Quote Automation", desc: "Jobs complete, invoices go out. POs get raised. Quotes get sent. All without anyone triggering it manually.", customComponent: "invoice-po-flow" },
     ],
   },
   {
@@ -419,6 +419,48 @@ const XERO_SCREENSHOTS = [
   { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero: accounting dashboard updated automatically" },
   { src: "/media/portfolio/bigchange-xero/xero-po-create.svg", caption: "Xero: purchase orders created and tracked" },
 ];
+
+const INVOICE_SCREENSHOTS = [
+  { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoice raised automatically in BigChange when the job is marked complete" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-quotes.png", caption: "Quote generated and sent without anyone typing it up" },
+  { src: "/media/portfolio/bigchange-xero/xero-po-create.svg", caption: "Purchase order created and tracked in Xero without manual entry" },
+  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero accounting dashboard updated in real time as jobs complete" },
+];
+
+function InvoicePOFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* Two logos: BigChange → Xero */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full flex items-center justify-center bg-[#003B6B] rounded-lg px-3 py-2 h-12">
+            <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-6 w-auto object-contain" />
+          </div>
+          <span className="text-[9px] text-fga/40">Field service</span>
+        </div>
+        <svg viewBox="0 0 40 12" width="40" height="12" className="shrink-0">
+          <line x1="0" y1="6" x2="32" y2="6" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/>
+          <polygon points="30,3 36,6 30,9" fill="rgba(25,211,162,0.6)"/>
+        </svg>
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full flex items-center justify-center bg-white rounded-lg px-3 py-2 h-12">
+            <img src="/media/portfolio/bigchange-xero/xero.svg" alt="Xero" className="h-6 w-auto object-contain" />
+          </div>
+          <span className="text-[9px] text-fga/40">Accounting</span>
+        </div>
+      </div>
+      {/* What flows */}
+      <div className="grid grid-cols-3 gap-2">
+        {["Quotes", "Invoices", "POs"].map((label) => (
+          <div key={label} className="flex items-center justify-center glass rounded-lg py-2.5 px-2">
+            <span className="text-[11px] font-semibold text-fga/70">{label}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={INVOICE_SCREENSHOTS} />
+    </div>
+  );
+}
 
 function BigChangeXeroFlow() {
   return (
@@ -729,6 +771,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "api-platforms" && (
                           <div className="p-4"><APIPlatformsFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "invoice-po-flow" && (
+                          <div className="p-4"><InvoicePOFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
