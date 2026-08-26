@@ -411,10 +411,11 @@ const CERTS = [
 
 
 const XERO_SCREENSHOTS = [
-  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero dashboard. financials at a glance" },
-  { src: "/media/portfolio/bigchange-xero/xero-invoicing.jpg", caption: "Invoicing. sent automatically from job completion" },
-  { src: "/media/portfolio/bigchange-xero/xero-pos.jpg", caption: "Purchase orders. raised and tracked without manual entry" },
-  { src: "/media/portfolio/bigchange-xero/xero-bills.jpg", caption: "Bills. reconciled automatically" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "BigChange: job scheduling and field team dispatch" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "BigChange: invoices generated automatically after job completion" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-quotes.png", caption: "BigChange: quotes created and sent without manual entry" },
+  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero: accounting dashboard updated automatically" },
+  { src: "/media/portfolio/bigchange-xero/xero-po-create.svg", caption: "Xero: purchase orders created and tracked" },
 ];
 
 function BigChangeXeroFlow() {
