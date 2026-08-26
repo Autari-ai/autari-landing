@@ -197,7 +197,7 @@ const ALL_WORK_CATEGORIES = [
       { name: "MCP Host + Query Planner", desc: "You type a question. It reads the database schema, plans exactly which queries to run, runs them, and writes the answer back in the chat with charts if they help.", customComponent: "mcp-query-flow" },
       { name: "Auronexus", desc: "Give each AI agent a role and a channel. They pick up jobs, collaborate in chat, and get things done. No code to write, just define what each agent does.", customComponent: "auronexus-flow" },
       { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
-      { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram. approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
+      { name: "Gig Copilot", desc: "The AI drafts the artifact. You get a Telegram message with approve, revise, or reject buttons. Your GitHub activity gets turned into portfolio case studies automatically.", customComponent: "gig-copilot-flow" },
     ],
   },
   {
@@ -499,6 +499,58 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const GIG_COPILOT_SCREENSHOTS = [
+  { src: "/media/portfolio/gig-copilot/telegram-inline-keyboard.png", caption: "Approve, revise, or reject — one tap in Telegram decides what happens to the draft" },
+  { src: "/media/portfolio/gig-copilot/telegram-bot-interface.png", caption: "The bot sends the artifact, you reply. No dashboards, no logins, just Telegram" },
+];
+
+function GigCopilotFlow() {
+  const stack = [
+    { label: "Telegram", logo: "/media/portfolio/gig-copilot/telegram.svg", bg: "#0088CC20", border: "#0088CC40", desc: "Review interface" },
+    { label: "GitHub", logo: "/media/portfolio/gig-copilot/github.svg", bg: "#ffffff10", border: "#ffffff25", desc: "Activity watcher" },
+    { label: "FastAPI", logo: "/media/portfolio/gig-copilot/fastapi.svg", bg: "#00968820", border: "#00968840", desc: "Backend & queue" },
+  ];
+  const steps = [
+    { label: "GitHub activity detected", flow: "New commit, PR, or push triggers the watcher" },
+    { label: "AI drafts the artifact", flow: "Case study, summary, or task written automatically" },
+    { label: "You get a Telegram message", flow: "Approve keeps it. Revise sends feedback. Reject drops it." },
+    { label: "Approved artifacts saved", flow: "Land in SQLite, ready to use or publish" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        {stack.map((s, i) => (
+          <React.Fragment key={s.label}>
+            <div className="flex-1 flex flex-col items-center gap-1">
+              <div className="w-full flex items-center justify-center gap-2 rounded-lg px-2 py-2 h-12" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
+                <img src={s.logo} alt={s.label} className="h-5 w-5 object-contain" />
+                <span className="text-[10px] font-semibold text-fga/70">{s.label}</span>
+              </div>
+              <span className="text-[9px] text-fga/40">{s.desc}</span>
+            </div>
+            {i < stack.length - 1 && (
+              <svg viewBox="0 0 16 10" width="16" height="10" className="shrink-0 mb-3">
+                <line x1="0" y1="5" x2="12" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="3 2"/>
+                <polygon points="10,2 14,5 10,8" fill="rgba(25,211,162,0.4)"/>
+              </svg>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
+        {steps.map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+            <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i + 1}</span>
+            <span className="text-[10px] font-semibold text-fga/70 w-36 shrink-0">{s.label}</span>
+            <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={GIG_COPILOT_SCREENSHOTS} />
     </div>
   );
 }
@@ -929,6 +981,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "auronexus-flow" && (
                           <div className="p-4"><AuronexusFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "gig-copilot-flow" && (
+                          <div className="p-4"><GigCopilotFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
