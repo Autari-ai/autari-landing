@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
@@ -140,9 +141,22 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Telecom & ISP Systems",
     items: [
-      { name: "ET System", desc: "Paste in a list of phone numbers, pick what you want to check, and come back when it is done. The system runs everything in the background, checking DSL availability, submitting leads, pulling line details, and running migration checks at scale. 2.4 million numbers processed at 99.7% success. Results download as Excel whenever you are ready. Each team gets their own workspace with their own credentials, and an admin controls who can access what." },
+      {
+        name: "DSL Manager",
+        desc: "Automation tool for DSL teams. Paste numbers, pick the task, come back to results. 2.4 million numbers processed at 99.7% success.",
+        images: [
+          { src: "/media/portfolio/et-system/dashboard.png", caption: "2.4M numbers processed, 99.7% success rate" },
+          { src: "/media/portfolio/et-system/modules.png", caption: "Task modules with live counts" },
+          { src: "/media/portfolio/et-system/scrape.png", caption: "Queue numbers and watch results live" },
+          { src: "/media/portfolio/et-system/lead-old.png", caption: "Lead submission with Excel export" },
+          { src: "/media/portfolio/et-system/proxy-pool.png", caption: "Residential proxy pool management" },
+          { src: "/media/portfolio/et-system/admin-users.png", caption: "User and access management" },
+          { src: "/media/portfolio/et-system/admin-access.png", caption: "Per-user per-app access control" },
+          { src: "/media/portfolio/et-system/applications.png", caption: "Isolated workspaces per team" },
+          { src: "/media/portfolio/et-system/login.png", caption: "Login" },
+        ],
+      },
     ],
-    featured: "et-system",
   },
   {
     title: "Field Service & Operations Automation",
@@ -384,17 +398,37 @@ const CERTS = [
 /* Helpers                                                              */
 /* ------------------------------------------------------------------ */
 
-const ET_SCREENSHOTS = [
-  { src: "/media/portfolio/et-system/dashboard.png", caption: "Dashboard showing 2.4M numbers processed at 99.7% success" },
-  { src: "/media/portfolio/et-system/modules.png", caption: "Application modules with live success and error counts per task type" },
-  { src: "/media/portfolio/et-system/scrape.png", caption: "Scrape module — paste numbers, queue them, watch results live" },
-  { src: "/media/portfolio/et-system/lead-old.png", caption: "Lead submission module with queue controls and Excel export" },
-  { src: "/media/portfolio/et-system/proxy-pool.png", caption: "Proxy pool — residential agents route traffic through real local IPs" },
-  { src: "/media/portfolio/et-system/admin-users.png", caption: "Admin panel — user accounts with per-app access control" },
-  { src: "/media/portfolio/et-system/admin-access.png", caption: "Granular access configuration per user per application" },
-  { src: "/media/portfolio/et-system/applications.png", caption: "Applications list — each team runs their own isolated workspace" },
-  { src: "/media/portfolio/et-system/login.png", caption: "ET System login" },
-];
+
+function Carousel({ images }: { images: { src: string; caption: string }[] }) {
+  const [idx, setIdx] = React.useState(0);
+  const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIdx((i) => (i + 1) % images.length);
+  return (
+    <div className="relative w-full overflow-hidden rounded-xl bg-ink-800 aspect-video">
+      {images.map((img, i) => (
+        <div key={img.src} className={`absolute inset-0 transition-opacity duration-300 ${i === idx ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+          <Image src={img.src} alt={img.caption} fill className="object-cover object-top" sizes="100vw" />
+        </div>
+      ))}
+      <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+        {images.map((_, i) => (
+          <button key={i} onClick={() => setIdx(i)} className={`h-1.5 rounded-full transition-all duration-200 ${i === idx ? "w-5 bg-spark" : "w-1.5 bg-white/30"}`} />
+        ))}
+      </div>
+      {images[idx].caption && (
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink/80 to-transparent px-4 pb-10 pt-6 pointer-events-none">
+          <p className="text-xs text-fga/70">{images[idx].caption}</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Tag({ label }: { label: string }) {
   return (
@@ -484,26 +518,19 @@ export default function PortfolioPage() {
                     <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-spark">{cat.title}</span>
                     <span className="flex-1 h-px bg-gradient-to-r from-spark/30 to-transparent" />
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {cat.items.map((item) => (
-                      <div key={item.name} className="glass glass-hover rounded-xl px-5 py-4">
-                        <div className="text-sm font-semibold text-fga mb-1">{item.name}</div>
-                        <div className="text-xs leading-relaxed text-fga/50">{item.desc}</div>
+                      <div key={item.name} className="glass glass-hover rounded-2xl overflow-hidden flex flex-col">
+                        {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
+                          <Carousel images={item.images as { src: string; caption: string }[]} />
+                        )}
+                        <div className="px-5 py-4">
+                          <div className="text-sm font-semibold text-fga mb-1">{item.name}</div>
+                          <div className="text-xs leading-relaxed text-fga/50">{item.desc}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
-                  {"featured" in cat && cat.featured === "et-system" && (
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {ET_SCREENSHOTS.map((s) => (
-                        <div key={s.src} className="glass rounded-xl overflow-hidden">
-                          <div className="relative w-full aspect-video bg-ink-800">
-                            <Image src={s.src} alt={s.caption} fill className="object-cover object-top" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
-                          </div>
-                          <p className="px-4 py-2.5 text-xs text-fga/50 leading-snug">{s.caption}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </motion.div>
               ))}
             </div>
