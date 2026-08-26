@@ -9,6 +9,122 @@ import Button from "@/components/ui/Button";
 import { bookACallHref } from "@/lib/constants";
 
 /* ------------------------------------------------------------------ */
+/* Haircut Detection Pipeline SVG                                      */
+/* ------------------------------------------------------------------ */
+
+function HaircutPipelineSVG() {
+  return (
+    <svg viewBox="0 0 700 220" width="100%" style={{ display: "block" }} aria-label="Haircut detection illustration">
+      <defs>
+        <linearGradient id="hc-g" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0E7C66" />
+          <stop offset="100%" stopColor="#19D3A2" />
+        </linearGradient>
+        <filter id="hc-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="6" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <filter id="hc-soft" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2.5" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+
+      {/* ── LEFT: face photo ── */}
+      {/* polaroid-style frame (sketchy, slightly rotated) */}
+      <g transform="translate(42,30) rotate(-4)">
+        <rect x="0" y="0" width="110" height="130" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
+        {/* face outline — oval */}
+        <ellipse cx="55" cy="58" rx="28" ry="33" fill="none" stroke="rgba(234,242,239,0.5)" strokeWidth="1.5" strokeDasharray="3 2" />
+        {/* eyes */}
+        <ellipse cx="44" cy="50" rx="4" ry="2.5" fill="rgba(234,242,239,0.35)" />
+        <ellipse cx="66" cy="50" rx="4" ry="2.5" fill="rgba(234,242,239,0.35)" />
+        {/* nose */}
+        <path d="M55 55 Q52 64 50 67 Q55 70 60 67 Q58 64 55 55" fill="none" stroke="rgba(234,242,239,0.3)" strokeWidth="1" />
+        {/* mouth */}
+        <path d="M48 72 Q55 77 62 72" fill="none" stroke="rgba(234,242,239,0.4)" strokeWidth="1.2" strokeLinecap="round" />
+        {/* hair */}
+        <path d="M27 42 Q30 20 55 18 Q80 20 83 42" fill="none" stroke="rgba(234,242,239,0.45)" strokeWidth="2" strokeLinecap="round" />
+        {/* label under */}
+        <text x="55" y="118" textAnchor="middle" fontSize="9" fill="rgba(234,242,239,0.45)" fontFamily="system-ui,sans-serif">your photo</text>
+      </g>
+
+      {/* ── ARROW 1 → brain/scan area ── */}
+      <path d="M162 110 C190 110 200 110 218 110" fill="none" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="4 3" />
+      <polygon points="218,106 226,110 218,114" fill="rgba(25,211,162,0.5)" />
+
+      {/* ── MIDDLE: AI scan burst ── */}
+      <g transform="translate(280,110)">
+        {/* glow ring */}
+        <circle cx="0" cy="0" r="52" fill="none" stroke="rgba(25,211,162,0.12)" strokeWidth="18" filter="url(#hc-glow)" />
+        <circle cx="0" cy="0" r="40" fill="rgba(14,124,102,0.15)" stroke="rgba(25,211,162,0.35)" strokeWidth="1.5" />
+        {/* scan lines */}
+        {[-22,-11,0,11,22].map((y, i) => (
+          <line key={i} x1="-28" y1={y} x2="28" y2={y} stroke="rgba(25,211,162,0.2)" strokeWidth="1" />
+        ))}
+        {/* landmark dots */}
+        {[[0,-24],[16,-14],[-16,-14],[0,0],[12,10],[-12,10],[0,22],[-20,4],[20,4]].map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="2.2" fill="#19D3A2" opacity={0.7} />
+        ))}
+        {/* connecting mesh lines */}
+        <g stroke="rgba(25,211,162,0.2)" strokeWidth="0.8" fill="none">
+          <line x1="0" y1="-24" x2="16" y2="-14" /><line x1="0" y1="-24" x2="-16" y2="-14" />
+          <line x1="16" y1="-14" x2="-16" y2="-14" /><line x1="16" y1="-14" x2="0" y2="0" />
+          <line x1="-16" y1="-14" x2="0" y2="0" /><line x1="0" y1="0" x2="12" y2="10" />
+          <line x1="0" y1="0" x2="-12" y2="10" /><line x1="12" y1="10" x2="-12" y2="10" />
+          <line x1="12" y1="10" x2="0" y2="22" /><line x1="-12" y1="10" x2="0" y2="22" />
+          <line x1="-20" y1="4" x2="-12" y2="10" /><line x1="20" y1="4" x2="12" y2="10" />
+        </g>
+        {/* centre label */}
+        <text x="0" y="60" textAnchor="middle" fontSize="8.5" fill="rgba(234,242,239,0.5)" fontFamily="system-ui,sans-serif">AI reading face shape</text>
+      </g>
+
+      {/* ── ARROW 2 → results ── */}
+      <path d="M334 110 C362 110 372 110 388 110" fill="none" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="4 3" />
+      <polygon points="388,106 396,110 388,114" fill="rgba(25,211,162,0.5)" />
+
+      {/* ── RIGHT: ranked haircut results ── */}
+      <g transform="translate(405,28)">
+        {[
+          { rank: "#1", style: "Textured crop", score: "98%" },
+          { rank: "#2", style: "Undercut fade", score: "91%" },
+          { rank: "#3", style: "Classic side part", score: "84%" },
+        ].map((r, i) => (
+          <g key={i} transform={`translate(0, ${i * 48})`}>
+            <rect x="0" y="0" width="230" height="38" rx="8"
+              fill={i === 0 ? "url(#hc-g)" : "rgba(14,124,102,0.1)"}
+              stroke={i === 0 ? "none" : "rgba(25,211,162,0.2)"} strokeWidth="1"
+              filter={i === 0 ? "url(#hc-soft)" : undefined}
+            />
+            <text x="12" y="15" fontSize="9" fontWeight="700" fontFamily="system-ui,sans-serif"
+              fill={i === 0 ? "#0B0E12" : "rgba(25,211,162,0.8)"}>{r.rank}</text>
+            <text x="32" y="15" fontSize="10" fontWeight="600" fontFamily="system-ui,sans-serif"
+              fill={i === 0 ? "#0B0E12" : "rgba(234,242,239,0.8)"}>{r.style}</text>
+            {/* score bar */}
+            <rect x="12" y="22" width="180" height="5" rx="3" fill="rgba(255,255,255,0.1)" />
+            <rect x="12" y="22" width={180 * parseInt(r.score) / 100} height="5" rx="3"
+              fill={i === 0 ? "rgba(11,14,18,0.4)" : "rgba(25,211,162,0.5)"} />
+            <text x="200" y="28" fontSize="8" fontFamily="system-ui,sans-serif"
+              fill={i === 0 ? "rgba(11,14,18,0.6)" : "rgba(234,242,239,0.45)"}>{r.score}</text>
+          </g>
+        ))}
+        <text x="115" y="164" textAnchor="middle" fontSize="8.5" fill="rgba(234,242,239,0.4)" fontFamily="system-ui,sans-serif">ranked by face-shape match</text>
+      </g>
+
+      {/* ── sparkles around result ── */}
+      {[[395,22],[638,18],[640,140],[392,145],[515,8],[515,175]].map(([x,y],i) => (
+        <g key={i}>
+          <line x1={x} y1={y-5} x2={x} y2={y+5} stroke="#19D3A2" strokeWidth="1.2" opacity="0.6" />
+          <line x1={x-5} y1={y} x2={x+5} y2={y} stroke="#19D3A2" strokeWidth="1.2" opacity="0.6" />
+          <line x1={x-3} y1={y-3} x2={x+3} y2={y+3} stroke="#19D3A2" strokeWidth="0.8" opacity="0.35" />
+          <line x1={x+3} y1={y-3} x2={x-3} y2={y+3} stroke="#19D3A2" strokeWidth="0.8" opacity="0.35" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Data                                                                 */
 /* ------------------------------------------------------------------ */
 
@@ -143,9 +259,10 @@ const WORK = [
 const PROJECTS = [
   {
     name: "Best-Fit Haircut Detection",
-    desc: "Fine-tuned a Vision Transformer (ViT) face-shape classifier, fused with facial-geometry scoring from MediaPipe. Full training pipeline: dataset acquisition, preprocessing, early-stopping fine-tune, calibration/evaluation grid to gate each new champion.",
+    desc: "Take a selfie, get a ranked list of the haircuts that actually suit your face. No sign-up, no cloud, runs entirely on your laptop. Under the hood it detects your face, measures your bone structure, runs it through a fine-tuned AI model, and cross-references a celebrity database to show you who pulls off each style.",
     lang: ["Python", "PyTorch", "HuggingFace", "MediaPipe", "OpenCV"],
     url: "https://github.com/noorgx/best-haircut-detection",
+    featured: true,
   },
   {
     name: "Cannabis Market Concentration",
@@ -389,8 +506,47 @@ export default function PortfolioPage() {
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>Open source</SectionLabel>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Projects on GitHub.</h2>
-            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {PROJECTS.map((p, i) => (
+
+            {/* Featured: Best-Fit Haircut Detection */}
+            {(() => {
+              const featured = PROJECTS.find((p) => p.featured);
+              if (!featured) return null;
+              return (
+                <motion.a
+                  href={featured.url} target="_blank" rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="mt-10 block glass glass-hover rounded-2xl overflow-hidden group cursor-pointer"
+                >
+                  {/* illustration */}
+                  <div className="bg-ink-800 px-6 pt-8 pb-2">
+                    <HaircutPipelineSVG />
+                  </div>
+                  {/* copy */}
+                  <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-end gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-display text-xl font-bold text-fga group-hover:text-spark transition-colors">{featured.name}</h3>
+                        <span className="rounded-full bg-spark/15 border border-spark/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-spark">Featured</span>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed text-fga/60 max-w-2xl">{featured.desc}</p>
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {featured.lang.map((l) => <Tag key={l} label={l} />)}
+                      </div>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-spark group-hover:text-mint transition-colors">
+                      View on GitHub
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </div>
+                  </div>
+                </motion.a>
+              );
+            })()}
+
+            {/* Rest of projects */}
+            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {PROJECTS.filter((p) => !p.featured).map((p, i) => (
                 <motion.a
                   href={p.url} target="_blank" rel="noopener noreferrer"
                   key={p.name} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
