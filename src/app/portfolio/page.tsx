@@ -183,7 +183,7 @@ const ALL_WORK_CATEGORIES = [
     title: "Accounting & Finance Automation",
     items: [
       { name: "Multi-Platform API Integrations", desc: "Xero, WorkflowMax, Glofox, Acorn, and JISR all connected. Every piece of data that used to be moved by hand between systems now moves on its own.", customComponent: "api-platforms" },
-      { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation (Hybrid Solutions Group)" },
+      { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation. Jobs complete, invoices go out, POs get raised, all without anyone triggering it manually." },
     ],
   },
   {
