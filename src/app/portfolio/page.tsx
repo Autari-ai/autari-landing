@@ -219,7 +219,6 @@ const ALL_WORK_CATEGORIES = [
       { name: "pycaps", desc: "Adds animated CSS-styled subtitles to videos. Give it a video and a style, get back a file ready for TikTok, YouTube Shorts, or Instagram Reels.", customComponent: "pycaps-flow" },
       { name: "worldmonitor", desc: "Real-time global intelligence dashboard. Live news, geopolitical map, AI-powered instability scoring, conflict zones, military activity, and country risk index.", customComponent: "worldmonitor-flow" },
       { name: "YouTube Automation", desc: "Automates a YouTube channel end to end: content scheduling, description generation, thumbnail creation, and upload — so the channel runs without anyone doing it manually.", customComponent: "youtube-flow" },
-      { name: "metaai-api", desc: "FastAPI wrapper around Meta AI. One endpoint gives you chat, image generation, and video generation via cookie-based auth. Drop-in REST API for any client.", customComponent: "metaai-flow" },
     ],
   },
   {
@@ -586,25 +585,6 @@ function WorldMonitorFlow() {
   );
 }
 
-function MetaAIFlow() {
-  const outputs = ["Chat", "Image gen", "Video gen"];
-  return (
-    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
-      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · FastAPI · Meta AI · Cookie auth</span><div className="h-px flex-1 bg-spark/20" /></div>
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 shrink-0">
-          <img src="/media/portfolio/analytics/meta.svg" alt="Meta" className="h-5 w-5 object-contain" />
-          <span className="text-[10px] font-semibold text-fga/70">Meta AI</span>
-        </div>
-        <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0"><line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/><polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.5)"/></svg>
-        <div className="flex-1 grid grid-cols-3 gap-1.5">{outputs.map(o => (
-          <div key={o} className="flex items-center justify-center glass rounded-lg py-2"><span className="text-[10px] font-semibold text-fga/60">{o}</span></div>
-        ))}</div>
-      </div>
-      <div className="flex flex-wrap gap-1.5">{["Python","FastAPI","Cookie auth","REST API"].map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
-    </div>
-  );
-}
 
 function PhishingFlow() {
   return (
@@ -1498,9 +1478,6 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "worldmonitor-flow" && (
                           <div className="p-4"><WorldMonitorFlow /></div>
-                        )}
-                        {"customComponent" in item && item.customComponent === "metaai-flow" && (
-                          <div className="p-4"><MetaAIFlow /></div>
                         )}
                         {"customComponent" in item && item.customComponent === "phishing-flow" && (
                           <div className="p-4"><PhishingFlow /></div>
