@@ -504,10 +504,9 @@ function BigChangeXeroFlow() {
 }
 
 const MCP_SCREENSHOTS = [
-  { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Question in plain English, data table back — the planner read the schema and wrote the right SQL" },
-  { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Ask for charts, get charts — the planner picks the right visualisation automatically" },
-  { src: "/media/portfolio/jagent/jagent-office-query.png", caption: "Each answer cites exactly which table and column it used — no guessing" },
-  { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Live in a dashboard — ask about what you're looking at while you're looking at it" },
+  { src: "/media/portfolio/mcp-query/nlq-demo.gif", caption: "Natural language querying in action: type a question, get results back immediately" },
+  { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "PostgreSQL live: server sessions, transactions per second, and block I/O monitored in real time" },
+  { src: "/media/portfolio/mcp-query/pgadmin-activity.webp", caption: "Active query sessions: every connection tracked live, query start times and wait events visible" },
 ];
 
 function MCPQueryFlow() {
