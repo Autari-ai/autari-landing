@@ -194,7 +194,7 @@ const ALL_WORK_CATEGORIES = [
         desc: "Ask it anything about your data. It queries the database, picks the right chart, and reports back in the chat. No dashboards to learn, no SQL to write.",
         customComponent: "jagent-flow",
       },
-      { name: "MCP Host + Query Planner", desc: "MCP host (stdio + streamable-HTTP) and a schema-grounded query planner that turns natural language into a validated SQL/Python execution plan, runs it, and reports results in chat" },
+      { name: "MCP Host + Query Planner", desc: "You type a question. It reads the database schema, plans exactly which queries to run, runs them, and writes the answer back in the chat with charts if they help.", customComponent: "mcp-query-flow" },
       { name: "Auronexus", desc: "CrewAI-based visual agent orchestration platform for building and running AI employee workflows" },
       { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
       { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram. approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
@@ -499,6 +499,63 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const MCP_SCREENSHOTS = [
+  { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Question in plain English, data table back — the planner read the schema and wrote the right SQL" },
+  { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Ask for charts, get charts — the planner picks the right visualisation automatically" },
+  { src: "/media/portfolio/jagent/jagent-office-query.png", caption: "Each answer cites exactly which table and column it used — no guessing" },
+  { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Live in a dashboard — ask about what you're looking at while you're looking at it" },
+];
+
+function MCPQueryFlow() {
+  const stack = [
+    { label: "PostgreSQL", logo: "/media/portfolio/mcp-query/postgresql.svg", bg: "#1a1a2e", desc: "Connected data source" },
+    { label: "MCP Protocol", logo: "/media/portfolio/mcp-query/anthropic.svg", bg: "#191919", desc: "Tool connection layer" },
+    { label: "Python", logo: "/media/portfolio/ocr/python-logo.svg", bg: "#1a2035", desc: "Execution runtime" },
+  ];
+
+  const steps = [
+    { label: "Read schema", flow: "Checks which tables and columns exist before writing any SQL" },
+    { label: "Plan queries", flow: "Breaks the question into ordered, validated SQL or Python steps" },
+    { label: "Run it", flow: "Executes against the real database — no simulated data" },
+    { label: "Report back", flow: "Writes the result in chat with charts if they help" },
+  ];
+
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* Stack row */}
+      <div className="flex items-center gap-2">
+        {stack.map((s, i) => (
+          <React.Fragment key={s.label}>
+            <div className="flex-1 flex flex-col items-center gap-1">
+              <div className="w-full flex flex-col items-center justify-center rounded-lg px-2 py-2 h-12 gap-1" style={{ background: s.bg }}>
+                <img src={s.logo} alt={s.label} className="h-5 w-auto object-contain" />
+              </div>
+              <span className="text-[9px] text-fga/40">{s.desc}</span>
+            </div>
+            {i < stack.length - 1 && (
+              <svg viewBox="0 0 16 10" width="16" height="10" className="shrink-0 mb-3">
+                <line x1="0" y1="5" x2="12" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="3 2"/>
+                <polygon points="10,2 14,5 10,8" fill="rgba(25,211,162,0.4)"/>
+              </svg>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      {/* Pipeline steps */}
+      <div className="flex flex-col gap-2">
+        {steps.map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+            <span className="shrink-0 text-[10px] font-bold text-spark/70 w-6">{i + 1}</span>
+            <span className="text-[10px] font-semibold text-fga/70 w-24 shrink-0">{s.label}</span>
+            <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={MCP_SCREENSHOTS} />
     </div>
   );
 }
@@ -821,6 +878,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "jagent-flow" && (
                           <div className="p-4"><JagentFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "mcp-query-flow" && (
+                          <div className="p-4"><MCPQueryFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
