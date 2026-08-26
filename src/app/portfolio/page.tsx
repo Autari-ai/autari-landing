@@ -203,23 +203,10 @@ const ALL_WORK_CATEGORIES = [
     title: "Data & Analytics Platforms",
     items: [
       { name: "Cannabis Market Concentration", desc: "HHI market-concentration pipeline over California cannabis license and sales registries 2018–2024, ported from Stata to Python with Matplotlib/Seaborn visualisations" },
-      { name: "jigsolos_intelligence", desc: "Celery-backed analytics and intelligence service with its own REST API (Jigsol)" },
-      { name: "jigsolos_analytics", desc: "Python analytics service for Jigsol OS data" },
-      { name: "mda-analytics", desc: "Laravel/Vue management analytics dashboard" },
       { name: "Jigsol OS ETL", desc: "End-to-end data ingestion, transformation, and reporting pipeline with PostgreSQL as system of record" },
       { name: "E-commerce BI & Forecasting", desc: "Analytics reports, dashboards, predictive modelling on inventory and sales data, and automated demand-forecasting pipelines for e-commerce clients (Fiverr)" },
       { name: "Stock Monitoring System", desc: "Automated stock monitoring across 20+ e-commerce stores" },
       { name: "Image Data Pipeline", desc: "Excel-driven Google image search pipeline that filters and ranks results by resolution and colour" },
-    ],
-  },
-  {
-    title: "SaaS & Products (Autari)",
-    items: [
-      { name: "autari-landing", desc: "Next.js validation landing page with a conversational survey, Stripe refundable deposit flow, and Google Sheets capture. deployed at autari.co.uk" },
-      { name: "autari-web-portal", desc: "Customer + staff web portal. account dashboard, billing, device-locked license management, staff admin with fulfill/revoke/refund/seat-adjust flows" },
-      { name: "autari-license-server", desc: "License backend. seat management, device-locking, signed activation tokens, payments" },
-      { name: "autari-desktop", desc: "Tauri + React desktop app with per-device activation" },
-      { name: "autari-employee", desc: "Packaging, installer (NSIS), and backend sidecar for the desktop product" },
     ],
   },
   {
