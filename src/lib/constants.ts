@@ -23,6 +23,7 @@ export const NAV_LINKS = [
   { label: "What we do", href: "#what-we-do" },
   { label: "How it works", href: "#how-it-works" },
   { label: "FAQ", href: "#faq" },
+  { label: "Portfolio", href: "/portfolio" },
 ];
 
 export const HERO = {

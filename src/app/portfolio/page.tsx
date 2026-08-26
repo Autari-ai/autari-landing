@@ -1296,15 +1296,15 @@ function Carousel({ images }: { images: { src: string; caption: string }[] }) {
           <Image src={img.src} alt={img.caption} fill className="object-cover object-top" sizes="100vw" />
         </div>
       ))}
-      <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
+      <button type="button" onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
       </button>
-      <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
+      <button type="button" onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-ink/70 backdrop-blur-sm flex items-center justify-center text-fga hover:bg-ink transition-colors">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
       </button>
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
         {images.map((_, i) => (
-          <button key={i} onClick={() => setIdx(i)} className={`h-1.5 rounded-full transition-all duration-200 ${i === idx ? "w-5 bg-spark" : "w-1.5 bg-white/30"}`} />
+          <button type="button" key={i} onClick={() => setIdx(i)} className={`h-1.5 rounded-full transition-all duration-200 ${i === idx ? "w-5 bg-spark" : "w-1.5 bg-white/30"}`} />
         ))}
       </div>
       {images[idx].caption && (
@@ -1348,7 +1348,22 @@ const fadeUp = {
 export default function PortfolioPage() {
   return (
     <>
-      <Navbar />
+      {/* Portfolio-specific nav — replaces section anchors with site links */}
+      <nav className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4">
+        <div className="flex w-full max-w-5xl items-center justify-between rounded-full px-4 py-2.5 glass-strong">
+          <a href="/" aria-label="autari home" className="flex items-center pl-1">
+            <img src="/logo_dark.png" alt="autari" className="h-7 w-auto object-contain" />
+          </a>
+          <div className="hidden items-center gap-6 md:flex">
+            <a href="/" className="text-[11px] font-medium uppercase tracking-[0.14em] text-fga/60 hover:text-fga transition-colors">autari.co.uk</a>
+            <a href="/#what-we-do" className="text-[11px] font-medium uppercase tracking-[0.14em] text-fga/60 hover:text-fga transition-colors">What we do</a>
+            <a href="/#how-it-works" className="text-[11px] font-medium uppercase tracking-[0.14em] text-fga/60 hover:text-fga transition-colors">How it works</a>
+          </div>
+          <a href="/" className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] bg-spark text-ink shadow-[0_0_40px_-6px_rgba(25,211,162,0.5)] hover:bg-mint transition-all duration-300">
+            Book a call
+          </a>
+        </div>
+      </nav>
 
       <main className="overflow-x-hidden">
         {/* ── Hero ── */}
