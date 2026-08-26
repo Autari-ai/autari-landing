@@ -225,10 +225,6 @@ const ALL_WORK_CATEGORIES = [
     items: [
       { name: "NoPhishyZeta", desc: "Phishing email scanner that uses an ML model to classify URLs and moves malicious emails to trash automatically" },
       { name: "MalwareDB", desc: "Automated malware sample download, extraction, and SHA-256 hashing pipeline from Malware Bazaar with multithreading and multiprocessing" },
-      { name: "CVE-2018-15473 Exploit", desc: "Python exploit for the OpenSSH username enumeration vulnerability with threading and multiple export formats" },
-      { name: "CTF Writeups", desc: "Writeups for competitive Capture the Flag challenges — top 10 global ranking on CTFtime" },
-      { name: "CrackMe Writeups", desc: "Step-by-step reverse engineering solutions for CrackMe challenges (x86 ASM, C++)" },
-      { name: "Bug Hunting", desc: "Active security research on HackerOne across web applications and APIs" },
     ],
   },
   {
