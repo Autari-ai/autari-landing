@@ -180,7 +180,7 @@ const ALL_WORK_CATEGORIES = [
     ],
   },
   {
-    title: "Accounting & Finance Automation",
+    title: "Accounting & Finance Automation", cols: 2,
     items: [
       { name: "Multi-Platform API Integrations", desc: "Xero, WorkflowMax, Glofox, Acorn, and JISR all connected. Every piece of data that used to be moved by hand between systems now moves on its own.", customComponent: "api-platforms" },
       { name: "Invoice, PO & Quote Automation", desc: "Jobs complete, invoices go out. POs get raised. Quotes get sent. All without anyone triggering it manually.", customComponent: "invoice-po-flow" },
@@ -428,32 +428,32 @@ const INVOICE_SCREENSHOTS = [
 ];
 
 function InvoicePOFlow() {
+  const flows = [
+    { label: "Quotes", logo: "/media/portfolio/bigchange-xero/bigchange-logo.svg", bg: "#003B6B", flow: "Generated and sent when a job is scoped" },
+    { label: "Invoices", logo: "/media/portfolio/bigchange-xero/bigchange-logo.svg", bg: "#003B6B", flow: "Raised automatically when a job is completed" },
+    { label: "Purchase Orders", logo: "/media/portfolio/bigchange-xero/xero.svg", bg: "#fff", flow: "Created and tracked in Xero without manual entry" },
+  ];
   return (
     <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
-      {/* Two logos: BigChange → Xero */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 flex flex-col items-center gap-1">
-          <div className="w-full flex items-center justify-center bg-[#003B6B] rounded-lg px-3 py-2 h-12">
-            <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-6 w-auto object-contain" />
-          </div>
-          <span className="text-[9px] text-fga/40">Field service</span>
-        </div>
-        <svg viewBox="0 0 40 12" width="40" height="12" className="shrink-0">
-          <line x1="0" y1="6" x2="32" y2="6" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/>
-          <polygon points="30,3 36,6 30,9" fill="rgba(25,211,162,0.6)"/>
-        </svg>
-        <div className="flex-1 flex flex-col items-center gap-1">
-          <div className="w-full flex items-center justify-center bg-white rounded-lg px-3 py-2 h-12">
-            <img src="/media/portfolio/bigchange-xero/xero.svg" alt="Xero" className="h-6 w-auto object-contain" />
-          </div>
-          <span className="text-[9px] text-fga/40">Accounting</span>
-        </div>
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Billing layer</span>
+        <div className="h-px flex-1 bg-spark/20" />
       </div>
-      {/* What flows */}
-      <div className="grid grid-cols-3 gap-2">
-        {["Quotes", "Invoices", "POs"].map((label) => (
-          <div key={label} className="flex items-center justify-center glass rounded-lg py-2.5 px-2">
-            <span className="text-[11px] font-semibold text-fga/70">{label}</span>
+      <div className="flex flex-col gap-2">
+        {flows.map((f) => (
+          <div key={f.label} className="flex items-center gap-3 glass rounded-xl px-4 py-3">
+            <div className="shrink-0 w-20 h-9 flex items-center justify-center rounded-lg px-2" style={{ background: f.bg }}>
+              <img src={f.logo} alt={f.label} className="max-h-6 w-auto object-contain" />
+            </div>
+            <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0">
+              <line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/>
+              <polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.6)"/>
+            </svg>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-semibold text-fga/70 mb-0.5">{f.label}</div>
+              <div className="text-[10px] text-fga/40 leading-snug">{f.flow}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -757,7 +757,7 @@ export default function PortfolioPage() {
                     <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-spark">{cat.title}</span>
                     <span className="flex-1 h-px bg-gradient-to-r from-spark/30 to-transparent" />
                   </div>
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className={`grid gap-5 ${"cols" in cat && cat.cols === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                     {cat.items.map((item) => (
                       <div key={item.name} className="glass glass-hover rounded-2xl overflow-hidden flex flex-col">
                         {"customComponent" in item && item.customComponent === "bigchange-xero" && (
