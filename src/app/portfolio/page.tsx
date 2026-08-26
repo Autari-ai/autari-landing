@@ -195,7 +195,7 @@ const ALL_WORK_CATEGORIES = [
         customComponent: "jagent-flow",
       },
       { name: "MCP Host + Query Planner", desc: "You type a question. It reads the database schema, plans exactly which queries to run, runs them, and writes the answer back in the chat with charts if they help.", customComponent: "mcp-query-flow" },
-      { name: "Auronexus", desc: "CrewAI-based visual agent orchestration platform for building and running AI employee workflows" },
+      { name: "Auronexus", desc: "Give each AI agent a role and a channel. They pick up jobs, collaborate in chat, and get things done. No code to write, just define what each agent does.", customComponent: "auronexus-flow" },
       { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
       { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram. approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
     ],
@@ -499,6 +499,52 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const AURONEXUS_SCREENSHOTS = [
+  { src: "/media/portfolio/auronexus/auronexus-agents-chat.png", caption: "AI agents working in a channel: claude finds the bug, codex reviews the code, gemini runs the security scan" },
+];
+
+function AuronexusFlow() {
+  const agents = [
+    { role: "Designer", name: "claude", color: "#7C5CFF" },
+    { role: "Reviewer", name: "codex", color: "#19D3A2" },
+    { role: "Security", name: "gemini", color: "#FF5A50" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* CrewAI powered */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 flex-1">
+          <img src="/media/portfolio/auronexus/crewai.svg" alt="CrewAI" className="h-5 w-5 object-contain" />
+          <span className="text-[11px] font-semibold text-fga/70">Powered by CrewAI</span>
+        </div>
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 flex-1">
+          <span className="text-[11px] text-fga/50">Visual agent builder</span>
+        </div>
+      </div>
+      {/* Agent roles */}
+      <div className="flex flex-col gap-2">
+        {agents.map((a) => (
+          <div key={a.name} className="flex items-center gap-3 glass rounded-xl px-4 py-3">
+            <div className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: a.color }}>
+              {a.name[0].toUpperCase()}
+            </div>
+            <div className="flex-1">
+              <span className="text-[10px] font-semibold text-fga/75">{a.name}</span>
+              <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full border" style={{ color: a.color, borderColor: a.color + "40" }}>{a.role}</span>
+            </div>
+            <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0">
+              <line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="3 2"/>
+              <polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.4)"/>
+            </svg>
+            <span className="text-[10px] text-fga/40">picks up jobs in channel</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={AURONEXUS_SCREENSHOTS} />
     </div>
   );
 }
@@ -880,6 +926,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "mcp-query-flow" && (
                           <div className="p-4"><MCPQueryFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "auronexus-flow" && (
+                          <div className="p-4"><AuronexusFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
