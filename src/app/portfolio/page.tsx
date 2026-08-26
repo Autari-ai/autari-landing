@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
+import BrandLogo from "@/components/ui/Logo";
 import Footer from "@/components/layout/Footer";
 import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
@@ -1352,7 +1353,7 @@ export default function PortfolioPage() {
       <nav className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4">
         <div className="flex w-full max-w-5xl items-center justify-between rounded-full px-4 py-2.5 glass-strong">
           <a href="/" aria-label="autari home" className="flex items-center pl-1">
-            <img src="/logo_dark.png" alt="autari" className="h-7 w-auto object-contain" />
+            <BrandLogo markClassName="h-7 w-7" />
           </a>
           <div className="hidden items-center gap-6 md:flex">
             <a href="/" className="text-[11px] font-medium uppercase tracking-[0.14em] text-fga/60 hover:text-fga transition-colors">autari.co.uk</a>
