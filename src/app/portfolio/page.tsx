@@ -202,24 +202,24 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Data & Analytics Platforms",
     items: [
-      { name: "Cannabis Market Concentration", desc: "HHI market-concentration pipeline over California cannabis license and sales registries 2018–2024, ported from Stata to Python with Matplotlib/Seaborn visualisations" },
-      { name: "Jigsol OS ETL", desc: "End-to-end data ingestion, transformation, and reporting pipeline with PostgreSQL as system of record" },
-      { name: "E-commerce BI & Forecasting", desc: "Analytics reports, dashboards, predictive modelling on inventory and sales data, and automated demand-forecasting pipelines for e-commerce clients (Fiverr)" },
-      { name: "Stock Monitoring System", desc: "Automated stock monitoring across 20+ e-commerce stores" },
-      { name: "Image Data Pipeline", desc: "Excel-driven Google image search pipeline that filters and ranks results by resolution and colour" },
+      { name: "Cannabis Market Concentration", desc: "HHI market-concentration pipeline over California cannabis license and sales data 2018–2024, ported from Stata to Python. Shows which counties and parent companies are consolidating the market.", customComponent: "cannabis-flow" },
+      { name: "Jigsol OS ETL", desc: "Ingests data from every third-party integration, transforms it, and loads it into PostgreSQL as the system of record. Feeds every report and dashboard in Jigsol OS.", customComponent: "etl-flow" },
+      { name: "E-commerce BI & Forecasting", desc: "Analytics reports, dashboards, and predictive models built for e-commerce clients. Covers inventory trends, sales forecasting, and demand planning.", customComponent: "ecommerce-bi-flow" },
+      { name: "Stock Monitoring System", desc: "Watches inventory levels across 20+ e-commerce stores. Fires alerts when stock drops below thresholds so nothing goes out of stock unnoticed.", customComponent: "stock-flow" },
+      { name: "Image Data Pipeline", desc: "Reads names from an Excel sheet, fetches images from Google, filters and ranks them by colour and resolution, and writes the results back to Excel.", customComponent: "image-pipeline-flow" },
     ],
   },
   {
     title: "Consumer & Personal Tools",
     items: [
-      { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions. fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
+      { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions. Fine-tuned ViT classifier, MediaPipe facial geometry, full training pipeline, celebrity star-match database. Runs entirely offline.", customComponent: "haircut-flow" },
       { name: "Game Pass Search", desc: "Browses the full Xbox Game Pass catalog of 600+ games with AI genre tags, color-coded theme filters, and tier badges. Runs offline, no API key needed.", customComponent: "gamepass-flow" },
-      { name: "Gig Radar", desc: "Upwork job intelligence tool. OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
+      { name: "Gig Radar", desc: "Upwork job intelligence: syncs jobs, profile, and contracts via OAuth2 and GraphQL. Scores each job with an editable rule engine and shows a receipt-style breakdown of which rules fired.", customComponent: "gig-radar-flow" },
       { name: "FormForge", desc: "Upload a scanned paper form, draw boxes over each field, and generate filled copies. Works for Arabic and English in the same form. Bulk-fill hundreds from an Excel sheet.", customComponent: "formforge-flow" },
-      { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
-      { name: "worldmonitor", desc: "Real-time global intelligence dashboard. AI-powered news aggregation and geopolitical monitoring" },
+      { name: "pycaps", desc: "Adds animated CSS-styled subtitles to videos. Give it a video and a style, get back a file ready for TikTok, YouTube Shorts, or Instagram Reels.", customComponent: "pycaps-flow" },
+      { name: "worldmonitor", desc: "Real-time global intelligence dashboard. Live news, geopolitical map, AI-powered instability scoring, conflict zones, military activity, and country risk index.", customComponent: "worldmonitor-flow" },
       { name: "YouTube Automation", desc: "Automates a YouTube channel end to end: content scheduling, description generation, thumbnail creation, and upload — so the channel runs without anyone doing it manually.", customComponent: "youtube-flow" },
-      { name: "metaai-api", desc: "FastAPI wrapper for Meta AI with chat, image generation, and video generation via cookie-based auth" },
+      { name: "metaai-api", desc: "FastAPI wrapper around Meta AI. One endpoint gives you chat, image generation, and video generation via cookie-based auth. Drop-in REST API for any client.", customComponent: "metaai-flow" },
     ],
   },
   {
@@ -231,15 +231,15 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Cybersecurity & Reverse Engineering",
     items: [
-      { name: "NoPhishyZeta", desc: "Phishing email scanner that uses an ML model to classify URLs and moves malicious emails to trash automatically" },
-      { name: "MalwareDB", desc: "Automated malware sample download, extraction, and SHA-256 hashing pipeline from Malware Bazaar with multithreading and multiprocessing" },
+      { name: "NoPhishyZeta", desc: "Scans incoming emails for phishing URLs using an ML model. Moves malicious emails to trash automatically so the inbox stays clean.", customComponent: "phishing-flow" },
+      { name: "MalwareDB", desc: "Downloads malware sample feeds daily, extracts them, hashes every file with MD5/SHA1/SHA256, and organises the collection into a searchable, hash-indexed local dataset.", customComponent: "malwaredb-flow" },
     ],
   },
   {
     title: "Infrastructure & Monitoring",
     items: [
       { name: "Grafana Dashboards", desc: "Production observability across every API integration: span rates, p95 latency, error rates, and distributed traces per service. Covers Xero, Glofox, JISR, and WorkflowMax pipelines live.", customComponent: "grafana-flow" },
-      { name: "F5 VPN Container", desc: "Containerised F5 VPN setup" },
+      { name: "F5 VPN Container", desc: "Containerised F5 BIG-IP VPN client. Runs the F5 session entirely inside Docker so the VPN is isolated from the host system and can be scripted and automated.", customComponent: "vpn-flow" },
     ],
   },
 ];
@@ -392,6 +392,288 @@ const CERTS = [
 /* Helpers                                                              */
 /* ------------------------------------------------------------------ */
 
+
+/* ── 13 new card components ── */
+
+function CannabisFlow() {
+  const pills = ["Python", "Pandas", "Matplotlib", "Seaborn", "Stata"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Market concentration · HHI analysis</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <svg viewBox="0 0 320 120" width="100%" style={{ display: "block" }}>
+        <defs><linearGradient id="hhi-g" x1="0" x2="0" y1="1" y2="0"><stop offset="0%" stopColor="#0E7C66"/><stop offset="100%" stopColor="#19D3A2"/></linearGradient></defs>
+        {[60,90,75,110,85,130,100,140,120,160].map((h, i) => (
+          <rect key={i} x={10+i*30} y={120-h} width={20} height={h} rx={3} fill="url(#hhi-g)" opacity={0.7+(i*0.03)} />
+        ))}
+        <polyline points="20,60 50,30 80,45 110,10 140,25 170,5 200,20 230,0 260,15 290,5" fill="none" stroke="#19D3A2" strokeWidth={2} strokeDasharray="4 2" />
+        <text x="4" y="115" fontSize="9" fill="rgba(234,242,239,0.4)" fontFamily="system-ui">HHI</text>
+        <text x="4" y="10" fontSize="8" fill="rgba(234,242,239,0.3)" fontFamily="system-ui">Concentration trend 2018–2024</text>
+      </svg>
+      <div className="flex flex-wrap gap-1.5">{pills.map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
+
+function ETLFlow() {
+  const steps = [
+    { label: "Source APIs", flow: "Xero, Glofox, JISR, WorkflowMax — pulled on schedule" },
+    { label: "Transform", flow: "Clean, normalise, and validate each payload" },
+    { label: "Load to PostgreSQL", flow: "System of record for every report and dashboard" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · FastAPI · PostgreSQL · Docker</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex items-center gap-2">
+        {["APIs", "→", "Transform", "→"].map((s, i) => (
+          s === "→" ? <svg key={i} viewBox="0 0 16 10" width="16" height="10" className="shrink-0"><line x1="0" y1="5" x2="12" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/><polygon points="10,2 14,5 10,8" fill="rgba(25,211,162,0.5)"/></svg>
+          : <div key={i} className="flex-1 flex items-center justify-center glass rounded-lg py-2"><span className="text-[11px] font-semibold text-fga/70">{s}</span></div>
+        ))}
+        <div className="flex-1 flex items-center justify-center gap-1.5 glass rounded-lg py-2 px-2">
+          <img src="/media/portfolio/mcp-query/postgresql.svg" alt="PostgreSQL" className="h-4 w-4 object-contain" />
+          <span className="text-[10px] font-semibold text-fga/70">PostgreSQL</span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">{steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+          <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i+1}</span>
+          <span className="text-[10px] font-semibold text-fga/70 w-28 shrink-0">{s.label}</span>
+          <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
+const ECOMBI_SCREENSHOTS = [
+  { src: "/media/portfolio/analytics/metabase-dashboard.webp", caption: "BI dashboard: revenue trends, order volumes, and product performance over time" },
+];
+function EcommerceBIFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Pandas · NumPy · Matplotlib · Seaborn</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 flex-1">
+          <img src="/media/portfolio/analytics/pandas.svg" alt="Pandas" className="h-5 w-5 object-contain" />
+          <span className="text-[10px] font-semibold text-fga/70">Pandas</span>
+        </div>
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 flex-1">
+          <img src="/media/portfolio/analytics/numpy.svg" alt="NumPy" className="h-5 w-5 object-contain" />
+          <span className="text-[10px] font-semibold text-fga/70">NumPy</span>
+        </div>
+      </div>
+      <Carousel images={ECOMBI_SCREENSHOTS} />
+    </div>
+  );
+}
+
+function StockFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · Shopify API · REST APIs</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5">
+        <img src="/media/portfolio/stock/shopify.svg" alt="Shopify" className="h-5 w-5 object-contain" />
+        <span className="text-[10px] font-semibold text-fga/70">20+ stores monitored</span>
+      </div>
+      <svg viewBox="0 0 300 80" width="100%" style={{ display: "block" }}>
+        {[
+          { x: 10, h: 55, label: "Store 1", ok: true },
+          { x: 110, h: 20, label: "Store 2", ok: false },
+          { x: 210, h: 60, label: "Store 3", ok: true },
+        ].map(s => (
+          <g key={s.x}>
+            <rect x={s.x} y={75-s.h} width={80} height={s.h} rx={4} fill={s.ok ? "rgba(25,211,162,0.35)" : "rgba(239,68,68,0.5)"} />
+            <text x={s.x+40} y={74} textAnchor="middle" fontSize="8" fill="rgba(234,242,239,0.5)" fontFamily="system-ui">{s.label}</text>
+            {!s.ok && <text x={s.x+40} y={55} textAnchor="middle" fontSize="8" fill="#EF4444" fontFamily="system-ui">⚠ LOW</text>}
+          </g>
+        ))}
+      </svg>
+      <div className="flex flex-wrap gap-1.5">{["Python","Shopify API","REST APIs","Alerts"].map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
+
+function ImagePipelineFlow() {
+  const steps = [
+    { label: "Read Excel", flow: "Load names from the first three columns" },
+    { label: "Fetch images", flow: "Google Image search per name" },
+    { label: "Filter & rank", flow: "Sort by colour match and resolution" },
+    { label: "Write Excel", flow: "Ranked image URLs written back to output file" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · Pandas · Pillow · Google Search</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex flex-col gap-2">{steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+          <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i+1}</span>
+          <span className="text-[10px] font-semibold text-fga/70 w-24 shrink-0">{s.label}</span>
+          <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
+function HaircutFlowCard() {
+  const pills = ["Python","PyTorch","HuggingFace","MediaPipe","OpenCV"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Fine-tuned ViT · offline · CPU-only</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="bg-ink-800 rounded-xl overflow-hidden"><HaircutPipelineSVG /></div>
+      <div className="flex flex-wrap gap-1.5">{pills.map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
+
+function GigRadarFlow() {
+  const logos = [
+    { src: "/media/portfolio/gig-radar/github.svg", label: "OAuth2" },
+    { src: "/media/portfolio/gig-radar/graphql.svg", label: "GraphQL" },
+    { src: "/media/portfolio/gig-radar/react.svg", label: "React" },
+    { src: "/media/portfolio/gig-radar/sqlite.svg", label: "SQLite" },
+  ];
+  const steps = [
+    { label: "Sync", flow: "Jobs, profile, and contracts fetched via OAuth2 + GraphQL" },
+    { label: "Store", flow: "Everything saved to a local SQLite database" },
+    { label: "Score", flow: "Rule engine: field, operator, weight — fully editable" },
+    { label: "Browse", flow: "React frontend with receipt-style score breakdown per job" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">FastAPI · React · SQLite · GraphQL</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="grid grid-cols-4 gap-2">{logos.map(l => (
+        <div key={l.label} className="flex flex-col items-center gap-1 glass rounded-xl py-2.5 px-2">
+          <img src={l.src} alt={l.label} className="h-5 w-5 object-contain" />
+          <span className="text-[9px] text-fga/50">{l.label}</span>
+        </div>
+      ))}</div>
+      <div className="flex flex-col gap-2">{steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+          <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i+1}</span>
+          <span className="text-[10px] font-semibold text-fga/70 w-16 shrink-0">{s.label}</span>
+          <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
+const PYCAPS_SCREENSHOTS = [
+  { src: "/media/portfolio/pycaps/demo-1.gif", caption: "Animated styled subtitles on a vertical video" },
+  { src: "/media/portfolio/pycaps/demo-2.gif", caption: "Different subtitle style on the same clip" },
+];
+function PycapsFlow() {
+  const pills = ["Python","CSS","Playwright","ffmpeg"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · CSS subtitles · TikTok/Shorts/Reels</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex flex-wrap gap-1.5">{pills.map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+      <Carousel images={PYCAPS_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const WORLDMONITOR_SCREENSHOTS = [
+  { src: "/media/portfolio/worldmonitor/dashboard.png", caption: "Global situation map: conflict zones, intel hotspots, live news, AI strategic posture, country instability index" },
+];
+function WorldMonitorFlow() {
+  const pills = ["TypeScript","React","AI insights","Live data"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">TypeScript · React · Live geopolitical data</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex flex-wrap gap-1.5">{pills.map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+      <Carousel images={WORLDMONITOR_SCREENSHOTS} />
+    </div>
+  );
+}
+
+function MetaAIFlow() {
+  const outputs = ["Chat", "Image gen", "Video gen"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · FastAPI · Meta AI · Cookie auth</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-2.5 shrink-0">
+          <img src="/media/portfolio/analytics/meta.svg" alt="Meta" className="h-5 w-5 object-contain" />
+          <span className="text-[10px] font-semibold text-fga/70">Meta AI</span>
+        </div>
+        <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0"><line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/><polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.5)"/></svg>
+        <div className="flex-1 grid grid-cols-3 gap-1.5">{outputs.map(o => (
+          <div key={o} className="flex items-center justify-center glass rounded-lg py-2"><span className="text-[10px] font-semibold text-fga/60">{o}</span></div>
+        ))}</div>
+      </div>
+      <div className="flex flex-wrap gap-1.5">{["Python","FastAPI","Cookie auth","REST API"].map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
+
+function PhishingFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · scikit-learn · Gmail API · ML</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <svg viewBox="0 0 300 90" width="100%" style={{ display: "block" }}>
+        <rect x="10" y="20" width="80" height="50" rx="8" fill="rgba(25,211,162,0.12)" stroke="rgba(25,211,162,0.3)" strokeWidth="1"/>
+        <text x="50" y="42" textAnchor="middle" fontSize="11" fill="rgba(234,242,239,0.7)" fontFamily="system-ui">✉</text>
+        <text x="50" y="58" textAnchor="middle" fontSize="8" fill="rgba(234,242,239,0.4)" fontFamily="system-ui">Email in</text>
+        <line x1="92" y1="45" x2="118" y2="45" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="3 2"/>
+        <polygon points="116,42 121,45 116,48" fill="rgba(25,211,162,0.4)"/>
+        <rect x="120" y="20" width="80" height="50" rx="8" fill="rgba(14,124,102,0.2)" stroke="rgba(25,211,162,0.4)" strokeWidth="1"/>
+        <text x="160" y="40" textAnchor="middle" fontSize="8" fill="rgba(234,242,239,0.6)" fontFamily="system-ui">ML Classifier</text>
+        <text x="160" y="56" textAnchor="middle" fontSize="7" fill="rgba(234,242,239,0.35)" fontFamily="system-ui">URL analysis</text>
+        <line x1="202" y1="35" x2="215" y2="25" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5"/>
+        <line x1="202" y1="55" x2="215" y2="65" stroke="rgba(239,68,68,0.5)" strokeWidth="1.5"/>
+        <rect x="216" y="10" width="72" height="28" rx="6" fill="rgba(25,211,162,0.12)" stroke="rgba(25,211,162,0.3)" strokeWidth="1"/>
+        <text x="252" y="29" textAnchor="middle" fontSize="8" fill="rgba(25,211,162,0.8)" fontFamily="system-ui">✓ Inbox</text>
+        <rect x="216" y="52" width="72" height="28" rx="6" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.4)" strokeWidth="1"/>
+        <text x="252" y="71" textAnchor="middle" fontSize="8" fill="rgba(239,68,68,0.8)" fontFamily="system-ui">🗑 Trash</text>
+      </svg>
+      <div className="flex flex-wrap gap-1.5">{["Python","scikit-learn","Gmail API","ML"].map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
+
+function MalwareDBFlow() {
+  const steps = [
+    { label: "Download", flow: "Daily feed from MalwareBazaar, date range or full history" },
+    { label: "Extract", flow: "Unzip with default password, prompt if it fails" },
+    { label: "Hash", flow: "MD5, SHA1, and SHA256 computed per sample" },
+    { label: "Organise", flow: "Files renamed by SHA256 hash, indexed for search" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · multithreading · SHA256 · MalwareBazaar</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex flex-col gap-2">{steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+          <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i+1}</span>
+          <span className="text-[10px] font-semibold text-fga/70 w-20 shrink-0">{s.label}</span>
+          <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
+function VPNFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2"><div className="h-px flex-1 bg-spark/20" /><span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Docker · F5 BIG-IP · Shell</span><div className="h-px flex-1 bg-spark/20" /></div>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 glass rounded-xl px-4 py-3 flex-1">
+          <img src="/media/portfolio/analytics/docker.svg" alt="Docker" className="h-5 w-5 object-contain" />
+          <div>
+            <div className="text-[10px] font-semibold text-fga/70">Docker container</div>
+            <div className="text-[9px] text-fga/40">Isolated VPN session</div>
+          </div>
+        </div>
+        <svg viewBox="0 0 24 10" width="24" height="10" className="shrink-0"><line x1="0" y1="5" x2="18" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5" strokeDasharray="3 2"/><polygon points="16,2 21,5 16,8" fill="rgba(25,211,162,0.5)"/></svg>
+        <div className="glass rounded-xl px-4 py-3 flex-1">
+          <div className="text-[10px] font-semibold text-fga/70">F5 BIG-IP</div>
+          <div className="text-[9px] text-fga/40">VPN client inside</div>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5">{["Docker","F5 BIG-IP","Shell","Scriptable"].map(t => <span key={t} className="text-[10px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{t}</span>)}</div>
+    </div>
+  );
+}
 
 const XERO_SCREENSHOTS = [
   { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "BigChange: job scheduling and field team dispatch" },
@@ -1189,6 +1471,45 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "youtube-flow" && (
                           <div className="p-4"><YoutubeFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "cannabis-flow" && (
+                          <div className="p-4"><CannabisFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "etl-flow" && (
+                          <div className="p-4"><ETLFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "ecommerce-bi-flow" && (
+                          <div className="p-4"><EcommerceBIFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "stock-flow" && (
+                          <div className="p-4"><StockFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "image-pipeline-flow" && (
+                          <div className="p-4"><ImagePipelineFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "haircut-flow" && (
+                          <div className="p-4"><HaircutFlowCard /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "gig-radar-flow" && (
+                          <div className="p-4"><GigRadarFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "pycaps-flow" && (
+                          <div className="p-4"><PycapsFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "worldmonitor-flow" && (
+                          <div className="p-4"><WorldMonitorFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "metaai-flow" && (
+                          <div className="p-4"><MetaAIFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "phishing-flow" && (
+                          <div className="p-4"><PhishingFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "malwaredb-flow" && (
+                          <div className="p-4"><MalwareDBFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "vpn-flow" && (
+                          <div className="p-4"><VPNFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
