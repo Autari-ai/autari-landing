@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -53,13 +54,16 @@ const WORK = [
     period: "Oct 2024 – Present",
     type: "Full-time",
     items: [
-      "ETL pipelines and data infrastructure for Jigsol OS — ingestion, transformation, and reporting layers with PostgreSQL as system of record",
-      "HMRC-compliant payroll module (FPS/CIS submissions) built on FastAPI + Docker",
-      "Jagent — a multi-tenant AI agent service with persistent memory, isolated per-session code execution, and a credential vault",
-      "MCP host (stdio + streamable-HTTP) and a natural-language query planner that writes and executes SQL against the database, reporting results back in chat",
-      "AI agent that turns Jira tickets into feature branches with resumable review sessions",
+      "ETL pipelines and data infrastructure for Jigsol OS — ingestion, transformation, and reporting with PostgreSQL; third-party API layer (jigsolos_data) documented in Confluence",
+      "HMRC-compliant payroll module (FPS/CIS submissions) on FastAPI + Docker (jigsolOS_payroll)",
+      "Jagent — headless, multi-tenant AI agent service (jigsolos_agent): persistent memory, isolated per-session code execution, credential vault, MCP host with stdio + streamable-HTTP transports",
+      "Schema-grounded query planner: natural-language question → validated SQL/Python execution plan → runs against the database → results reported back in chat",
+      "jigsolos_intelligence: Celery-backed analytics and intelligence service with its own REST API",
+      "jigsolos_systemdeployer: Ansible deployment automation across production, staging, and testing environments on AWS Lightsail; Grafana dashboards for Celery task and system monitoring",
+      "claude-ops-bot: AI agent that converts Jira tickets into feature branches with resumable, AI-assisted review sessions and documented cutover/deploy runbooks",
+      "mda-analytics: Laravel/Vue analytics dashboard for management data",
     ],
-    tags: ["Python", "FastAPI", "PostgreSQL", "MCP", "Docker", "CI/CD"],
+    tags: ["Python", "FastAPI", "PostgreSQL", "Redis", "Celery", "MCP", "Docker", "Ansible", "AWS", "TypeScript"],
   },
   {
     company: "Autari Ltd",
@@ -68,13 +72,31 @@ const WORK = [
     period: "Sep 2025 – Present",
     type: "Founder",
     items: [
-      "Done-for-you automation consultancy delivering AI agent and ETL systems for UK and international businesses",
-      "CrewAI-based AI agent orchestration platform and a natural-language data query engine",
-      "REST API integrations across Xero, WFM, Glofox, Acorn, and JISR — replacing manual data entry and reporting",
-      "License and accounts backend: seat management, device-locking, signed activation tokens, and payments",
-      "End-to-end client ownership: requirements, architecture, delivery, and account management",
+      "Built and run an automation consultancy delivering AI agent and ETL systems for UK and international businesses",
+      "autari-landing: Next.js 15 validation landing page with Stripe deposit flow and Google Sheets survey capture — deployed on Netlify at autari.co.uk",
+      "autari-web-portal: Customer + staff web portal (Next.js BFF) — account dashboard, billing, device-locked license management, staff admin console with fulfill/revoke/refund flows",
+      "autari-license-server: Python license backend — seat management, device-locking, signed activation tokens, payments",
+      "autari-desktop: Tauri + React desktop app with per-device activation",
+      "autari-brain: AI Query Engine (MindsDB fork) — natural-language queries over connected data sources via HTTP :47334 and MySQL :47335",
+      "auronexus: CrewAI-based visual agent orchestration platform for building and running AI employee workflows",
+      "REST API integrations across Xero, WFM, Glofox, Acorn, and JISR for client automation",
     ],
-    tags: ["CrewAI", "Python", "REST APIs", "Xero", "FastAPI"],
+    tags: ["Python", "FastAPI", "Next.js", "React", "Tauri", "CrewAI", "Stripe", "REST APIs"],
+  },
+  {
+    company: "ET System (Etisalat / TE Data)",
+    reg: "Contract · Private",
+    role: "Backend & Automation Engineer",
+    period: "Apr 2026 – May 2026",
+    type: "Contract",
+    items: [
+      "Built a high-throughput DSL/broadband customer-inquiry portal automation system for a major Egyptian ISP",
+      "Python FastAPI backend with a queue worker system, smart discovery, and a lead/request-details scraping pipeline",
+      "Go tray agent (et-proxy-agent): a Windows residential-proxy agent that registers at startup, connects to the coordinator via WebSocket, executes HTTP requests from the user's egress IP, and auto-reconnects with exponential backoff",
+      "Multi-tier proxy pool with automatic failover; session/state caching cut network round-trips per lookup from 4 to 1 with per-key concurrency locking",
+      "React/TypeScript frontend with Dashboard, Queue, Results, Stats, Proxy Pool, Scheduler, and TE Inquiry views",
+    ],
+    tags: ["Python", "Go", "FastAPI", "React", "TypeScript", "WebSocket", "Proxy Pool"],
   },
   {
     company: "Hybrid Solutions Group",
@@ -96,8 +118,8 @@ const WORK = [
     period: "2021 – Present",
     type: "Freelance",
     items: [
-      "High-throughput telecom portal automation (Python + Go workers) for a major Egyptian DSL/broadband provider — resilient multi-tier proxy pool with automatic failover, session caching cut round-trips from 4 to 1 with per-key concurrency locking",
-      "Full automation suite for BigChange field service platform — job scheduling, quoting, invoicing",
+      "ET System (above) — telecom portal automation with Go+Python worker split and resilient proxy pool",
+      "Full automation suite for the BigChange field service platform — job scheduling, quoting, invoicing",
       "Stock-monitoring system across 20+ e-commerce stores",
       "Analytics dashboards, web scraping pipelines, and chatbot/AI agent integrations for UK and international clients",
     ],
@@ -157,6 +179,34 @@ const PROJECTS = [
   },
 ];
 
+const SCREENSHOTS = [
+  {
+    src: "/media/portfolio/autari-portal-dashboard.png",
+    caption: "Autari customer portal — account & active device",
+    system: "Autari Web Portal",
+  },
+  {
+    src: "/media/portfolio/autari-portal-billing.png",
+    caption: "Billing — individual & org license purchase with invoice history",
+    system: "Autari Web Portal",
+  },
+  {
+    src: "/media/portfolio/autari-portal-admin.png",
+    caption: "Staff admin console — accounts table, license issue/revoke, seat management",
+    system: "Autari Web Portal",
+  },
+  {
+    src: "/media/portfolio/autari-portal-fulfill.png",
+    caption: "Fulfill a sale — org order creation with live license activation",
+    system: "Autari Web Portal",
+  },
+  {
+    src: "/media/portfolio/autari-ai-employee-abilities.png",
+    caption: "Autari AI employee — configurable abilities and per-role skill sets",
+    system: "Autari AI Employees",
+  },
+];
+
 const CERTS = [
   { name: "AI Engineer for Developers — Associate", issuer: "DataCamp", url: "https://www.datacamp.com/certificate/AIEDA0010363096562" },
   { name: "Data Visualization with Python", issuer: "IBM / Coursera", date: "Aug 2020", url: "https://www.coursera.org/account/accomplishments/certificate/U6HCZ8Q9XA5X" },
@@ -209,37 +259,23 @@ export default function PortfolioPage() {
         <section className="relative flex min-h-[70vh] items-center pb-24 pt-36">
           <div className="aurora" />
           <div className="mx-auto max-w-6xl px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <SectionLabel>Work & Projects</SectionLabel>
             </motion.div>
-
             <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.08 }}
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
               className="mt-6 max-w-3xl font-display text-5xl font-bold leading-[0.96] tracking-[-0.04em] text-fga sm:text-6xl lg:text-7xl"
             >
               Five years of work that ships.
             </motion.h1>
-
             <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.16 }}
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.16 }}
               className="mt-6 max-w-xl text-base leading-relaxed text-fga/60 sm:text-lg"
             >
               Automation systems, AI agents, ETL pipelines, and full-stack products — built for UK and international clients since 2021.
             </motion.p>
-
-            {/* Stat row */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.24 }}
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }}
               className="mt-10 flex flex-wrap gap-4"
             >
               {STATS.map((s) => (
@@ -256,18 +292,11 @@ export default function PortfolioPage() {
         <section className="py-24">
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>What Autari builds</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
-              Four areas, one result.
-            </h2>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Four areas, one result.</h2>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {SERVICES.map((s, i) => (
                 <motion.div
-                  key={s.title}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, margin: "-60px" }}
-                  variants={fadeUp}
+                  key={s.title} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
                   className="glass glass-hover rounded-2xl p-6 flex flex-col gap-4"
                 >
                   <span className="text-3xl">{s.icon}</span>
@@ -284,22 +313,45 @@ export default function PortfolioPage() {
           </div>
         </section>
 
+        {/* ── Screenshots ── */}
+        <section className="py-24 border-t border-white/8">
+          <div className="mx-auto max-w-6xl px-6">
+            <SectionLabel>System screenshots</SectionLabel>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Real products, shipped.</h2>
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {SCREENSHOTS.map((s, i) => (
+                <motion.div
+                  key={s.src} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
+                  className="glass glass-hover rounded-2xl overflow-hidden flex flex-col"
+                >
+                  <div className="relative w-full aspect-[16/10] bg-ink-800 overflow-hidden">
+                    <Image
+                      src={s.src}
+                      alt={s.caption}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="text-[10px] font-medium uppercase tracking-[0.1em] text-spark mb-1">{s.system}</div>
+                    <p className="text-sm text-fga/60 leading-snug">{s.caption}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── Work history ── */}
         <section className="py-24 border-t border-white/8">
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>Experience</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
-              Every engagement.
-            </h2>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Every engagement.</h2>
             <div className="mt-12 flex flex-col gap-6">
               {WORK.map((w, i) => (
                 <motion.div
-                  key={w.company}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, margin: "-60px" }}
-                  variants={fadeUp}
+                  key={w.company} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
                   className="glass glass-hover rounded-2xl p-6 sm:p-8"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -336,27 +388,16 @@ export default function PortfolioPage() {
         <section className="py-24 border-t border-white/8">
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>Open source</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
-              Projects on GitHub.
-            </h2>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Projects on GitHub.</h2>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {PROJECTS.map((p, i) => (
                 <motion.a
-                  href={p.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  key={p.name}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, margin: "-60px" }}
-                  variants={fadeUp}
+                  href={p.url} target="_blank" rel="noopener noreferrer"
+                  key={p.name} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
                   className="glass glass-hover rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-display text-base font-semibold text-fga group-hover:text-spark transition-colors">
-                      {p.name}
-                    </h3>
+                    <h3 className="font-display text-base font-semibold text-fga group-hover:text-spark transition-colors">{p.name}</h3>
                     <svg className="mt-0.5 h-4 w-4 shrink-0 text-fga/30 group-hover:text-spark transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -376,16 +417,8 @@ export default function PortfolioPage() {
           <div className="mx-auto max-w-6xl px-6">
             <SectionLabel>Founder</SectionLabel>
             <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_1.2fr] items-start">
-              {/* Bio */}
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <h2 className="font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
-                  Noor Ossama Zakaria
-                </h2>
+              <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+                <h2 className="font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Noor Ossama Zakaria</h2>
                 <p className="mt-1 text-sm text-fga/45">23 · Cairo, Egypt</p>
                 <p className="mt-5 text-base leading-relaxed text-fga/65">
                   Started freelancing in automation and data engineering on Upwork in 2021. Over five years that grew from scripts and dashboards into full ETL systems, AI agent services, and a consultancy — Autari — that runs production automation for businesses across the UK.
@@ -394,24 +427,13 @@ export default function PortfolioPage() {
                   Currently also a software engineer at Jigsol Business Solutions, building the data infrastructure and AI tools inside Jigsol OS.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Button href="mailto:noorossamazakaria@gmail.com" variant="primary">
-                    Get in touch
-                  </Button>
-                  <Button href="https://linkedin.com/in/noor-zakaria" target="_blank" rel="noopener noreferrer" variant="secondary">
-                    LinkedIn
-                  </Button>
-                  <Button href="https://github.com/noorgx" target="_blank" rel="noopener noreferrer" variant="secondary">
-                    GitHub
-                  </Button>
+                  <Button href="mailto:noorossamazakaria@gmail.com" variant="primary">Get in touch</Button>
+                  <Button href="https://linkedin.com/in/noor-zakaria" target="_blank" rel="noopener noreferrer" variant="secondary">LinkedIn</Button>
+                  <Button href="https://github.com/noorgx" target="_blank" rel="noopener noreferrer" variant="secondary">GitHub</Button>
                 </div>
               </motion.div>
-
-              {/* Certifications */}
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
+                initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}
                 className="flex flex-col gap-3"
               >
                 <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-fga/40">Certifications</p>
@@ -419,17 +441,10 @@ export default function PortfolioPage() {
                   <div key={c.name} className="glass glass-hover rounded-xl px-5 py-4 flex items-center justify-between gap-4">
                     <div>
                       <div className="text-sm font-medium text-fga">{c.name}</div>
-                      <div className="mt-0.5 text-xs text-fga/45">
-                        {c.issuer}{c.date ? ` · ${c.date}` : ""}
-                      </div>
+                      <div className="mt-0.5 text-xs text-fga/45">{c.issuer}{c.date ? ` · ${c.date}` : ""}</div>
                     </div>
                     {c.url && (
-                      <a
-                        href={c.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="shrink-0 text-[10px] font-medium uppercase tracking-[0.1em] text-spark hover:text-mint transition-colors"
-                      >
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[10px] font-medium uppercase tracking-[0.1em] text-spark hover:text-mint transition-colors">
                         View →
                       </a>
                     )}
@@ -444,19 +459,13 @@ export default function PortfolioPage() {
         <section className="py-24 border-t border-white/8">
           <div className="mx-auto max-w-6xl px-6 text-center">
             <SectionLabel className="justify-center">Work with Autari</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">
-              Have a process worth automating?
-            </h2>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Have a process worth automating?</h2>
             <p className="mt-4 text-base text-fga/55 max-w-lg mx-auto">
               Book a call. You walk us through the repetitive work, we scope it and show you it working before anything goes live.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Button href={bookACallHref()} className="px-8 py-3.5">
-                Book a call
-              </Button>
-              <Button href="/" variant="secondary" className="px-8 py-3.5">
-                Back to autari.co.uk
-              </Button>
+              <Button href={bookACallHref()} className="px-8 py-3.5">Book a call</Button>
+              <Button href="/" variant="secondary" className="px-8 py-3.5">Back to autari.co.uk</Button>
             </div>
           </div>
         </section>
