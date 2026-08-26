@@ -465,7 +465,9 @@ const BIGCHANGE_SCREENSHOTS = [
 ];
 
 const OCR_SCREENSHOTS = [
-  { src: "/media/portfolio/ocr/ocr-process.jpg", caption: "What the pipeline does: scanned documents and PDFs go in, structured data comes out" },
+  { src: "/media/portfolio/ocr/invoice-ocr-1.jpg", caption: "Automated invoice processing: image in, structured data out, no manual entry" },
+  { src: "/media/portfolio/ocr/invoice-ocr-2.jpg", caption: "Traditional vs automated: human reviewers replaced by a validated extraction pipeline" },
+  { src: "/media/portfolio/ocr/ocr-process.jpg", caption: "The pipeline: scanned documents and PDFs go in, text and database records come out" },
 ];
 
 function OCRPipelineFlow() {
@@ -495,18 +497,17 @@ function OCRPipelineFlow() {
       {/* Flow: PDF → Read → Extract → Data */}
       <div className="flex items-center gap-1">
         {[
-          { icon: "📄", label: "PDF in" },
-          { icon: "🔍", label: "Read" },
-          { icon: "📝", label: "Extract" },
-          { icon: "🗄️", label: "Data out" },
+          { label: "PDF in" },
+          { label: "Read" },
+          { label: "Extract" },
+          { label: "Data out" },
         ].map((s, i, arr) => (
           <React.Fragment key={s.label}>
-            <div className="flex-1 flex flex-col items-center gap-0.5">
-              <span className="text-lg">{s.icon}</span>
-              <span className="text-[9px] text-fga/50">{s.label}</span>
+            <div className="flex-1 flex items-center justify-center bg-white/5 border border-white/10 rounded-lg py-2 px-1">
+              <span className="text-[11px] font-semibold text-fga/70">{s.label}</span>
             </div>
             {i < arr.length - 1 && (
-              <svg viewBox="0 0 14 10" width="14" height="10" className="shrink-0 mb-3">
+              <svg viewBox="0 0 14 10" width="14" height="10" className="shrink-0">
                 <line x1="0" y1="5" x2="10" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5"/>
                 <polygon points="8,2 12,5 8,8" fill="rgba(25,211,162,0.4)"/>
               </svg>
