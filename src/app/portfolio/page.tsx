@@ -218,7 +218,7 @@ const ALL_WORK_CATEGORIES = [
       { name: "FormForge", desc: "Upload a scanned paper form, draw boxes over each field, and generate filled copies. Works for Arabic and English in the same form. Bulk-fill hundreds from an Excel sheet.", customComponent: "formforge-flow" },
       { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
       { name: "worldmonitor", desc: "Real-time global intelligence dashboard. AI-powered news aggregation and geopolitical monitoring" },
-      { name: "youtube-automation", desc: "YouTube channel and content automation system" },
+      { name: "YouTube Automation", desc: "Automates a YouTube channel end to end: content scheduling, description generation, thumbnail creation, and upload — so the channel runs without anyone doing it manually.", customComponent: "youtube-flow" },
       { name: "metaai-api", desc: "FastAPI wrapper for Meta AI with chat, image generation, and video generation via cookie-based auth" },
     ],
   },
@@ -476,6 +476,38 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const YOUTUBE_SCREENSHOTS = [
+  { src: "/media/portfolio/youtube/demo.gif", caption: "YouTube automation in action: end-to-end channel management running automatically" },
+];
+
+function YoutubeFlow() {
+  const steps = [
+    { label: "Schedule content", flow: "Decide what goes up and when, once" },
+    { label: "Generate descriptions", flow: "AI writes the copy for every upload" },
+    { label: "Create thumbnails", flow: "Thumbnails produced automatically" },
+    { label: "Upload and publish", flow: "Video goes live without anyone touching it" },
+  ];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-spark/20" />
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-spark/60">Python · YouTube API · AI</span>
+        <div className="h-px flex-1 bg-spark/20" />
+      </div>
+      <div className="flex flex-col gap-2">
+        {steps.map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
+            <span className="shrink-0 text-[10px] font-bold text-spark/70 w-5">{i + 1}</span>
+            <span className="text-[10px] font-semibold text-fga/70 w-32 shrink-0">{s.label}</span>
+            <span className="text-[10px] text-fga/45 leading-snug flex-1">{s.flow}</span>
+          </div>
+        ))}
+      </div>
+      <Carousel images={YOUTUBE_SCREENSHOTS} />
     </div>
   );
 }
@@ -1155,6 +1187,9 @@ export default function PortfolioPage() {
                         {"customComponent" in item && item.customComponent === "grafana-flow" && (
                           <div className="p-4"><GrafanaFlow /></div>
                         )}
+                        {"customComponent" in item && item.customComponent === "youtube-flow" && (
+                          <div className="p-4"><YoutubeFlow /></div>
+                        )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
                         )}
@@ -1172,113 +1207,6 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* ── Work history ── */}
-        <section className="py-24 border-t border-white/8">
-          <div className="mx-auto max-w-6xl px-6">
-            <SectionLabel>Experience</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Every engagement.</h2>
-            <div className="mt-12 flex flex-col gap-6">
-              {WORK.map((w, i) => (
-                <motion.div
-                  key={w.company} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
-                  className="glass glass-hover rounded-2xl p-6 sm:p-8"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-display text-lg font-semibold text-fga">{w.company}</h3>
-                        <TypeBadge type={w.type} />
-                      </div>
-                      <div className="mt-1 text-xs text-fga/45">{w.reg}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-spark">{w.role}</div>
-                      <div className="mt-0.5 text-xs text-fga/40">{w.period}</div>
-                    </div>
-                  </div>
-                  <ul className="mt-5 flex flex-col gap-2">
-                    {w.items.map((item, j) => (
-                      <li key={j} className="flex gap-3 text-sm leading-relaxed text-fga/65">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-spark/60" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-5 flex flex-wrap gap-1.5">
-                    {w.tags.map((t) => <Tag key={t} label={t} />)}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Open-source projects ── */}
-        <section className="py-24 border-t border-white/8">
-          <div className="mx-auto max-w-6xl px-6">
-            <SectionLabel>Open source</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Projects on GitHub.</h2>
-
-            {/* Featured: Best-Fit Haircut Detection */}
-            {(() => {
-              const featured = PROJECTS.find((p) => p.featured);
-              if (!featured) return null;
-              return (
-                <motion.a
-                  href={featured.url} target="_blank" rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="mt-10 block glass glass-hover rounded-2xl overflow-hidden group cursor-pointer"
-                >
-                  {/* illustration */}
-                  <div className="bg-ink-800 px-6 pt-8 pb-2">
-                    <HaircutPipelineSVG />
-                  </div>
-                  {/* copy */}
-                  <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-end gap-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-display text-xl font-bold text-fga group-hover:text-spark transition-colors">{featured.name}</h3>
-                        <span className="rounded-full bg-spark/15 border border-spark/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-spark">Featured</span>
-                      </div>
-                      <p className="mt-3 text-sm leading-relaxed text-fga/60 max-w-2xl">{featured.desc}</p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {featured.lang.map((l) => <Tag key={l} label={l} />)}
-                      </div>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-spark group-hover:text-mint transition-colors">
-                      View on GitHub
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </div>
-                  </div>
-                </motion.a>
-              );
-            })()}
-
-            {/* Rest of projects */}
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {PROJECTS.filter((p) => !p.featured).map((p, i) => (
-                <motion.a
-                  href={p.url} target="_blank" rel="noopener noreferrer"
-                  key={p.name} custom={i} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp}
-                  className="glass glass-hover rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-display text-base font-semibold text-fga group-hover:text-spark transition-colors">{p.name}</h3>
-                    <svg className="mt-0.5 h-4 w-4 shrink-0 text-fga/30 group-hover:text-spark transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </div>
-                  <p className="text-sm leading-relaxed text-fga/55 flex-1">{p.desc}</p>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {p.lang.map((l) => <Tag key={l} label={l} />)}
-                  </div>
-                </motion.a>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── Founder / About ── */}
         <section className="py-24 border-t border-white/8">
