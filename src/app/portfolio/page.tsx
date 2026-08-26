@@ -196,7 +196,7 @@ const ALL_WORK_CATEGORIES = [
       },
       { name: "MCP Host + Query Planner", desc: "You type a question. It reads the database schema, plans exactly which queries to run, runs them, and writes the answer back in the chat with charts if they help.", customComponent: "mcp-query-flow" },
       { name: "Auronexus", desc: "Give each AI agent a role and a channel. They pick up jobs, collaborate in chat, and get things done. No code to write, just define what each agent does.", customComponent: "auronexus-flow" },
-      { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
+      { name: "Autari Brain", desc: "Connect your databases, spreadsheets, and APIs. Ask questions in plain English, get answers. Works over HTTP or MySQL, so any SQL tool can talk to it.", customComponent: "autari-brain-flow" },
       { name: "Gig Copilot", desc: "The AI drafts the artifact. You get a Telegram message with approve, revise, or reject buttons. Your GitHub activity gets turned into portfolio case studies automatically.", customComponent: "gig-copilot-flow" },
     ],
   },
@@ -499,6 +499,53 @@ function BigChangeXeroFlow() {
       </div>
       {/* Screenshot carousel */}
       <Carousel images={XERO_SCREENSHOTS} />
+    </div>
+  );
+}
+
+const AUTARI_BRAIN_SCREENSHOTS = [
+  { src: "/media/portfolio/autari-brain/mysql-sql-editor.gif", caption: "MySQL Workbench connected to Autari Brain: write SQL, get AI-powered results from any data source" },
+  { src: "/media/portfolio/autari-brain/mysql-performance.png", caption: "Performance dashboard: monitor queries, connections, and throughput in real time" },
+];
+
+function AutariBrainFlow() {
+  const interfaces = [
+    { label: "HTTP :47334", desc: "REST API — any client" },
+    { label: "MySQL :47335", desc: "Any SQL tool connects" },
+  ];
+  const sources = ["Databases", "Spreadsheets", "APIs", "Files"];
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* Header: MindsDB fork + interfaces */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 glass rounded-xl px-3 py-2.5 shrink-0">
+          <img src="/media/portfolio/autari-brain/mindsdb-logo.png" alt="MindsDB" className="h-6 w-6 rounded object-cover" />
+          <span className="text-[10px] font-semibold text-fga/70">MindsDB fork</span>
+        </div>
+        <svg viewBox="0 0 16 10" width="16" height="10" className="shrink-0">
+          <line x1="0" y1="5" x2="12" y2="5" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5" strokeDasharray="3 2"/>
+          <polygon points="10,2 14,5 10,8" fill="rgba(25,211,162,0.4)"/>
+        </svg>
+        <div className="flex flex-col gap-1.5 flex-1">
+          {interfaces.map((iface) => (
+            <div key={iface.label} className="flex items-center gap-2 glass rounded-lg px-3 py-1.5">
+              <img src="/media/portfolio/autari-brain/mysql.svg" alt="MySQL" className="h-4 w-4 object-contain" />
+              <span className="text-[9px] font-mono text-spark/80">{iface.label}</span>
+              <span className="text-[9px] text-fga/40">{iface.desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Connected sources */}
+      <div className="flex items-center gap-2">
+        <span className="text-[9px] text-fga/40 shrink-0">connects to</span>
+        <div className="flex flex-wrap gap-1.5 flex-1">
+          {sources.map((s) => (
+            <span key={s} className="text-[9px] font-semibold text-fga/60 border border-white/10 rounded-full px-2.5 py-1">{s}</span>
+          ))}
+        </div>
+      </div>
+      <Carousel images={AUTARI_BRAIN_SCREENSHOTS} />
     </div>
   );
 }
@@ -984,6 +1031,9 @@ export default function PortfolioPage() {
                         )}
                         {"customComponent" in item && item.customComponent === "gig-copilot-flow" && (
                           <div className="p-4"><GigCopilotFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "autari-brain-flow" && (
+                          <div className="p-4"><AutariBrainFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
