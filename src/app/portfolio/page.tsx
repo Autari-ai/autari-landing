@@ -169,7 +169,8 @@ const ALL_WORK_CATEGORIES = [
       },
       {
         name: "BigChange Automation Suite",
-        desc: "Full automation of job scheduling, quoting, and invoicing for a UK field service company. Jobs flow through the system without anyone having to move them manually.",
+        desc: "Jobs flow through scheduling, quoting, and invoicing without anyone having to move them manually.",
+        customComponent: "bigchange-flow",
       },
       {
         name: "OCR Document Pipeline",
@@ -455,6 +456,41 @@ function BigChangeXeroFlow() {
   );
 }
 
+const BIGCHANGE_SCREENSHOTS = [
+  { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "Job scheduling: every engineer, every job, in one view" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-quotes.png", caption: "Quotes sent to customers without anyone typing them up" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoice raised the moment a job is completed" },
+  { src: "/media/portfolio/bigchange-xero/bigchange-reporting.png", caption: "Reporting dashboard updated in real time" },
+];
+
+function BigChangeFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* BigChange logo */}
+      <div className="flex items-center justify-center bg-[#003B6B] rounded-lg px-4 py-3 h-14">
+        <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-7 w-auto object-contain" />
+      </div>
+      {/* Flow: Jobs → Quotes → Invoices */}
+      <div className="flex items-center gap-1">
+        {["Jobs", "Quotes", "Invoices"].map((label, i) => (
+          <React.Fragment key={label}>
+            <div className="flex-1 flex items-center justify-center bg-[#003B6B]/40 border border-[#003B6B]/60 rounded-lg py-2 px-1">
+              <span className="text-[11px] font-semibold text-fga/80">{label}</span>
+            </div>
+            {i < 2 && (
+              <svg viewBox="0 0 16 10" width="16" height="10" className="shrink-0">
+                <line x1="0" y1="5" x2="12" y2="5" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5"/>
+                <polygon points="10,2 14,5 10,8" fill="rgba(25,211,162,0.5)"/>
+              </svg>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      <Carousel images={BIGCHANGE_SCREENSHOTS} />
+    </div>
+  );
+}
+
 function Carousel({ images }: { images: { src: string; caption: string }[] }) {
   const [idx, setIdx] = React.useState(0);
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
@@ -579,6 +615,9 @@ export default function PortfolioPage() {
                       <div key={item.name} className="glass glass-hover rounded-2xl overflow-hidden flex flex-col">
                         {"customComponent" in item && item.customComponent === "bigchange-xero" && (
                           <div className="p-4"><BigChangeXeroFlow /></div>
+                        )}
+                        {"customComponent" in item && item.customComponent === "bigchange-flow" && (
+                          <div className="p-4"><BigChangeFlow /></div>
                         )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
