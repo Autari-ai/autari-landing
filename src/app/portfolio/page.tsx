@@ -167,6 +167,14 @@ const ALL_WORK_CATEGORIES = [
         desc: "Every job, quote, invoice and purchase order that used to be done by hand now runs automatically between BigChange and Xero. Scanned documents get read and filed. Dashboards stay up to date.",
         customComponent: "bigchange-xero",
       },
+      {
+        name: "BigChange Automation Suite",
+        desc: "Full automation of job scheduling, quoting, and invoicing for a UK field service company. Jobs flow through the system without anyone having to move them manually.",
+      },
+      {
+        name: "OCR Document Pipeline",
+        desc: "Scanned paper forms and PDFs go in, structured data comes out. Built for Hybrid Solutions Group to stop people from retyping information from documents by hand.",
+      },
     ],
   },
   {
