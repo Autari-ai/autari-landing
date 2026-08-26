@@ -410,45 +410,58 @@ const CERTS = [
 /* ------------------------------------------------------------------ */
 
 
+const XERO_SCREENSHOTS = [
+  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero dashboard — financials at a glance" },
+  { src: "/media/portfolio/bigchange-xero/xero-invoicing.jpg", caption: "Invoicing — sent automatically from job completion" },
+  { src: "/media/portfolio/bigchange-xero/xero-pos.jpg", caption: "Purchase orders — raised and tracked without manual entry" },
+  { src: "/media/portfolio/bigchange-xero/xero-bills.jpg", caption: "Bills — reconciled automatically" },
+];
+
 function BigChangeXeroFlow() {
   return (
-    <div className="w-full bg-ink-800 rounded-xl p-6">
-      {/* Logo row */}
-      <div className="flex items-center justify-between gap-2 mb-6">
-        {/* BigChange logo */}
-        <div className="flex-1 flex items-center justify-center bg-[#003B6B] rounded-xl p-3 h-14">
-          <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-8 w-auto object-contain" />
+    <div className="w-full bg-ink-800 rounded-xl p-4 flex flex-col gap-4">
+      {/* Logo row: BigChange → Airflow → Xero */}
+      <div className="flex items-center gap-2">
+        {/* BigChange */}
+        <div className="flex-1 flex flex-col items-center gap-1.5">
+          <div className="w-full flex items-center justify-center bg-[#003B6B] rounded-lg px-3 py-2 h-12">
+            <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-6 w-auto object-contain" />
+          </div>
+          <span className="text-[9px] text-fga/40 tracking-wide">Field service</span>
         </div>
-        {/* Arrow + Airflow */}
+        {/* Airflow middle */}
         <div className="flex flex-col items-center gap-1 shrink-0">
-          <svg viewBox="0 0 80 32" width="80" height="32">
+          <svg viewBox="0 0 60 44" width="60" height="44">
             <defs>
-              <linearGradient id="arr" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stopColor="#017CEE" />
-                <stop offset="100%" stopColor="#00C7D4" />
+              <linearGradient id="af-g" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#017CEE"/>
+                <stop offset="100%" stopColor="#00A9E0"/>
               </linearGradient>
             </defs>
-            {/* Airflow icon — simplified "A" shape */}
-            <rect x="1" y="6" width="20" height="20" rx="5" fill="#017CEE" />
-            <text x="11" y="21" textAnchor="middle" fontSize="13" fontWeight="900" fill="white" fontFamily="system-ui">A</text>
-            {/* Arrow */}
-            <line x1="24" y1="16" x2="72" y2="16" stroke="url(#arr)" strokeWidth="2" />
-            <polygon points="72,12 79,16 72,20" fill="#00C7D4" />
-            <text x="48" y="30" textAnchor="middle" fontSize="7" fill="rgba(25,211,162,0.6)" fontFamily="system-ui" letterSpacing="0.05em">Airflow</text>
+            {/* left arrow in */}
+            <line x1="0" y1="16" x2="10" y2="16" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5"/>
+            {/* Airflow badge */}
+            <rect x="10" y="6" width="40" height="20" rx="6" fill="url(#af-g)"/>
+            {/* A mark */}
+            <text x="20" y="21" fontSize="12" fontWeight="900" fill="white" fontFamily="system-ui">A</text>
+            {/* word */}
+            <text x="33" y="21" fontSize="8" fontWeight="600" fill="rgba(255,255,255,0.9)" fontFamily="system-ui">flow</text>
+            {/* right arrow out */}
+            <line x1="50" y1="16" x2="60" y2="16" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5"/>
+            <polygon points="57,13 61,16 57,19" fill="rgba(25,211,162,0.6)"/>
+            <text x="30" y="40" textAnchor="middle" fontSize="7.5" fill="rgba(1,124,238,0.7)" fontFamily="system-ui">orchestration</text>
           </svg>
         </div>
-        {/* Xero logo */}
-        <div className="flex-1 flex items-center justify-center bg-white rounded-xl p-3 h-14">
-          <img src="/media/portfolio/bigchange-xero/xero.svg" alt="Xero" className="h-8 w-auto object-contain" />
+        {/* Xero */}
+        <div className="flex-1 flex flex-col items-center gap-1.5">
+          <div className="w-full flex items-center justify-center bg-white rounded-lg px-3 py-2 h-12">
+            <img src="/media/portfolio/bigchange-xero/xero.svg" alt="Xero" className="h-6 w-auto object-contain" />
+          </div>
+          <span className="text-[9px] text-fga/40 tracking-wide">Accounting</span>
         </div>
       </div>
-      {/* Xero dashboard product screenshot */}
-      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-        <Image src="/media/portfolio/bigchange-xero/xero-dashboard.jpg" alt="Xero dashboard" fill className="object-cover" sizes="100vw" />
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/80 to-transparent px-4 py-3">
-          <p className="text-xs text-fga/70">Xero accounting dashboard — connected and automated</p>
-        </div>
-      </div>
+      {/* Screenshot carousel */}
+      <Carousel images={XERO_SCREENSHOTS} />
     </div>
   );
 }
