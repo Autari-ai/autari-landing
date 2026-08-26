@@ -35,7 +35,7 @@ function HaircutPipelineSVG() {
       {/* polaroid-style frame (sketchy, slightly rotated) */}
       <g transform="translate(42,30) rotate(-4)">
         <rect x="0" y="0" width="110" height="130" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-        {/* face outline — oval */}
+        {/* face outline. oval */}
         <ellipse cx="55" cy="58" rx="28" ry="33" fill="none" stroke="rgba(234,242,239,0.5)" strokeWidth="1.5" strokeDasharray="3 2" />
         {/* eyes */}
         <ellipse cx="44" cy="50" rx="4" ry="2.5" fill="rgba(234,242,239,0.35)" />
@@ -180,18 +180,18 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Accounting & Finance Automation",
     items: [
-      { name: "Multi-Platform API Integrations", desc: "Automation across Xero, WFM, Glofox, Acorn, and JISR — replacing manual data entry and reporting for UK and international clients (Autari)" },
+      { name: "Multi-Platform API Integrations", desc: "Automation across Xero, WFM, Glofox, Acorn, and JISR. replacing manual data entry and reporting for UK and international clients (Autari)" },
       { name: "Invoice, PO & Quote Automation", desc: "End-to-end billing and purchase-order workflow automation (Hybrid Solutions Group)" },
     ],
   },
   {
     title: "AI Agent Platforms",
     items: [
-      { name: "Jagent", desc: "Headless multi-tenant AI agent service — persistent memory, isolated per-session code execution, credential vault that keeps secrets out of the LLM context" },
+      { name: "Jagent", desc: "Headless multi-tenant AI agent service. persistent memory, isolated per-session code execution, credential vault that keeps secrets out of the LLM context" },
       { name: "MCP Host + Query Planner", desc: "MCP host (stdio + streamable-HTTP) and a schema-grounded query planner that turns natural language into a validated SQL/Python execution plan, runs it, and reports results in chat" },
       { name: "Auronexus", desc: "CrewAI-based visual agent orchestration platform for building and running AI employee workflows" },
-      { name: "Autari Brain", desc: "AI query engine (MindsDB fork) — natural-language queries over connected data sources via HTTP and MySQL interfaces" },
-      { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram — approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
+      { name: "Autari Brain", desc: "AI query engine (MindsDB fork). natural-language queries over connected data sources via HTTP and MySQL interfaces" },
+      { name: "Gig Copilot", desc: "AI task runner with human-in-the-loop review over Telegram. approve, revise, or reject each artifact; GitHub-activity watcher auto-drafts case studies" },
     ],
   },
   {
@@ -199,7 +199,7 @@ const ALL_WORK_CATEGORIES = [
     items: [
       { name: "claude-ops-bot", desc: "AI agent that converts Jira tickets into feature branches with resumable, AI-assisted review sessions and documented cutover/deploy runbooks" },
       { name: "jigsolos_systemdeployer", desc: "Ansible-based deployment automation across production, staging, and testing environments on AWS Lightsail, with Grafana task monitoring" },
-      { name: "job-ops", desc: "DevOps principles applied to job hunting — a self-hosted pipeline to track, analyse, and assist the application process" },
+      { name: "job-ops", desc: "DevOps principles applied to job hunting. a self-hosted pipeline to track, analyse, and assist the application process" },
       { name: "OffensiveSET", desc: "MCP server for generating high-quality pentesting conversation datasets for LLM fine-tuning" },
     ],
   },
@@ -219,9 +219,9 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "SaaS & Products (Autari)",
     items: [
-      { name: "autari-landing", desc: "Next.js validation landing page with a conversational survey, Stripe refundable deposit flow, and Google Sheets capture — deployed at autari.co.uk" },
-      { name: "autari-web-portal", desc: "Customer + staff web portal — account dashboard, billing, device-locked license management, staff admin with fulfill/revoke/refund/seat-adjust flows" },
-      { name: "autari-license-server", desc: "License backend — seat management, device-locking, signed activation tokens, payments" },
+      { name: "autari-landing", desc: "Next.js validation landing page with a conversational survey, Stripe refundable deposit flow, and Google Sheets capture. deployed at autari.co.uk" },
+      { name: "autari-web-portal", desc: "Customer + staff web portal. account dashboard, billing, device-locked license management, staff admin with fulfill/revoke/refund/seat-adjust flows" },
+      { name: "autari-license-server", desc: "License backend. seat management, device-locking, signed activation tokens, payments" },
       { name: "autari-desktop", desc: "Tauri + React desktop app with per-device activation" },
       { name: "autari-employee", desc: "Packaging, installer (NSIS), and backend sidecar for the desktop product" },
     ],
@@ -229,12 +229,12 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Consumer & Personal Tools",
     items: [
-      { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions — fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
+      { name: "Best-Fit Haircut Detection", desc: "Take a selfie, get ranked haircut suggestions. fine-tuned ViT face-shape classifier fused with MediaPipe facial geometry, full training pipeline, celebrity star-match database" },
       { name: "Game Pass Search", desc: "Desktop app syncing the Xbox Game Pass catalog into SQLite with on-device AI genre/tag classification and Steam-style faceted filters" },
-      { name: "Gig Radar", desc: "Upwork job intelligence tool — OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
-      { name: "FormForge", desc: "Desktop form filler for scanned paper templates — bulk generation from Excel, Arabic RTL + English in the same field box" },
+      { name: "Gig Radar", desc: "Upwork job intelligence tool. OAuth2/GraphQL sync, editable rule-based scoring engine, React frontend with receipt-style score breakdown" },
+      { name: "FormForge", desc: "Desktop form filler for scanned paper templates. bulk generation from Excel, Arabic RTL + English in the same field box" },
       { name: "pycaps", desc: "Animated video subtitle generator with Python and CSS" },
-      { name: "worldmonitor", desc: "Real-time global intelligence dashboard — AI-powered news aggregation and geopolitical monitoring" },
+      { name: "worldmonitor", desc: "Real-time global intelligence dashboard. AI-powered news aggregation and geopolitical monitoring" },
       { name: "youtube-automation", desc: "YouTube channel and content automation system" },
       { name: "metaai-api", desc: "FastAPI wrapper for Meta AI with chat, image generation, and video generation via cookie-based auth" },
     ],
@@ -242,7 +242,7 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "PlayStation Platform",
     items: [
-      { name: "PlayStation Backend + Frontend", desc: "Full-stack PlayStation platform — Node.js/JavaScript backend and frontend application" },
+      { name: "PlayStation Backend + Frontend", desc: "Full-stack PlayStation platform. Node.js/JavaScript backend and frontend application" },
     ],
   },
   {
@@ -269,9 +269,9 @@ const WORK = [
     period: "Oct 2024 – Present",
     type: "Full-time",
     items: [
-      "ETL pipelines and data infrastructure for Jigsol OS — ingestion, transformation, and reporting with PostgreSQL; third-party API layer (jigsolos_data) documented in Confluence",
+      "ETL pipelines and data infrastructure for Jigsol OS. ingestion, transformation, and reporting with PostgreSQL; third-party API layer (jigsolos_data) documented in Confluence",
       "HMRC-compliant payroll module (FPS/CIS submissions) on FastAPI + Docker (jigsolOS_payroll)",
-      "Jagent — headless, multi-tenant AI agent service (jigsolos_agent): persistent memory, isolated per-session code execution, credential vault, MCP host with stdio + streamable-HTTP transports",
+      "Jagent. headless, multi-tenant AI agent service (jigsolos_agent): persistent memory, isolated per-session code execution, credential vault, MCP host with stdio + streamable-HTTP transports",
       "Schema-grounded query planner: natural-language question → validated SQL/Python execution plan → runs against the database → results reported back in chat",
       "jigsolos_intelligence: Celery-backed analytics and intelligence service with its own REST API",
       "jigsolos_systemdeployer: Ansible deployment automation across production, staging, and testing environments on AWS Lightsail; Grafana dashboards for Celery task and system monitoring",
@@ -288,11 +288,11 @@ const WORK = [
     type: "Founder",
     items: [
       "Built and run an automation consultancy delivering AI agent and ETL systems for UK and international businesses",
-      "autari-landing: Next.js 15 validation landing page with Stripe deposit flow and Google Sheets survey capture — deployed on Netlify at autari.co.uk",
-      "autari-web-portal: Customer + staff web portal (Next.js BFF) — account dashboard, billing, device-locked license management, staff admin console with fulfill/revoke/refund flows",
-      "autari-license-server: Python license backend — seat management, device-locking, signed activation tokens, payments",
+      "autari-landing: Next.js 15 validation landing page with Stripe deposit flow and Google Sheets survey capture. deployed on Netlify at autari.co.uk",
+      "autari-web-portal: Customer + staff web portal (Next.js BFF). account dashboard, billing, device-locked license management, staff admin console with fulfill/revoke/refund flows",
+      "autari-license-server: Python license backend. seat management, device-locking, signed activation tokens, payments",
       "autari-desktop: Tauri + React desktop app with per-device activation",
-      "autari-brain: AI Query Engine (MindsDB fork) — natural-language queries over connected data sources via HTTP :47334 and MySQL :47335",
+      "autari-brain: AI Query Engine (MindsDB fork). natural-language queries over connected data sources via HTTP :47334 and MySQL :47335",
       "auronexus: CrewAI-based visual agent orchestration platform for building and running AI employee workflows",
       "REST API integrations across Xero, WFM, Glofox, Acorn, and JISR for client automation",
     ],
@@ -320,7 +320,7 @@ const WORK = [
     period: "Jun 2025 – Feb 2026",
     type: "Contract",
     items: [
-      "Python/Airflow ETL system integrating BigChange field service platform with Xero accounting — automating job, quote, invoice, and purchase-order workflows end to end",
+      "Python/Airflow ETL system integrating BigChange field service platform with Xero accounting. automating job, quote, invoice, and purchase-order workflows end to end",
       "OCR/document pipeline (PyMuPDF, Tesseract, OpenCV) extracting structured data from scanned PDFs",
       "Grafana dashboards for operational monitoring, shared across this engagement and the Jigsol OS platform",
     ],
@@ -333,8 +333,8 @@ const WORK = [
     period: "2021 – Present",
     type: "Freelance",
     items: [
-      "ET System (above) — telecom portal automation with Go+Python worker split and resilient proxy pool",
-      "Full automation suite for the BigChange field service platform — job scheduling, quoting, invoicing",
+      "ET System (above). telecom portal automation with Go+Python worker split and resilient proxy pool",
+      "Full automation suite for the BigChange field service platform. job scheduling, quoting, invoicing",
       "Stock-monitoring system across 20+ e-commerce stores",
       "Analytics dashboards, web scraping pipelines, and chatbot/AI agent integrations for UK and international clients",
     ],
@@ -397,7 +397,7 @@ const PROJECTS = [
 
 
 const CERTS = [
-  { name: "AI Engineer for Developers — Associate", issuer: "DataCamp", url: "https://www.datacamp.com/certificate/AIEDA0010363096562" },
+  { name: "AI Engineer for Developers. Associate", issuer: "DataCamp", url: "https://www.datacamp.com/certificate/AIEDA0010363096562" },
   { name: "Data Visualization with Python", issuer: "IBM / Coursera", date: "Aug 2020", url: "https://www.coursera.org/account/accomplishments/certificate/U6HCZ8Q9XA5X" },
   { name: "Data Analysis with Python", issuer: "IBM / Coursera", date: "Aug 2020", url: "https://www.coursera.org/account/accomplishments/certificate/V9GRVQ7DBQMV" },
   { name: "Applied Data Science Capstone", issuer: "IBM / Coursera", date: "Aug 2020", url: "https://www.coursera.org/account/accomplishments/certificate/3QVGKBYTLUWG" },
@@ -411,10 +411,10 @@ const CERTS = [
 
 
 const XERO_SCREENSHOTS = [
-  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero dashboard — financials at a glance" },
-  { src: "/media/portfolio/bigchange-xero/xero-invoicing.jpg", caption: "Invoicing — sent automatically from job completion" },
-  { src: "/media/portfolio/bigchange-xero/xero-pos.jpg", caption: "Purchase orders — raised and tracked without manual entry" },
-  { src: "/media/portfolio/bigchange-xero/xero-bills.jpg", caption: "Bills — reconciled automatically" },
+  { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero dashboard. financials at a glance" },
+  { src: "/media/portfolio/bigchange-xero/xero-invoicing.jpg", caption: "Invoicing. sent automatically from job completion" },
+  { src: "/media/portfolio/bigchange-xero/xero-pos.jpg", caption: "Purchase orders. raised and tracked without manual entry" },
+  { src: "/media/portfolio/bigchange-xero/xero-bills.jpg", caption: "Bills. reconciled automatically" },
 ];
 
 function BigChangeXeroFlow() {
@@ -430,27 +430,15 @@ function BigChangeXeroFlow() {
           <span className="text-[9px] text-fga/40 tracking-wide">Field service</span>
         </div>
         {/* Airflow middle */}
-        <div className="flex flex-col items-center gap-1 shrink-0">
-          <svg viewBox="0 0 60 44" width="60" height="44">
-            <defs>
-              <linearGradient id="af-g" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#017CEE"/>
-                <stop offset="100%" stopColor="#00A9E0"/>
-              </linearGradient>
-            </defs>
-            {/* left arrow in */}
-            <line x1="0" y1="16" x2="10" y2="16" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5"/>
-            {/* Airflow badge */}
-            <rect x="10" y="6" width="40" height="20" rx="6" fill="url(#af-g)"/>
-            {/* A mark */}
-            <text x="20" y="21" fontSize="12" fontWeight="900" fill="white" fontFamily="system-ui">A</text>
-            {/* word */}
-            <text x="33" y="21" fontSize="8" fontWeight="600" fill="rgba(255,255,255,0.9)" fontFamily="system-ui">flow</text>
-            {/* right arrow out */}
-            <line x1="50" y1="16" x2="60" y2="16" stroke="rgba(25,211,162,0.5)" strokeWidth="1.5"/>
-            <polygon points="57,13 61,16 57,19" fill="rgba(25,211,162,0.6)"/>
-            <text x="30" y="40" textAnchor="middle" fontSize="7.5" fill="rgba(1,124,238,0.7)" fontFamily="system-ui">orchestration</text>
-          </svg>
+        <div className="flex flex-col items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1">
+            <svg viewBox="0 0 6 12" width="6" height="12"><line x1="3" y1="0" x2="3" y2="12" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5"/><polygon points="0,9 3,12 6,9" fill="rgba(25,211,162,0.4)"/></svg>
+            <div className="flex flex-col items-center justify-center bg-[#017CEE]/15 border border-[#017CEE]/40 rounded-lg px-3 py-2 h-12">
+              <img src="/media/portfolio/bigchange-xero/airflow-logo.svg" alt="Apache Airflow" className="h-6 w-6 object-contain" />
+            </div>
+            <svg viewBox="0 0 6 12" width="6" height="12"><line x1="3" y1="0" x2="3" y2="12" stroke="rgba(25,211,162,0.4)" strokeWidth="1.5"/><polygon points="0,9 3,12 6,9" fill="rgba(25,211,162,0.4)"/></svg>
+          </div>
+          <span className="text-[9px] text-[#017CEE]/70 tracking-wide">Airflow</span>
         </div>
         {/* Xero */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
@@ -549,7 +537,7 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.16 }}
               className="mt-6 max-w-xl text-base leading-relaxed text-fga/60 sm:text-lg"
             >
-              Automation systems, AI agents, ETL pipelines, and full-stack products — built for UK and international clients since 2021.
+              Automation systems, AI agents, ETL pipelines, and full-stack products. built for UK and international clients since 2021.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }}
@@ -725,7 +713,7 @@ export default function PortfolioPage() {
                 <h2 className="font-display text-3xl font-bold tracking-[-0.03em] text-fga sm:text-4xl">Noor Ossama Zakaria</h2>
                 <p className="mt-1 text-sm text-fga/45">23 · Cairo, Egypt</p>
                 <p className="mt-5 text-base leading-relaxed text-fga/65">
-                  Started freelancing in automation and data engineering on Upwork in 2021. Over five years that grew from scripts and dashboards into full ETL systems, AI agent services, and a consultancy — Autari — that runs production automation for businesses across the UK.
+                  Started freelancing in automation and data engineering on Upwork in 2021. Over five years that grew from scripts and dashboards into full ETL systems, AI agent services, and a consultancy. Autari. that runs production automation for businesses across the UK.
                 </p>
                 <p className="mt-4 text-base leading-relaxed text-fga/65">
                   Currently also a software engineer at Jigsol Business Solutions, building the data infrastructure and AI tools inside Jigsol OS.
