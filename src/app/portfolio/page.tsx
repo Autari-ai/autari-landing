@@ -161,9 +161,12 @@ const ALL_WORK_CATEGORIES = [
   {
     title: "Field Service & Operations Automation",
     items: [
-      { name: "BigChange + Xero ETL", desc: "Airflow pipeline integrating BigChange field service platform with Xero accounting — job, quote, invoice, and PO workflows end to end (Hybrid Solutions Group)" },
-      { name: "BigChange Automation Suite", desc: "Job scheduling, quoting, and invoicing automation for a UK field service company (Upwork)" },
-      { name: "OCR Document Pipeline", desc: "PyMuPDF, Tesseract, and OpenCV pipeline extracting structured data from scanned PDFs into the workflow (Hybrid Solutions Group)" },
+      {
+        name: "Hybrid Solutions Group",
+        subtitle: "UK Co. 13791780",
+        desc: "Every job, quote, invoice and purchase order that used to be done by hand now runs automatically between BigChange and Xero. Scanned documents get read and filed. Dashboards stay up to date.",
+        customComponent: "bigchange-xero",
+      },
     ],
   },
   {
@@ -399,6 +402,49 @@ const CERTS = [
 /* ------------------------------------------------------------------ */
 
 
+function BigChangeXeroFlow() {
+  return (
+    <div className="w-full bg-ink-800 rounded-xl p-6">
+      {/* Logo row */}
+      <div className="flex items-center justify-between gap-2 mb-6">
+        {/* BigChange logo */}
+        <div className="flex-1 flex items-center justify-center bg-[#003B6B] rounded-xl p-3 h-14">
+          <img src="/media/portfolio/bigchange-xero/bigchange-logo.svg" alt="BigChange" className="h-8 w-auto object-contain" />
+        </div>
+        {/* Arrow + Airflow */}
+        <div className="flex flex-col items-center gap-1 shrink-0">
+          <svg viewBox="0 0 80 32" width="80" height="32">
+            <defs>
+              <linearGradient id="arr" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#017CEE" />
+                <stop offset="100%" stopColor="#00C7D4" />
+              </linearGradient>
+            </defs>
+            {/* Airflow icon — simplified "A" shape */}
+            <rect x="1" y="6" width="20" height="20" rx="5" fill="#017CEE" />
+            <text x="11" y="21" textAnchor="middle" fontSize="13" fontWeight="900" fill="white" fontFamily="system-ui">A</text>
+            {/* Arrow */}
+            <line x1="24" y1="16" x2="72" y2="16" stroke="url(#arr)" strokeWidth="2" />
+            <polygon points="72,12 79,16 72,20" fill="#00C7D4" />
+            <text x="48" y="30" textAnchor="middle" fontSize="7" fill="rgba(25,211,162,0.6)" fontFamily="system-ui" letterSpacing="0.05em">Airflow</text>
+          </svg>
+        </div>
+        {/* Xero logo */}
+        <div className="flex-1 flex items-center justify-center bg-white rounded-xl p-3 h-14">
+          <img src="/media/portfolio/bigchange-xero/xero.svg" alt="Xero" className="h-8 w-auto object-contain" />
+        </div>
+      </div>
+      {/* Xero dashboard product screenshot */}
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+        <Image src="/media/portfolio/bigchange-xero/xero-dashboard.jpg" alt="Xero dashboard" fill className="object-cover" sizes="100vw" />
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/80 to-transparent px-4 py-3">
+          <p className="text-xs text-fga/70">Xero accounting dashboard — connected and automated</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Carousel({ images }: { images: { src: string; caption: string }[] }) {
   const [idx, setIdx] = React.useState(0);
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
@@ -521,11 +567,15 @@ export default function PortfolioPage() {
                   <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {cat.items.map((item) => (
                       <div key={item.name} className="glass glass-hover rounded-2xl overflow-hidden flex flex-col">
+                        {"customComponent" in item && item.customComponent === "bigchange-xero" && (
+                          <div className="p-4"><BigChangeXeroFlow /></div>
+                        )}
                         {"images" in item && Array.isArray(item.images) && item.images.length > 0 && (
                           <Carousel images={item.images as { src: string; caption: string }[]} />
                         )}
                         <div className="px-5 py-4">
-                          <div className="text-sm font-semibold text-fga mb-1">{item.name}</div>
+                          <div className="text-sm font-semibold text-fga mb-0.5">{item.name}</div>
+                          {"subtitle" in item && <div className="text-[10px] text-spark mb-1.5">{item.subtitle as string}</div>}
                           <div className="text-xs leading-relaxed text-fga/50">{item.desc}</div>
                         </div>
                       </div>
