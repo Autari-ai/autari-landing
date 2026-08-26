@@ -231,10 +231,7 @@ const ALL_WORK_CATEGORIES = [
     title: "Infrastructure & Monitoring",
     items: [
       { name: "Grafana Dashboards", desc: "Operational monitoring dashboards for Jigsol OS (Celery tasks, system metrics) and Hybrid Solutions Group" },
-      { name: "GitHub Actions CI/CD", desc: "CI/CD pipelines set up across Jigsol services" },
-      { name: "Docker Containerisation", desc: "Multi-service Docker setup across the Jigsol OS platform" },
       { name: "F5 VPN Container", desc: "Containerised F5 VPN setup" },
-      { name: "jigsolos_data", desc: "Third-party API integration layer and data contracts (TypeScript + PLpgSQL)" },
     ],
   },
 ];
