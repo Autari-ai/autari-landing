@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Ops</title>
+<style>
+  :root {
+    --bg: #070d1a;
+    --surface: #0d1525;
+    --surface-2: #0b1220;
+    --border: rgba(99,179,237,0.12);
+    --brand: #38bdf8;
+    --brand-dim: rgba(56,189,248,0.1);
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --success: #34d399;
+    --warn: #fbbf24;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* ambient cosmic glow */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(600px 420px at 85% -10%, rgba(56,189,248,0.10), transparent 65%),
+      radial-gradient(500px 400px at 8% 100%, rgba(56,189,248,0.06), transparent 65%);
+  }
+
+  .topbar, .shell { position: relative; z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 54px;
+    flex: 0 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(56,189,248,0.4);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 14px rgba(56,189,248,0.25);
+  }
+  .logo-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .topbar-right .accent { color: var(--brand); font-weight: 600; }
+  .topbar-right .sep { opacity: 0.4; margin: 0 4px; }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(52,211,153,0.8);
+    animation: pulse 2s ease-in-out infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.82); }
+  }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; min-height: 0; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 220px;
+    flex: 0 0 220px;
+    background: #08111e;
+    border-right: 1px solid rgba(99,179,237,0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+  }
+  .sidebar-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    padding: 0 10px 12px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.4s ease;
+    cursor: default;
+  }
+  .nav-item .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+  }
+  .nav-item.active {
+    color: var(--brand);
+    background: var(--brand-dim);
+    border-color: rgba(56,189,248,0.25);
+  }
+  .nav-item.active .nav-dot {
+    opacity: 1;
+    box-shadow: 0 0 7px rgba(56,189,248,0.8);
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px 4px;
+    border-top: 1px solid rgba(99,179,237,0.08);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sidebar-footer .sync-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .sidebar-footer .sync-label { font-size: 11.5px; color: var(--muted); }
+  .sidebar-footer .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    padding: 20px 24px;
+  }
+  .view {
+    display: none;
+    animation: viewIn 0.45s ease both;
+    height: 100%;
+  }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .page-sub { color: var(--muted); font-size: 12.5px; }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; padding: 14px 18px; }
+  .stat-value { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .stat-value .accent { color: var(--brand); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* Tables */
+  .table-card { padding: 4px 0; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 11px 18px 9px;
+    border-bottom: 1px solid rgba(99,179,237,0.09);
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid rgba(99,179,237,0.05);
+    font-size: 13.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .ref { font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+
+  /* Status pills */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .pill.green { color: var(--success); background: rgba(52,211,153,0.10); border: 1px solid rgba(52,211,153,0.32); }
+  .pill.cyan { color: var(--brand); background: var(--brand-dim); border: 1px solid rgba(56,189,248,0.32); }
+  .pill.amber { color: var(--warn); background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.34); }
+  .pill.grey { color: var(--muted); background: rgba(100,116,139,0.10); border: 1px solid rgba(100,116,139,0.28); }
+
+  /* ===== VIEW 1: JOBS SCHEDULE ===== */
+  .schedule-shell { display: flex; gap: 14px; height: calc(100% - 56px); }
+  .eng-list { width: 190px; flex: 0 0 190px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+  .eng-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px;
+    height: 40px;
+  }
+  .eng-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(56,189,248,0.14);
+    border: 1px solid rgba(56,189,248,0.3);
+    color: var(--brand);
+    font-size: 10.5px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex: 0 0 24px;
+  }
+  .eng-name { font-size: 12.5px; font-weight: 500; }
+
+  .timeline-card { flex: 1; padding: 16px 18px; overflow: hidden; display: flex; flex-direction: column; }
+  .timeline-hours { display: flex; font-size: 10.5px; color: var(--muted); margin-bottom: 10px; padding-left: 0; }
+  .timeline-hours span { flex: 1; text-align: left; }
+  .timeline-rows { display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: center; }
+  .tl-row { position: relative; height: 26px; background: rgba(255,255,255,0.02); border-radius: 6px; }
+  .tl-block {
+    position: absolute;
+    top: 2px; bottom: 2px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #06202e;
+  }
+  .tl-block.done { background: rgba(52,211,153,0.55); color: #063d2b; }
+  .tl-block.active { background: var(--brand); color: #052233; box-shadow: 0 0 14px rgba(56,189,248,0.5); }
+  .tl-block.active.completing { animation: blockPulse 0.9s ease-in-out infinite; }
+  .tl-block.upcoming { background: rgba(100,116,139,0.22); color: var(--muted); }
+  @keyframes blockPulse {
+    0%, 100% { box-shadow: 0 0 14px rgba(56,189,248,0.5); }
+    50% { box-shadow: 0 0 22px rgba(56,189,248,0.9); }
+  }
+  .now-line {
+    position: absolute;
+    top: -6px; bottom: -6px;
+    width: 2px;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+  }
+  .now-line::before {
+    content: 'NOW';
+    position: absolute;
+    top: -16px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--brand);
+    letter-spacing: 0.06em;
+  }
+
+  /* ===== VIEW 3: MAP ===== */
+  .map-shell { display: flex; gap: 14px; height: calc(100% - 56px); }
+  .map-card {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(rgba(56,189,248,0.06) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(56,189,248,0.06) 1px, transparent 1px) 0 0 / 40px 40px,
+      #060b16;
+  }
+  .map-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px currentColor;
+  }
+  .map-dot::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.5;
+    animation: ripple 2.2s ease-out infinite;
+  }
+  @keyframes ripple {
+    0% { transform: scale(0.6); opacity: 0.6; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  .map-label {
+    position: absolute;
+    top: 16px; left: 16px;
+    transform: translate(0,0);
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(7,13,26,0.85);
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    border: 1px solid rgba(99,179,237,0.15);
+  }
+  .map-eng-list { width: 210px; flex: 0 0 210px; display: flex; flex-direction: column; gap: 8px; padding: 4px; }
+  .map-eng-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 14px;
+  }
+  .map-eng-left { display: flex; align-items: center; gap: 9px; }
+  .map-eng-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; box-shadow: 0 0 8px currentColor; }
+  .map-eng-name { font-size: 12.5px; font-weight: 500; }
+
+  /* ===== VIEW 4: ACCOUNTING ===== */
+  .sync-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .xero-mark {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(19,181,234,0.14);
+    border: 1px solid rgba(19,181,234,0.4);
+    color: #6BD5F5;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.01em;
+  }
+  .sync-info .sync-name { font-weight: 600; font-size: 15px; }
+  .sync-info .sync-sub { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .sync-sub .mini-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 7px rgba(52,211,153,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .sync-sub .just-now { color: var(--success); font-weight: 500; }
+  .footnote {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 12.5px;
+    padding: 0 4px;
+  }
+  .footnote .accent { color: var(--brand); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">F</div>
+      <div class="logo-name">Field Ops</div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-dot"></span><span class="accent">14 engineers</span>&nbsp;active
+      <span class="sep">&middot;</span>
+      <span class="accent">6 jobs</span>&nbsp;completing today
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Field Ops</div>
+      <nav class="nav">
+        <div class="nav-item" id="nav-0"><span class="nav-dot"></span>Jobs Schedule</div>
+        <div class="nav-item" id="nav-1"><span class="nav-dot"></span>Invoices</div>
+        <div class="nav-item" id="nav-2"><span class="nav-dot"></span>Live Map</div>
+        <div class="nav-item" id="nav-3"><span class="nav-dot"></span>Accounting</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Xero sync<strong>Running</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- VIEW 1: JOBS SCHEDULE -->
+      <section class="view" id="view-0">
+        <div class="page-head">
+          <span class="page-title">Jobs Schedule</span>
+          <span class="page-sub">Today &middot; 28 Aug</span>
+        </div>
+        <div class="schedule-shell">
+          <div class="eng-list">
+            <div class="surface eng-row"><span class="eng-avatar">GM</span><span class="eng-name">G. Macdonald</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">EH</span><span class="eng-name">E. Hayes</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">MH</span><span class="eng-name">M. Howard</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">DC</span><span class="eng-name">D. Collins</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">SW</span><span class="eng-name">S. West</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">RO</span><span class="eng-name">R. Osei</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">TB</span><span class="eng-name">T. Brennan</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">LF</span><span class="eng-name">L. Ferris</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">JK</span><span class="eng-name">J. Kavanagh</span></div>
+            <div class="surface eng-row"><span class="eng-avatar">AP</span><span class="eng-name">A. Pryce</span></div>
+          </div>
+          <div class="surface timeline-card">
+            <div class="timeline-hours">
+              <span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span>
+            </div>
+            <div class="timeline-rows" style="position:relative;">
+              <div class="now-line" style="left: 61%;"></div>
+              <div class="tl-row"><div class="tl-block done" style="left:2%; width:14%;">Meridian Htg</div><div class="tl-block done" style="left:34%; width:12%;">Stackhouse</div><div class="tl-block upcoming" style="left:70%; width:16%;">Halberd</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:6%; width:16%;">Thornwick</div><div class="tl-block active" style="left:46%; width:14%;">Atlantic Wks</div><div class="tl-block upcoming" style="left:80%; width:14%;">Crestline</div></div>
+              <div class="tl-row" id="row-fairview"><div class="tl-block done" style="left:0%; width:18%;">Northgate</div><div class="tl-block active completing" id="block-fairview" style="left:52%; width:16%;">Fairview Care</div><div class="tl-block upcoming" style="left:86%; width:10%;">Halberd</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:4%; width:12%;">Crestline</div><div class="tl-block done" style="left:28%; width:14%;">Meridian Htg</div><div class="tl-block upcoming" style="left:62%; width:18%;">Thornwick</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:10%; width:14%;">Halberd</div><div class="tl-block active" style="left:44%; width:12%;">Northgate</div><div class="tl-block upcoming" style="left:74%; width:16%;">Stackhouse</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:0%; width:16%;">Atlantic Wks</div><div class="tl-block upcoming" style="left:40%; width:14%;">Crestline</div><div class="tl-block upcoming" style="left:78%; width:14%;">Meridian Htg</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:8%; width:12%;">Stackhouse</div><div class="tl-block done" style="left:32%; width:16%;">Thornwick</div><div class="tl-block upcoming" style="left:72%; width:16%;">Fairview</div></div>
+              <div class="tl-row"><div class="tl-block done" style="left:2%; width:14%;">Northgate</div><div class="tl-block active" style="left:38%; width:12%;">Halberd</div><div class="tl-block upcoming" style="left:68%; width:18%;">Atlantic Wks</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: INVOICES AUTO-RAISED -->
+      <section class="view" id="view-1">
+        <div class="page-head">
+          <span class="page-title">Invoices Auto-Raised</span>
+          <span class="page-sub">Today</span>
+        </div>
+        <div class="stats-row">
+          <div class="surface stat-card">
+            <div class="stat-value"><span class="accent">&pound;2,340</span></div>
+            <div class="stat-label">raised today</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">8</div>
+            <div class="stat-label">invoices</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">manual</div>
+          </div>
+        </div>
+        <div class="surface table-card">
+          <table>
+            <thead>
+              <tr><th>Job Ref</th><th>Client</th><th>Amount</th><th>Time Raised</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ref">JB-2854</td><td>Thornwick Group</td><td class="num">&pound;380.00</td><td class="muted">1h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2853</td><td>Atlantic Works</td><td class="num">&pound;420.00</td><td class="muted">1h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2852</td><td>Meridian Heating</td><td class="num">&pound;215.00</td><td class="muted">2h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2851</td><td>Fairview Care</td><td class="num">&pound;340.00</td><td class="muted">2h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2850</td><td>Halberd Retail</td><td class="num">&pound;295.00</td><td class="muted">3h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2849</td><td>Northgate Schools</td><td class="num">&pound;180.00</td><td class="muted">4h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2848</td><td>Crestline Property</td><td class="num">&pound;265.00</td><td class="muted">5h ago</td><td><span class="pill green">Sent</span></td></tr>
+              <tr><td class="ref">JB-2847</td><td>Stackhouse Ltd</td><td class="num">&pound;245.00</td><td class="muted">6h ago</td><td><span class="pill green">Sent</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 3: LIVE MAP -->
+      <section class="view" id="view-2">
+        <div class="page-head">
+          <span class="page-title">Live Map View</span>
+          <span class="page-sub">Real-time engineer locations</span>
+        </div>
+        <div class="map-shell">
+          <div class="surface map-card">
+            <div class="map-dot" style="left:22%; top:28%; color:#38bdf8;"></div>
+            <div class="map-label" style="left:calc(22% + 14px); top:calc(28% - 6px);">G.M. &middot; En route</div>
+            <div class="map-dot" style="left:48%; top:18%; color:#34d399;"></div>
+            <div class="map-label" style="left:calc(48% + 14px); top:calc(18% - 6px);">E.H. &middot; On site</div>
+            <div class="map-dot" style="left:64%; top:52%; color:#64748b;"></div>
+            <div class="map-label" style="left:calc(64% + 14px); top:calc(52% - 6px);">M.H. &middot; Complete</div>
+            <div class="map-dot" style="left:36%; top:66%; color:#fbbf24;"></div>
+            <div class="map-label" style="left:calc(36% + 14px); top:calc(66% - 6px);">D.C. &middot; Travelling</div>
+            <div class="map-dot" style="left:78%; top:74%; color:#38bdf8;"></div>
+            <div class="map-label" style="left:calc(78% + 14px); top:calc(74% - 6px);">S.W. &middot; En route</div>
+          </div>
+          <div class="map-eng-list">
+            <div class="surface map-eng-row"><div class="map-eng-left"><span class="map-eng-dot" style="background:#38bdf8; color:#38bdf8;"></span><span class="map-eng-name">G. Macdonald</span></div><span class="pill cyan">En route</span></div>
+            <div class="surface map-eng-row"><div class="map-eng-left"><span class="map-eng-dot" style="background:#34d399; color:#34d399;"></span><span class="map-eng-name">E. Hayes</span></div><span class="pill green">On site</span></div>
+            <div class="surface map-eng-row"><div class="map-eng-left"><span class="map-eng-dot" style="background:#64748b; color:#64748b;"></span><span class="map-eng-name">M. Howard</span></div><span class="pill grey">Complete</span></div>
+            <div class="surface map-eng-row"><div class="map-eng-left"><span class="map-eng-dot" style="background:#fbbf24; color:#fbbf24;"></span><span class="map-eng-name">D. Collins</span></div><span class="pill amber">Travelling</span></div>
+            <div class="surface map-eng-row"><div class="map-eng-left"><span class="map-eng-dot" style="background:#38bdf8; color:#38bdf8;"></span><span class="map-eng-name">S. West</span></div><span class="pill cyan">En route</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ACCOUNTING SYNC -->
+      <section class="view" id="view-3">
+        <div class="page-head">
+          <span class="page-title">Accounting Sync</span>
+        </div>
+        <div class="surface sync-card">
+          <div class="xero-mark">Xero</div>
+          <div class="sync-info">
+            <div class="sync-name">Xero</div>
+            <div class="sync-sub"><span class="mini-dot"></span>Synced <span class="just-now">8 minutes ago</span></div>
+          </div>
+        </div>
+        <div class="surface table-card">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Invoice</th><th>Client</th><th>Amount</th><th>Xero Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="muted">Today</td><td class="ref">INV-2854</td><td>Thornwick Group</td><td class="num">&pound;380.00</td><td><span class="pill green">Synced</span></td></tr>
+              <tr><td class="muted">Today</td><td class="ref">INV-2853</td><td>Atlantic Works</td><td class="num">&pound;420.00</td><td><span class="pill green">Synced</span></td></tr>
+              <tr><td class="muted">Today</td><td class="ref">INV-2852</td><td>Meridian Heating</td><td class="num">&pound;215.00</td><td><span class="pill green">Synced</span></td></tr>
+              <tr><td class="muted">Today</td><td class="ref">INV-2851</td><td>Fairview Care</td><td class="num">&pound;340.00</td><td><span class="pill green">Synced</span></td></tr>
+              <tr><td class="muted">Today</td><td class="ref">INV-2850</td><td>Halberd Retail</td><td class="num">&pound;295.00</td><td><span class="pill green">Synced</span></td></tr>
+              <tr><td class="muted">Today</td><td class="ref">INV-2849</td><td>Northgate Schools</td><td class="num">&pound;180.00</td><td><span class="pill green">Synced</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footnote">All transactions sync within <span class="accent">30 seconds</span> of being raised.</div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  const views = [0, 1, 2, 3];
+  const navItems = [document.getElementById('nav-0'), document.getElementById('nav-1'), document.getElementById('nav-2'), document.getElementById('nav-3')];
+  let current = 0;
+
+  const showView = (i) => {
+    views.forEach((idx) => {
+      const el = document.getElementById('view-' + idx);
+      el.style.display = idx === i ? 'block' : 'none';
+      if (idx === i) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      }
+      navItems[idx].classList.toggle('active', idx === i);
+    });
+    current = i;
+  };
+
+  // Fairview Care job completing animation (view 0)
+  const triggerFairviewComplete = () => {
+    const block = document.getElementById('block-fairview');
+    if (!block) return;
+    block.className = 'tl-block active completing';
+    block.textContent = 'Fairview Care';
+    setTimeout(() => {
+      block.className = 'tl-block done';
+      block.textContent = 'Fairview Care';
+    }, 2400);
+  };
+
+  showView(0);
+  triggerFairviewComplete();
+  setInterval(() => {
+    const next = (current + 1) % views.length;
+    showView(next);
+    if (next === 0) setTimeout(triggerFairviewComplete, 400);
+  }, 3500);
+</script>
+</body>
+</html>
