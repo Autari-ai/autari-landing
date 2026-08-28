@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Email Security Scanner — Product Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+
+body {
+  background: #060A12;
+  color: #EAF2EF;
+  font-family: 'Google Sans', system-ui, sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+.glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20px; right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  pointer-events: none;
+}
+
+h1 { font-size: clamp(40px, 5vw, 72px); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 24px; }
+h2 { font-size: clamp(28px, 3.5vw, 48px); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 24px; }
+h3 { font-size: 20px; font-weight: 600; margin: 0 0 10px; color: #EAF2EF; }
+p { font-size: 16px; line-height: 1.7; color: rgba(234,242,239,0.65); margin: 0; }
+.label { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #8AFFC4; display: block; margin-bottom: 20px; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
+section { padding: 96px 0; min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; }
+
+/* ---------- Section 1: Hero ---------- */
+.hero-inner { width: 100%; text-align: center; }
+.hero-sub { max-width: 640px; margin: 0 auto 56px; font-size: 18px; }
+.hero-card-wrap { position: relative; max-width: 480px; margin: 0 auto; }
+.hero-glow {
+  position: absolute; inset: -60px;
+  background: radial-gradient(circle, rgba(138,255,196,0.2) 0%, transparent 70%);
+  filter: blur(20px);
+  z-index: -1;
+}
+.email-card { padding: 26px 30px; text-align: left; }
+.email-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.email-from { font-size: 13px; color: rgba(234,242,239,0.5); letter-spacing: 0.02em; margin-bottom: 6px; }
+.email-from b { color: rgba(234,242,239,0.85); font-weight: 600; }
+.email-subject { font-size: 17px; font-weight: 600; color: #EAF2EF; }
+.blocked-badge {
+  flex-shrink: 0;
+  background: rgba(239,68,68,0.16);
+  color: #FF8A8A;
+  border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(3deg);
+}
+.email-preview-line { font-size: 14px; color: rgba(234,242,239,0.4); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
+.hero-stats { margin-top: 28px; font-size: 14px; color: rgba(234,242,239,0.5); letter-spacing: 0.01em; }
+.hero-stats b { color: #8AFFC4; font-weight: 600; }
+
+/* ---------- Section 2: Problem ---------- */
+.section-inner { width: 100%; }
+.cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; width: 100%; }
+.problem-card {
+  padding: 32px 28px;
+  background: rgba(239,68,68,0.06);
+  border-color: rgba(239,68,68,0.25);
+}
+.problem-card::before { background: linear-gradient(90deg, transparent, rgba(239,68,68,0.3), transparent); }
+.problem-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #FF8A8A;
+}
+
+/* ---------- Section 3: How it works ---------- */
+.steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; width: 100%; }
+.step-card { padding: 36px 30px; }
+.step-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(138,255,196,0.15);
+  border: 1px solid rgba(138,255,196,0.35);
+  color: #8AFFC4;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* ---------- Section 4: What it catches ---------- */
+.features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 56px; width: 100%; }
+.feature-card { padding: 36px 32px; }
+.feature-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: rgba(138,255,196,0.12);
+  border: 1px solid rgba(138,255,196,0.25);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+/* ---------- Section 5: CTA ---------- */
+.cta-inner { width: 100%; text-align: center; }
+.cta-card { max-width: 720px; margin: 40px auto 48px; padding: 40px 48px; }
+.cta-card p { font-size: 18px; color: rgba(234,242,239,0.75); }
+.cta-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+.btn {
+  padding: 16px 32px;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+.btn-solid { background: #8AFFC4; color: #060A12; box-shadow: 0 0 40px rgba(138,255,196,0.25); }
+.btn-outline {
+  background: rgba(255,255,255,0.06);
+  color: #EAF2EF;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="container hero-inner">
+    <span class="label">Email Security</span>
+    <h1>Phishing emails do not reach your inbox. Ever.</h1>
+    <p class="hero-sub">Every message is scanned before you see it. Suspicious links are checked, malicious emails are moved to trash, and you never have to think about it.</p>
+    <div class="hero-card-wrap">
+      <div class="hero-glow"></div>
+      <div class="glass email-card">
+        <div class="email-top">
+          <div>
+            <div class="email-from">From <b>security@paypall-verify.net</b></div>
+            <div class="email-subject">Urgent: Verify your account</div>
+          </div>
+          <div class="blocked-badge">Blocked</div>
+        </div>
+        <div class="email-preview-line">We detected unusual activity on your account. Click here to verify your identity immediately&hellip;</div>
+      </div>
+      <div class="hero-stats"><b>247</b> emails scanned today &middot; <b>3</b> threats blocked &middot; <b>0</b> reached your inbox</div>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="container section-inner">
+    <span class="label">The risk</span>
+    <h2>One click is all it takes.</h2>
+    <div class="cards-row">
+      <div class="glass problem-card">
+        <div class="problem-icon">&#9888;</div>
+        <h3>Phishing looks legitimate</h3>
+        <p>Modern phishing emails are nearly indistinguishable from real ones. Even careful people get caught.</p>
+      </div>
+      <div class="glass problem-card">
+        <div class="problem-icon">&#128274;</div>
+        <h3>One mistake is enough</h3>
+        <p>A single clicked link can compromise your accounts, your data, or your entire business.</p>
+      </div>
+      <div class="glass problem-card">
+        <div class="problem-icon">&#9940;</div>
+        <h3>Spam filters miss them</h3>
+        <p>Standard email filters catch spam. They are not built to catch targeted phishing attacks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container section-inner">
+    <span class="label">How it works</span>
+    <h2>Scanned before it reaches you.</h2>
+    <div class="steps-row">
+      <div class="glass step-card">
+        <div class="step-num">1</div>
+        <h3>Email arrives</h3>
+        <p>Every incoming message is intercepted and checked before it lands in your inbox.</p>
+      </div>
+      <div class="glass step-card">
+        <div class="step-num">2</div>
+        <h3>Every link is checked</h3>
+        <p>The system checks every URL in the message against what it knows about phishing patterns.</p>
+      </div>
+      <div class="glass step-card">
+        <div class="step-num">3</div>
+        <h3>Threats go to trash</h3>
+        <p>Anything malicious is moved automatically. Clean emails arrive as normal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container section-inner">
+    <span class="label">What it blocks</span>
+    <h2>The attacks that look real.</h2>
+    <div class="features-grid">
+      <div class="glass feature-card">
+        <div class="feature-icon">&#127974;</div>
+        <h3>Fake bank emails</h3>
+        <p>Emails that look like your bank asking you to verify your account.</p>
+      </div>
+      <div class="glass feature-card">
+        <div class="feature-icon">&#128273;</div>
+        <h3>Credential harvesting</h3>
+        <p>Login pages that collect your password and send it to an attacker.</p>
+      </div>
+      <div class="glass feature-card">
+        <div class="feature-icon">&#128179;</div>
+        <h3>Invoice fraud</h3>
+        <p>Emails pretending to be suppliers with changed payment details.</p>
+      </div>
+      <div class="glass feature-card">
+        <div class="feature-icon">&#128272;</div>
+        <h3>Account takeover attempts</h3>
+        <p>Messages designed to get you to reset a password on a fake site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="container cta-inner">
+    <h2>Your inbox should be safe without you having to be careful every second.</h2>
+    <div class="glass cta-card">
+      <p>This runs in the background, checking every email that arrives. You do not have to do anything differently. It just stops threats before they become problems.</p>
+    </div>
+    <div class="cta-buttons">
+      <button class="btn btn-solid">Book a call</button>
+      <button class="btn btn-outline">See how it works</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const sections = document.querySelectorAll('section');
+let current = 0;
+const scrollToSection = (i) => {
+  sections[i].scrollIntoView({ behavior: 'smooth' });
+  current = i;
+  if (i < sections.length - 1) {
+    setTimeout(() => scrollToSection(i + 1), 3500);
+  } else {
+    setTimeout(() => { window.scrollTo({top:0,behavior:'smooth'}); setTimeout(()=>scrollToSection(0),2000); }, 3500);
+  }
+};
+setTimeout(() => scrollToSection(0), 2500);
+</script>
+
+</body>
+</html>
