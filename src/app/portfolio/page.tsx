@@ -532,7 +532,10 @@ export default function PortfolioPage() {
                 { label: "For", value: "Automation teams" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/auronexus/auronexus-agents-chat.png"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/auronexus-app.gif", caption: "Auronexus — AI agents working together in channels, each with their own role" },
+                { src: "/media/portfolio/auronexus/auronexus-agents-chat.png", caption: "Real conversation between Claude, Codex, and Gemini agents debugging a login issue" },
+              ]}
               cols={[
                 { title: "What it does", body: "A platform for building teams of AI agents — each with a role, a set of skills, and a channel to work in. They collaborate, complete tasks, and escalate when they need a human." },
                 { title: "Who it helped", body: "Teams looking to run AI at scale without wiring up agents from scratch every time." },
@@ -550,7 +553,10 @@ export default function PortfolioPage() {
                 { label: "Triggered by", value: "The work you're already doing" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/gig-copilot/telegram-inline-keyboard.png"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/gigcopilot-app.gif", caption: "Gig Copilot — AI drafts, you approve on Telegram before anything lands" },
+                { src: "/media/portfolio/gig-copilot/telegram-inline-keyboard.png", caption: "Inline Telegram buttons: Approve, Revise, or Reject in one tap" },
+              ]}
               cols={[
                 { title: "What it does", body: "An AI assistant that watches your work as it happens, drafts case studies and task summaries, then sends them to your Telegram for review — with Approve, Revise, and Reject buttons." },
                 { title: "Who it helped", body: "Freelancers and founders who want AI doing the drafting but still want to stay in control." },
@@ -568,7 +574,9 @@ export default function PortfolioPage() {
                 { label: "Platform", value: "Desktop (offline)" },
                 { label: "Year", value: "2025" },
               ]}
-              haircutSvg={true}
+              carouselImages={[
+                { src: "/media/portfolio/mockups/haircut-app.gif", caption: "AI face shape analysis — landmarks mapped, geometry measured, haircuts ranked" },
+              ]}
               cols={[
                 { title: "What it does", body: "A desktop app that studies your face shape, takes real measurements, and ranks haircut styles by how well they'd suit you — with celebrity examples so you can see each cut on a real face." },
                 { title: "Who it helped", body: "Anyone tired of guessing at a haircut. Runs entirely on your laptop, no internet needed, no data shared." },
@@ -601,7 +609,10 @@ export default function PortfolioPage() {
                 { label: "Method", value: "6 years, county by county" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/analytics/metabase-dashboard.webp"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/cannabis-app.gif", caption: "Canopy Index — six years of California cannabis market concentration, mapped" },
+                { src: "/media/portfolio/analytics/metabase-dashboard.webp", caption: "BI dashboard: revenue trends and market data" },
+              ]}
               cols={[
                 { title: "What it does", body: "Tracks retail market concentration across every California county from 2018 to 2024 — measuring whether the cannabis industry is becoming dominated by a few large players or staying diverse." },
                 { title: "Who it helped", body: "Researchers and policymakers who needed hard data on market structure, not guesswork." },
@@ -716,7 +727,9 @@ export default function PortfolioPage() {
                 { label: "Shows", value: "Why each job scored how it did" },
                 { label: "Year", value: "2025" },
               ]}
-              noImage={true}
+              carouselImages={[
+                { src: "/media/portfolio/mockups/upwork-app.gif", caption: "Upwork Job Finder — jobs scored, ranked, and explained automatically" },
+              ]}
               cols={[
                 { title: "What it does", body: "Signs in to your Upwork account securely, pulls in jobs, profiles, and contract history, and scores every job against rules you set — field by field, rule by rule." },
                 { title: "Who it helped", body: "Freelancers spending hours filtering through job listings to find the ones worth applying to." },
@@ -750,7 +763,10 @@ export default function PortfolioPage() {
                 { label: "AI writes", value: "Descriptions and titles" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/youtube/demo.gif"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/youtube-app.gif", caption: "ChannelPilot — upload queue, AI descriptions, thumbnail generation, and analytics" },
+                { src: "/media/portfolio/youtube/demo.gif", caption: "YouTube automation in action" },
+              ]}
               cols={[
                 { title: "What it does", body: "Automates the full production and publishing workflow for a YouTube channel — scheduling, AI-written descriptions, thumbnail creation, and automated uploads." },
                 { title: "Who it helped", body: "Content creators and businesses who wanted a consistent YouTube presence without the hours of admin that comes with it." },
@@ -768,6 +784,7 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/pycaps-app.gif", caption: "pycaps — style picker, timeline editor, and live caption preview" },
                 { src: "/media/portfolio/pycaps/demo-1.gif", caption: "Animated styled subtitles on a vertical video" },
                 { src: "/media/portfolio/pycaps/demo-2.gif", caption: "Different subtitle style on the same video" },
               ]}
