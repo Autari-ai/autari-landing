@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stock Monitoring System — Nothing goes out of stock unnoticed</title>
+<style>
+  body { background: #060A12; color: #EAF2EF; font-family: 'Google Sans', system-ui, sans-serif; margin: 0; overflow-x: hidden; }
+  .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(255,255,255,0.08); position: relative; }
+  .glass::before { content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); pointer-events: none; }
+  h1 { font-size: clamp(40px, 5vw, 72px); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 24px; }
+  h2 { font-size: clamp(28px, 3.5vw, 48px); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 20px; }
+  p { font-size: 16px; line-height: 1.7; color: rgba(234,242,239,0.65); margin: 0; }
+  .label { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #8AFFC4; display: block; margin-bottom: 20px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; width: 100%; box-sizing: border-box; }
+  section { padding: 96px 0; min-height: 100vh; display: flex; align-items: center; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 80px 80px; }
+  * { box-sizing: border-box; }
+  section > .container { position: relative; z-index: 1; }
+
+  /* ---- Hero ---- */
+  #hero .container { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  #hero .sub { max-width: 640px; margin: 0 auto 48px; font-size: 18px; }
+  .store-widget { width: 100%; max-width: 640px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .store-widget-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .store-widget-head span { font-size: 12px; color: rgba(234,242,239,0.5); }
+  .store-row { display: flex; align-items: center; gap: 14px; }
+  .store-label { font-size: 13px; width: 78px; color: rgba(234,242,239,0.6); flex-shrink: 0; text-align: left; }
+  .store-track { flex: 1; height: 16px; background: rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; }
+  .store-fill { height: 100%; border-radius: 8px; }
+  .store-fill.green { background: linear-gradient(90deg, #8AFFC4, #4FD1A5); }
+  .store-fill.amber { background: linear-gradient(90deg, #FFD98A, #F5A623); }
+  .store-fill.red { background: linear-gradient(90deg, #FF9A9A, #F54263); }
+  .store-status { width: 118px; flex-shrink: 0; text-align: right; font-size: 12px; color: rgba(234,242,239,0.45); }
+  .alert-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; color: #FF9A9A; background: rgba(255,80,80,0.12); border: 1px solid rgba(255,80,80,0.3); border-radius: 20px; padding: 5px 12px; }
+  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #FF4D4D; flex-shrink: 0; animation: pulse 1.5s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,77,77,0.55); }
+    70% { box-shadow: 0 0 0 9px rgba(255,77,77,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,77,77,0); }
+  }
+
+  /* ---- Problem ---- */
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+  .problem-card { padding: 36px 30px; border: 1px solid rgba(255,150,80,0.22); }
+  .problem-card h3 { font-size: 20px; font-weight: 600; margin: 0 0 12px; color: #EAF2EF; }
+  .icon-badge { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,150,80,0.12); border: 1px solid rgba(255,150,80,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 20px; }
+
+  /* ---- How it works ---- */
+  .flow-row { display: flex; align-items: stretch; gap: 0; width: 100%; }
+  .flow-step { flex: 1; padding: 36px 28px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 60px; flex-shrink: 0; color: #8AFFC4; font-size: 28px; }
+  .flow-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(138,255,196,0.15); border: 1px solid rgba(138,255,196,0.35); color: #8AFFC4; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; font-size: 15px; }
+  .flow-step h3 { font-size: 19px; font-weight: 600; margin: 0 0 10px; color: #EAF2EF; }
+
+  /* ---- Scale ---- */
+  .stat-card { padding: 44px 32px; text-align: center; }
+  .stat-value { font-size: clamp(40px, 4.5vw, 60px); font-weight: 700; letter-spacing: -0.02em; color: #8AFFC4; line-height: 1; margin-bottom: 14px; }
+  .stat-sub { font-size: 13px; color: rgba(234,242,239,0.5); }
+  .scale-footnote { max-width: 620px; margin: 40px auto 0; text-align: center; font-size: 16px; }
+
+  /* ---- CTA ---- */
+  #cta .container { text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .cta-card { max-width: 680px; padding: 48px; margin: 32px 0 40px; }
+  .cta-card p { font-size: 18px; color: rgba(234,242,239,0.75); }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn { padding: 16px 32px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn-solid { background: #8AFFC4; color: #060A12; border: 1px solid #8AFFC4; }
+  .btn-outline { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); color: #EAF2EF; }
+
+  ::-webkit-scrollbar { display: none; }
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="container">
+    <span class="label">Stock Monitoring</span>
+    <h1>Nothing goes out of stock unnoticed.</h1>
+    <p class="sub">Every store, watched around the clock. The moment stock drops below your threshold, you know — and so does your reorder system.</p>
+    <div class="store-widget glass">
+      <div class="store-widget-head">
+        <span>Live store status</span>
+        <span class="alert-badge"><span class="pulse-dot"></span>Low stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 01</span>
+        <div class="store-track"><div class="store-fill green" style="width: 88%;"></div></div>
+        <span class="store-status">In stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 02</span>
+        <div class="store-track"><div class="store-fill green" style="width: 92%;"></div></div>
+        <span class="store-status">In stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 03</span>
+        <div class="store-track"><div class="store-fill green" style="width: 79%;"></div></div>
+        <span class="store-status">In stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 04</span>
+        <div class="store-track"><div class="store-fill green" style="width: 85%;"></div></div>
+        <span class="store-status">In stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 05</span>
+        <div class="store-track"><div class="store-fill green" style="width: 90%;"></div></div>
+        <span class="store-status">In stock</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 06</span>
+        <div class="store-track"><div class="store-fill amber" style="width: 38%;"></div></div>
+        <span class="store-status">Watch</span>
+      </div>
+      <div class="store-row">
+        <span class="store-label">Store 07</span>
+        <div class="store-track"><div class="store-fill red" style="width: 11%;"></div></div>
+        <span class="store-status">Low stock</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="container">
+    <span class="label">What usually happens</span>
+    <h2>You find out when the customer can not find it.</h2>
+    <div class="card-grid-3" style="margin-top: 48px;">
+      <div class="problem-card glass">
+        <div class="icon-badge">⚠️</div>
+        <h3>No early warning</h3>
+        <p>Stock runs out before anyone notices. The first sign is an empty shelf or a failed order.</p>
+      </div>
+      <div class="problem-card glass">
+        <div class="icon-badge">🔍</div>
+        <h3>Checking by hand</h3>
+        <p>Someone has to log into each store system and look. Twenty stores. Every day.</p>
+      </div>
+      <div class="problem-card glass">
+        <div class="icon-badge">⏱️</div>
+        <h3>Late reorders</h3>
+        <p>By the time you order, lead time means you are out of stock for another week.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <span class="label">How it works</span>
+    <h2>Set a threshold. Walk away.</h2>
+    <div class="flow-row glass" style="margin-top: 48px;">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h3>Connect your stores</h3>
+        <p>Link each store once. The system watches all of them from that point on.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h3>Set your thresholds</h3>
+        <p>Tell it when to alert you. 10 units? 5? You decide per product, per store.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h3>Get alerted immediately</h3>
+        <p>The moment stock crosses the line, you are notified. Before the shelf is empty.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scale">
+  <div class="container">
+    <span class="label">Built for volume</span>
+    <h2>20 stores. 847 products. Watched every hour.</h2>
+    <div class="card-grid-3" style="margin-top: 48px;">
+      <div class="stat-card glass">
+        <div class="stat-value">20+ stores</div>
+        <div class="stat-sub">All monitored simultaneously</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-value">847 SKUs</div>
+        <div class="stat-sub">Every product tracked</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-value">0 stockouts</div>
+        <div class="stat-sub">This week</div>
+      </div>
+    </div>
+    <p class="scale-footnote">When something drops, an alert fires. When stock is restored, the alert clears. Simple.</p>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="container">
+    <h2>How many stockouts happened last month that you did not know about in time?</h2>
+    <div class="cta-card glass">
+      <p>Most businesses can not answer that question. This system makes sure you never have to ask it again.</p>
+    </div>
+    <div class="cta-buttons">
+      <a class="btn btn-solid" href="#">Book a call</a>
+      <a class="btn btn-outline glass" href="#">See how alerts work</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section'));
+    var idx = 0;
+    function scrollToNext() {
+      sections[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      idx = (idx + 1) % sections.length;
+      setTimeout(scrollToNext, 3500);
+    }
+    setTimeout(scrollToNext, 2500);
+  })();
+</script>
+
+</body>
+</html>
