@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gig Copilot</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #0b0d14;
+  --surface: #131722;
+  --surface-2: #1a2035;
+  --border: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.14);
+  --brand: #3b82f6;
+  --brand-dim: rgba(59,130,246,0.15);
+  --brand-hover: #2563eb;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --success: #22c55e;
+  --success-dim: rgba(34,197,94,0.14);
+  --warn: #f59e0b;
+  --warn-dim: rgba(245,158,11,0.14);
+  --danger: #ef4444;
+  --danger-dim: rgba(239,68,68,0.14);
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-dot { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.35); } 50% { box-shadow: 0 0 0 6px rgba(59,130,246,0); } }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; background: #0e111a; border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+.brand .logo {
+  width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), #60a5fa);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.4);
+}
+.topbar-right { display: flex; align-items: center; gap: 18px; }
+.gh-status { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12.5px; }
+.gh-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 2px var(--success-dim); }
+.clock { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; min-width: 58px; text-align: right; }
+
+/* ---------- App body ---------- */
+.app-body { flex: 1; display: flex; overflow: hidden; }
+
+.sidebar {
+  width: 260px; flex-shrink: 0; background: #0f1219; border-right: 1px solid rgba(255,255,255,0.05);
+  padding: 18px 12px; display: flex; flex-direction: column; overflow: hidden;
+}
+.side-section { margin-bottom: 22px; }
+.side-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 10px 8px; }
+.side-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--muted);
+  font-size: 13.5px; font-weight: 500; margin-bottom: 2px;
+}
+.side-item .ic { width: 16px; text-align: center; flex-shrink: 0; font-size: 13px; }
+.side-item.active { background: var(--brand-dim); color: var(--text); }
+.side-item .count {
+  margin-left: auto; background: var(--surface-2); color: var(--muted); font-size: 10.5px; font-weight: 700;
+  padding: 1px 7px; border-radius: 20px;
+}
+.side-item.active .count { background: var(--brand); color: #fff; }
+.sidebar-footer {
+  margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid var(--border);
+  color: var(--muted); font-size: 12px;
+}
+.avatar-mini { width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); flex-shrink: 0; }
+
+.main { flex: 1; position: relative; overflow: hidden; padding: 22px; }
+.screen { position: absolute; inset: 22px; display: none; flex-direction: column; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ---------- Screen 1: Pending review (chat) ---------- */
+.chat-wrap { max-width: 620px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.bot-msg-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 6px; }
+.bot-avatar {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, var(--brand), #60a5fa);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 15px;
+}
+.bot-bubble-col { flex: 1; min-width: 0; }
+.bot-name-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.bot-name { font-weight: 700; font-size: 13.5px; }
+.bot-badge {
+  font-size: 10px; font-weight: 700; background: var(--brand-dim); color: var(--brand); padding: 1px 6px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.bot-bubble {
+  background: var(--surface-2); border-radius: 4px 14px 14px 14px; padding: 12px 16px; font-size: 13.5px;
+  line-height: 1.55; color: var(--text); border: 1px solid var(--border);
+}
+.timestamp { font-size: 11px; color: var(--muted); margin-top: 6px; margin-left: 2px; }
+
+.draft-card { margin-top: 14px; padding: 18px 20px; }
+.draft-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.draft-card-head .doc-ic { color: var(--brand); }
+.draft-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.draft-body p { font-size: 13px; line-height: 1.65; color: #c3cbdb; margin: 0 0 10px; }
+.draft-body p:last-child { margin-bottom: 0; }
+
+.action-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn { border-radius: 8px; padding: 9px 18px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: default; border: 1px solid transparent; }
+.btn-approve { background: var(--brand); color: #fff; animation: glow 2.2s ease-in-out infinite; }
+.btn-revise { background: transparent; border-color: var(--border-strong); color: var(--text); }
+.btn-reject { background: transparent; color: var(--muted); }
+
+/* ---------- Screen 2: Task queue ---------- */
+.panel-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.panel-subtitle { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; }
+.queue-list { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.queue-item {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border);
+}
+.queue-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.queue-text { flex: 1; min-width: 0; }
+.queue-title { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.queue-meta { font-size: 11.5px; color: var(--muted); }
+.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+.badge-ready { background: var(--brand-dim); color: var(--brand); }
+.badge-drafting { background: var(--warn-dim); color: var(--warn); }
+.badge-scheduled { background: var(--surface-2); color: var(--muted); }
+.badge-queued { background: var(--surface-2); color: var(--muted); }
+.badge-approved { background: var(--success-dim); color: var(--success); }
+.badge .spinner-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: pulse-dot 1.2s ease-in-out infinite; }
+.badge .spinner-dot:nth-child(2) { animation-delay: .2s; }
+.badge .spinner-dot:nth-child(3) { animation-delay: .4s; }
+
+/* ---------- Screen 3: Activity feed ---------- */
+.repo-group { margin-bottom: 16px; }
+.repo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.repo-name { font-size: 13.5px; font-weight: 700; }
+.repo-count { font-size: 11.5px; color: var(--muted); }
+.repo-status { margin-left: auto; }
+.commit-list { display: flex; flex-direction: column; gap: 5px; padding-left: 4px; border-left: 2px solid var(--border); margin-left: 6px; }
+.commit-row { display: flex; align-items: center; gap: 8px; padding: 6px 0 6px 14px; font-size: 12.5px; }
+.commit-hash { color: var(--brand); font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px; flex-shrink: 0; }
+.commit-msg { color: #c3cbdb; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.commit-time { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.spinner-ring {
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--warn-dim); border-top-color: var(--warn);
+  animation: spin .8s linear infinite; display: inline-block;
+}
+
+/* ---------- Screen 4: History ---------- */
+.history-grid { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.history-card { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.thumb { width: 56px; height: 56px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; }
+.thumb-1 { background: linear-gradient(135deg,#3b82f6,#1e3a8a); }
+.thumb-2 { background: linear-gradient(135deg,#8b5cf6,#4c1d95); }
+.thumb-3 { background: linear-gradient(135deg,#64748b,#1e293b); }
+.thumb-4 { background: linear-gradient(135deg,#22c55e,#14532d); }
+.hist-text { flex: 1; min-width: 0; }
+.hist-title { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+.hist-meta { font-size: 11.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="logo">G</span>Gig Copilot</div>
+  <div class="topbar-right">
+    <div class="gh-status"><span class="dot"></span>Connected to GitHub</div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+</div>
+
+<div class="app-body">
+  <aside class="sidebar">
+    <div class="side-section">
+      <div class="side-label">Tasks</div>
+      <div class="side-item" id="nav-review"><span class="ic">&#128172;</span>Pending review<span class="count">1</span></div>
+      <div class="side-item" id="nav-queue"><span class="ic">&#128203;</span>Task queue<span class="count">5</span></div>
+      <div class="side-item" id="nav-activity"><span class="ic">&#9889;</span>Activity feed</div>
+    </div>
+    <div class="side-section">
+      <div class="side-label">History</div>
+      <div class="side-item" id="nav-history"><span class="ic">&#128193;</span>Approved<span class="count">12</span></div>
+    </div>
+    <div class="sidebar-footer"><span class="avatar-mini"></span>noor@jigsol.ai</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- SCREEN 1: PENDING REVIEW -->
+    <section class="screen active" id="screen-1">
+      <div class="chat-wrap">
+        <div class="bot-msg-row">
+          <div class="bot-avatar">G</div>
+          <div class="bot-bubble-col">
+            <div class="bot-name-row"><span class="bot-name">Gig Copilot</span><span class="bot-badge">Bot</span></div>
+            <div class="bot-bubble">New case study drafted for your repository activity this week. Ready for review?</div>
+            <div class="timestamp">2 min ago</div>
+
+            <div class="draft-card surface">
+              <div class="draft-card-head"><span class="doc-ic">&#128196;</span>Case study draft</div>
+              <div class="draft-title">ET System</div>
+              <div class="draft-body">
+                <p>Over the past week, the ET System repository saw a focused push around the ingestion pipeline, with three commits reworking how event batches are validated before they reach the queue. The changes reduce duplicate processing and cut the average retry rate significantly.</p>
+                <p>A new configuration layer was introduced to replace scattered hardcoded thresholds, aligning the module with the rest of the platform's config-driven approach. This makes future tuning a one-line change instead of a redeploy.</p>
+                <p>Test coverage for the validation path grew alongside the refactor, and the CI run time held steady despite the added assertions. This draft frames the work as a reliability improvement suitable for the portfolio case study section.</p>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-approve">Approve</button>
+                <button class="btn btn-revise">Revise</button>
+                <button class="btn btn-reject">Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: TASK QUEUE -->
+    <section class="screen" id="screen-2">
+      <div class="panel-title">Task queue</div>
+      <div class="panel-subtitle">5 tasks &middot; auto-drafted from your connected activity</div>
+      <div class="queue-list">
+        <div class="queue-item">
+          <div class="queue-icon">&#128196;</div>
+          <div class="queue-text"><div class="queue-title">Case study: ET System</div><div class="queue-meta">Drafted from 3 commits &middot; 2 min ago</div></div>
+          <div class="badge badge-ready">Ready for review</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">&#128200;</div>
+          <div class="queue-text"><div class="queue-title">Summary: Week 32 activity</div><div class="queue-meta">Across 3 repositories</div></div>
+          <div class="badge badge-drafting"><span class="spinner-dot"></span><span class="spinner-dot"></span><span class="spinner-dot"></span>Drafting</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">&#128196;</div>
+          <div class="queue-text"><div class="queue-title">Case study: Gig Radar</div><div class="queue-meta">Waiting on more repository activity</div></div>
+          <div class="badge badge-scheduled">Scheduled</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">&#128190;</div>
+          <div class="queue-text"><div class="queue-title">Demo summary: formforge</div><div class="queue-meta">Queued behind 2 tasks</div></div>
+          <div class="badge badge-queued">Queued</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">&#128196;</div>
+          <div class="queue-text"><div class="queue-title">Case study: autari-landing</div><div class="queue-meta">Approved and published</div></div>
+          <div class="badge badge-approved">Approved</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: ACTIVITY FEED -->
+    <section class="screen" id="screen-3">
+      <div class="panel-title">Your GitHub activity</div>
+      <div class="panel-subtitle">Watching 3 repositories for drafting triggers</div>
+
+      <div class="repo-group">
+        <div class="repo-head"><span class="repo-name">ET System</span><span class="repo-count">3 commits</span><span class="repo-status badge badge-approved">Case study ready</span></div>
+        <div class="commit-list">
+          <div class="commit-row"><span class="commit-hash">a4e1c9</span><span class="commit-msg">refactor: validate event batches before queue</span><span class="commit-time">3d</span></div>
+          <div class="commit-row"><span class="commit-hash">2f0b71</span><span class="commit-msg">add config-driven ingestion thresholds</span><span class="commit-time">3d</span></div>
+          <div class="commit-row"><span class="commit-hash">9d3a44</span><span class="commit-msg">test: cover new validation paths</span><span class="commit-time">2d</span></div>
+        </div>
+      </div>
+
+      <div class="repo-group">
+        <div class="repo-head"><span class="repo-name">Gig Radar</span><span class="repo-count">7 commits</span><span class="repo-status badge badge-drafting"><span class="spinner-ring"></span>Drafting case study...</span></div>
+        <div class="commit-list">
+          <div class="commit-row"><span class="commit-hash">7c81e2</span><span class="commit-msg">feat: rank leads by response likelihood</span><span class="commit-time">1d</span></div>
+          <div class="commit-row"><span class="commit-hash">b6f420</span><span class="commit-msg">fix: dedupe listings across sources</span><span class="commit-time">1d</span></div>
+          <div class="commit-row"><span class="commit-hash">0aa17d</span><span class="commit-msg">chore: bump scraper rate limits</span><span class="commit-time">18h</span></div>
+        </div>
+      </div>
+
+      <div class="repo-group">
+        <div class="repo-head"><span class="repo-name">autari-landing</span><span class="repo-count">12 commits</span><span class="repo-status badge badge-approved">Case study ready</span></div>
+        <div class="commit-list">
+          <div class="commit-row"><span class="commit-hash">e91f3a</span><span class="commit-msg">feat(portfolio): gig copilot app interface GIF</span><span class="commit-time">2h</span></div>
+          <div class="commit-row"><span class="commit-hash">4bb208</span><span class="commit-msg">feat(portfolio): stock app trading terminal rebuild</span><span class="commit-time">1d</span></div>
+          <div class="commit-row"><span class="commit-hash">c015d6</span><span class="commit-msg">feat(portfolio): email app apple minimal rebuild</span><span class="commit-time">2d</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: HISTORY -->
+    <section class="screen" id="screen-4">
+      <div class="panel-title">Approved case studies</div>
+      <div class="panel-subtitle">12 published &middot; drafted and reviewed via the bot</div>
+      <div class="history-grid">
+        <div class="history-card">
+          <div class="thumb thumb-1">ET</div>
+          <div class="hist-text"><div class="hist-title">ET System &middot; Case Study</div><div class="hist-meta">Approved 3 days ago</div></div>
+          <div class="badge badge-approved">Approved</div>
+        </div>
+        <div class="history-card">
+          <div class="thumb thumb-2">FF</div>
+          <div class="hist-text"><div class="hist-title">formforge &middot; Demo Summary</div><div class="hist-meta">Approved 1 week ago</div></div>
+          <div class="badge badge-approved">Approved</div>
+        </div>
+        <div class="history-card">
+          <div class="thumb thumb-3">GR</div>
+          <div class="hist-text"><div class="hist-title">Gig Radar &middot; Case Study draft</div><div class="hist-meta">Rejected 2 weeks ago</div></div>
+          <div class="badge" style="background:var(--danger-dim); color:var(--danger);">Rejected</div>
+        </div>
+        <div class="history-card">
+          <div class="thumb thumb-4">AL</div>
+          <div class="hist-text"><div class="hist-title">autari-landing &middot; Weekly Summary</div><div class="hist-meta">Approved 3 weeks ago</div></div>
+          <div class="badge badge-approved">Approved</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function tick() {
+    var d = new Date();
+    var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
+    document.getElementById('clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  var screens = document.querySelectorAll('.screen');
+  var navIds = ['nav-review', 'nav-queue', 'nav-activity', 'nav-history'];
+  var idx = 0;
+
+  function show(i) {
+    screens.forEach(function(s, j) { s.classList.toggle('active', j === i); });
+    navIds.forEach(function(id, j) {
+      document.getElementById(id).classList.toggle('active', j === i);
+    });
+  }
+
+  show(0);
+  setInterval(function() {
+    idx = (idx + 1) % 4;
+    show(idx);
+  }, 3500);
+</script>
+
+</body>
+</html>
