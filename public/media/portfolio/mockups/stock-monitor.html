@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Stock Monitor Mockup</title>
+<style>
+  :root{
+    --bg:#070710;
+    --green:#19D3A2;
+    --amber:#F59E0B;
+    --red:#EF4444;
+    --glass-bg: rgba(255,255,255,0.055);
+    --glass-border: rgba(255,255,255,0.1);
+    --text-main:#E9EAF0;
+    --text-mute:#7C8296;
+    --mono: ui-monospace, SFMono-Regular, "Consolas", "Liberation Mono", monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    width:1280px;
+    height:800px;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--text-main);
+    font-family:var(--sans);
+    position:relative;
+  }
+
+  /* subtle background grid */
+  .bg-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: radial-gradient(ellipse 900px 600px at 50% 40%, #000 40%, transparent 90%);
+            mask-image: radial-gradient(ellipse 900px 600px at 50% 40%, #000 40%, transparent 90%);
+    pointer-events:none;
+  }
+
+  /* scanline sweep for retro-futurist feel */
+  .scanline{
+    position:absolute; left:0; right:0; height:140px;
+    background: linear-gradient(180deg, transparent 0%, rgba(25,211,162,0.05) 45%, rgba(25,211,162,0.1) 50%, rgba(25,211,162,0.05) 55%, transparent 100%);
+    animation: sweep 8s linear infinite;
+    pointer-events:none;
+    mix-blend-mode: screen;
+  }
+  @keyframes sweep{
+    0%{ top:-140px; }
+    100%{ top:800px; }
+  }
+
+  .stage{
+    position:relative;
+    width:1280px; height:800px;
+    display:flex;
+    flex-direction:column;
+    z-index:1;
+  }
+
+  /* header */
+  .header{
+    height:78px;
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 0 32px;
+    border-bottom:1px solid var(--glass-border);
+    background: rgba(255,255,255,0.02);
+  }
+  .brand-block .brand{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:0.5px;
+  }
+  .brand-block .tagline{
+    font-size:11px;
+    color:var(--text-mute);
+    letter-spacing:0.6px;
+    margin-top:2px;
+    text-transform:uppercase;
+  }
+  .header-right{
+    display:flex;
+    align-items:center;
+    gap:22px;
+  }
+  .alert-msg-wrap{
+    position:relative;
+    width:170px;
+    height:20px;
+  }
+  .alert-msg{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--red);
+    opacity:0;
+    transition:opacity .5s ease;
+    white-space:nowrap;
+  }
+  body[data-state="1"] .alert-msg[data-msg="1"]{ opacity:1; }
+  body[data-state="2"] .alert-msg[data-msg="2"],
+  body[data-state="3"] .alert-msg[data-msg="2"]{ opacity:1; }
+  .live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text-mute);
+    font-weight:600;
+  }
+  .live-dot{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(25,211,162,0.6);
+    animation: pulse-dot 1.6s ease-out infinite;
+  }
+  @keyframes pulse-dot{
+    0%{ box-shadow:0 0 0 0 rgba(25,211,162,0.55); }
+    70%{ box-shadow:0 0 0 9px rgba(25,211,162,0); }
+    100%{ box-shadow:0 0 0 0 rgba(25,211,162,0); }
+  }
+
+  /* content area */
+  .content{
+    position:relative;
+    flex:1;
+    margin:22px 32px;
+  }
+  .dashboard-view, .stats-view{
+    position:absolute; inset:0;
+    display:flex;
+    gap:20px;
+    opacity:1;
+    transform:scale(1);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .stats-view{ opacity:0; pointer-events:none; transform:scale(0.98); }
+  body[data-state="3"] .dashboard-view{ opacity:0; pointer-events:none; transform:scale(0.98); }
+  body[data-state="3"] .stats-view{ opacity:1; pointer-events:auto; transform:scale(1); }
+
+  /* store grid */
+  .grid-view{ flex:1; min-width:0; }
+  .store-grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap:14px;
+    width:100%;
+    height:100%;
+  }
+  .card{
+    background:var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    transition: box-shadow .5s ease, border-color .5s ease;
+  }
+  .card-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .card-name{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-main);
+    letter-spacing:0.3px;
+  }
+  .card-watch{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(25,211,162,0.6);
+    animation: pulse-dot 2.2s ease-out infinite;
+  }
+  .card-watch.delay1{ animation-delay:.3s; }
+  .card-watch.delay2{ animation-delay:.6s; }
+  .card-watch.delay3{ animation-delay:.9s; }
+  .card-bar-label{
+    display:flex;
+    justify-content:space-between;
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--text-mute);
+    margin-bottom:5px;
+  }
+  .card-bar{
+    width:100%;
+    height:6px;
+    border-radius:4px;
+    background: rgba(255,255,255,0.08);
+    overflow:hidden;
+  }
+  .card-fill{
+    height:100%;
+    border-radius:4px;
+    background:var(--green);
+    transition: width .6s ease, background-color .6s ease;
+  }
+  .card[data-level="amber"] .card-fill{ background:var(--amber); }
+  .card[data-level="red"] .card-fill{ background:var(--red); }
+  .card[data-level="amber"] .card-watch{ background:var(--amber); }
+  .card[data-level="red"] .card-watch{ background:var(--red); }
+
+  /* store 14: amber -> red once threshold crossed */
+  body[data-state="2"] #card-14, body[data-state="3"] #card-14{ }
+  body[data-state="2"] #card-14 .card-fill, body[data-state="3"] #card-14 .card-fill{
+    width:9% !important;
+    background:var(--red);
+  }
+  body[data-state="2"] #card-14 .card-watch, body[data-state="3"] #card-14 .card-watch{ background:var(--red); }
+  body[data-state="2"] #card-14, body[data-state="3"] #card-14{
+    border-color: rgba(239,68,68,0.5);
+    box-shadow: 0 0 20px rgba(239,68,68,0.3);
+  }
+
+  /* store 07: alert flash */
+  #card-07 .card-fill{ transition: width .6s ease, background-color .6s ease; }
+  body[data-state="1"] #card-07, body[data-state="2"] #card-07{
+    animation: alertFlash 1.1s ease-in-out infinite;
+  }
+  body[data-state="1"] #card-07 .card-fill, body[data-state="2"] #card-07 .card-fill{
+    width:8% !important;
+    background:var(--red) !important;
+  }
+  body[data-state="1"] #card-07 .card-watch, body[data-state="2"] #card-07 .card-watch{ background:var(--red); }
+  @keyframes alertFlash{
+    0%,100%{ box-shadow: 0 0 20px rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); }
+    50%{ box-shadow: 0 0 30px rgba(239,68,68,0.55); border-color: rgba(239,68,68,0.85); }
+  }
+
+  /* sidebar */
+  .sidebar{
+    width:330px;
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .notification-panel, .feed-panel{
+    background:var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:18px 20px;
+    opacity:0;
+    transform: translateX(50px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .notification-panel{
+    border-color: rgba(239,68,68,0.45);
+    box-shadow: 0 0 20px rgba(239,68,68,0.3);
+  }
+  body[data-state="1"] .notification-panel,
+  body[data-state="2"] .notification-panel{
+    opacity:1;
+    transform: translateX(0);
+  }
+  .notif-label{
+    font-size:11px;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--red);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .notif-store{
+    font-size:19px;
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .notif-row{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--text-mute);
+    margin-bottom:7px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .notif-row .val{ color:var(--text-main); }
+  .notif-row.units .val{ color:var(--red); font-weight:700; }
+  .reorder-btn{
+    margin-top:14px;
+    width:100%;
+    padding:10px 0;
+    border-radius:8px;
+    border:1px solid rgba(239,68,68,0.6);
+    background: rgba(239,68,68,0.16);
+    color:#ffb4b0;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.4px;
+    cursor:pointer;
+  }
+
+  .feed-panel{
+    border-color: var(--glass-border);
+    box-shadow:none;
+  }
+  body[data-state="2"] .feed-panel,
+  body[data-state="3"] .feed-panel{
+    opacity:1;
+    transform: translateX(0);
+  }
+  .feed-label{
+    font-size:11px;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--text-mute);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .feed-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-top:1px solid rgba(255,255,255,0.06);
+    font-size:12.5px;
+  }
+  .feed-item:first-child{ border-top:none; }
+  .feed-dot{
+    width:6px; height:6px; border-radius:50%;
+    flex:0 0 auto;
+    background:var(--green);
+  }
+  .feed-item.alert .feed-dot{ background:var(--red); }
+  .feed-store{ font-weight:700; flex:0 0 auto; }
+  .feed-action{ color:var(--text-mute); flex:1; }
+  .feed-item.alert .feed-action{ color:var(--red); }
+  .feed-detail{ font-family:var(--mono); color:var(--text-mute); flex:0 0 auto; }
+
+  /* stats view */
+  .stats-view{
+    flex-direction:column;
+    justify-content:center;
+    align-items:stretch;
+    gap:28px;
+  }
+  .stat-tiles{
+    display:flex;
+    gap:20px;
+  }
+  .tile{
+    flex:1;
+    background:var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:30px 26px;
+    text-align:center;
+  }
+  .tile-number{
+    font-family:var(--mono);
+    font-size:56px;
+    font-weight:700;
+    color:var(--green);
+    line-height:1;
+  }
+  .tile-label{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--text-mute);
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+  }
+  .trend-panel{
+    background:var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:22px 28px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+  .trend-title{
+    font-size:12px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text-mute);
+    margin-bottom:10px;
+  }
+  .trend-chart-wrap{ flex:1; display:flex; align-items:center; justify-content:center; }
+</style>
+</head>
+<body data-state="0">
+  <div class="bg-grid"></div>
+  <div class="scanline"></div>
+
+  <div class="stage">
+    <div class="header">
+      <div class="brand-block">
+        <div class="brand">Stock Monitor</div>
+        <div class="tagline">20+ stores. Nothing goes unnoticed.</div>
+      </div>
+      <div class="header-right">
+        <div class="alert-msg-wrap">
+          <div class="alert-msg" data-msg="1">1 alert active</div>
+          <div class="alert-msg" data-msg="2">2 alerts active</div>
+        </div>
+        <div class="live"><span class="live-dot"></span>Live</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="dashboard-view">
+        <div class="grid-view">
+          <div class="store-grid" id="storeGrid"></div>
+        </div>
+        <div class="sidebar">
+          <div class="notification-panel">
+            <div class="notif-label">Low Stock Alert</div>
+            <div class="notif-store">Store 07</div>
+            <div class="notif-row"><span>SKU</span><span class="val">HDMI-4K-2M</span></div>
+            <div class="notif-row units"><span>Remaining</span><span class="val">3 units</span></div>
+            <div class="notif-row"><span>Threshold</span><span class="val">10 units</span></div>
+            <button class="reorder-btn">Reorder Now</button>
+          </div>
+          <div class="feed-panel">
+            <div class="feed-label">Activity Feed</div>
+            <div class="feed-item">
+              <span class="feed-dot"></span>
+              <span class="feed-store">Store 07</span>
+              <span class="feed-action">restocked</span>
+              <span class="feed-detail">48 units</span>
+            </div>
+            <div class="feed-item alert">
+              <span class="feed-dot"></span>
+              <span class="feed-store">Store 14</span>
+              <span class="feed-action">alert triggered</span>
+              <span class="feed-detail">2 units</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-view">
+        <div class="stat-tiles">
+          <div class="tile">
+            <div class="tile-number">20</div>
+            <div class="tile-label">stores monitored</div>
+          </div>
+          <div class="tile">
+            <div class="tile-number">847</div>
+            <div class="tile-label">SKUs tracked</div>
+          </div>
+          <div class="tile">
+            <div class="tile-number">0</div>
+            <div class="tile-label">stockouts this week</div>
+          </div>
+        </div>
+        <div class="trend-panel">
+          <div class="trend-title">Stockout count, last 7 days</div>
+          <div class="trend-chart-wrap">
+            <svg width="720" height="150" viewBox="0 0 720 150">
+              <line x1="30" y1="120" x2="700" y2="120" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+              <polyline points="30,30 141.6,50 253.3,68 365,68 476.6,86 588.3,104 700,120"
+                        fill="none" stroke="#19D3A2" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+              <g fill="#19D3A2">
+                <circle cx="30" cy="30" r="4"/>
+                <circle cx="141.6" cy="50" r="4"/>
+                <circle cx="253.3" cy="68" r="4"/>
+                <circle cx="365" cy="68" r="4"/>
+                <circle cx="476.6" cy="86" r="4"/>
+                <circle cx="588.3" cy="104" r="4"/>
+                <circle cx="700" cy="120" r="5" fill="#070710" stroke="#19D3A2" stroke-width="2.5"/>
+              </g>
+              <g fill="#7C8296" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">
+                <text x="30" y="138">Day 1</text>
+                <text x="141.6" y="138">Day 2</text>
+                <text x="253.3" y="138">Day 3</text>
+                <text x="365" y="138">Day 4</text>
+                <text x="476.6" y="138">Day 5</text>
+                <text x="588.3" y="138">Day 6</text>
+                <text x="700" y="138">Day 7</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var amberStores = [5, 14, 18];
+  var redStores = [11];
+  var fillValues = {
+    1:88, 2:74, 3:66, 4:92, 5:35, 6:80, 7:70, 8:58, 9:95, 10:63,
+    11:8, 12:77, 13:84, 14:28, 15:69, 16:91, 17:60, 18:40, 19:73, 20:86
+  };
+  var grid = document.getElementById('storeGrid');
+  for (var i = 1; i <= 20; i++) {
+    var id = (i < 10 ? '0' + i : '' + i);
+    var level = 'green';
+    if (amberStores.indexOf(i) !== -1) level = 'amber';
+    if (redStores.indexOf(i) !== -1) level = 'red';
+    var fill = fillValues[i];
+
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + id;
+    card.setAttribute('data-level', level);
+
+    card.innerHTML =
+      '<div class="card-top">' +
+        '<div class="card-name">Store ' + id + '</div>' +
+        '<span class="card-watch delay' + (i % 3) + '"></span>' +
+      '</div>' +
+      '<div>' +
+        '<div class="card-bar-label"><span>Stock</span><span>' + fill + '%</span></div>' +
+        '<div class="card-bar"><div class="card-fill" style="width:' + fill + '%"></div></div>' +
+      '</div>';
+
+    grid.appendChild(card);
+  }
+
+  var STATE_MS = 3500;
+  var CYCLE_MS = STATE_MS * 4;
+  var t0 = performance.now();
+  function tick(now){
+    var elapsed = (now - t0) % CYCLE_MS;
+    var state = Math.floor(elapsed / STATE_MS);
+    document.body.setAttribute('data-state', String(state));
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
