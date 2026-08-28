@@ -324,18 +324,6 @@ export default function PortfolioPage() {
                   { label: "Result", value: "End-to-end billing automated" },
                 ],
               },
-              {
-                num: "04",
-                name: "SaaS Platform",
-                hook: "Accounts, billing, device locking, activation — live and in use every day.",
-                image: "/media/portfolio/autari-portal-admin.png",
-                meta: [
-                  { label: "What", value: "SaaS Platform" },
-                  { label: "For", value: "Business clients" },
-                  { label: "When", value: "2025" },
-                  { label: "Result", value: "Live with paying customers" },
-                ],
-              },
             ].map((p, i) => (
               <motion.div
                 key={p.num}
