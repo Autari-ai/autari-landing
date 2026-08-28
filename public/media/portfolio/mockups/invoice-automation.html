@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice Automation</title>
+<style>
+  :root{
+    --bg:#070710;
+    --card:rgba(255,255,255,0.055);
+    --border:rgba(255,255,255,0.1);
+    --accent:#19D3A2;
+    --text:#EAF2EF;
+    --muted:rgba(234,242,239,0.5);
+    --muted-dim:rgba(234,242,239,0.35);
+    --yellow:#E3B341;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    width:1280px;height:800px;overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column;
+    position:relative;
+  }
+  body::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background-image:repeating-linear-gradient(45deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 40px);
+    pointer-events:none;
+  }
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;}
+
+  /* header */
+  .header{
+    position:relative;z-index:2;
+    display:flex;align-items:center;gap:10px;
+    padding:26px 40px 18px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 10px rgba(25,211,162,0.7);
+    animation:pulseDot 2.4s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  .brand{
+    font-variant:small-caps;
+    letter-spacing:2.5px;
+    font-size:14px;
+    font-weight:600;
+    color:rgba(234,242,239,0.85);
+  }
+  @keyframes pulseDot{
+    0%,100%{box-shadow:0 0 8px rgba(25,211,162,0.55);}
+    50%{box-shadow:0 0 18px rgba(25,211,162,1);}
+  }
+
+  /* stage */
+  .stage{
+    position:relative;z-index:1;
+    flex:1;
+    margin:0 40px;
+  }
+  .state{
+    position:absolute;inset:0;
+    opacity:0;
+    transform:translateY(16px);
+    transition:opacity 800ms ease, transform 800ms ease;
+    pointer-events:none;
+  }
+  .state.active{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+
+  /* card base */
+  .card{
+    background:var(--card);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    border:1px solid var(--border);
+    border-radius:16px;
+  }
+
+  /* badges */
+  .badge{
+    display:inline-flex;align-items:center;
+    padding:4px 13px;border-radius:999px;
+    font-size:11px;font-weight:600;letter-spacing:0.3px;
+    transition:background-color 800ms ease, color 800ms ease, border-color 800ms ease, box-shadow 800ms ease;
+    white-space:nowrap;
+  }
+  .badge-yellow{background:rgba(227,179,65,0.15);color:var(--yellow);border:1px solid rgba(227,179,65,0.3);}
+  .badge-green{background:rgba(25,211,162,0.15);color:var(--accent);border:1px solid rgba(25,211,162,0.3);}
+  .badge-neutral{background:rgba(255,255,255,0.07);color:rgba(234,242,239,0.6);border:1px solid rgba(255,255,255,0.1);}
+  .badge.glow{box-shadow:0 0 24px rgba(25,211,162,0.3);}
+
+  /* ===== STATE 1 : JOBS BOARD ===== */
+  .jobs-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-template-rows:repeat(4,1fr);
+    gap:18px;
+    height:100%;
+  }
+  .job-card{
+    padding:0 24px;
+    display:flex;align-items:center;gap:16px;
+    border-color:var(--border);
+    transition:border-color 800ms ease;
+  }
+  .job-card.highlight{border-color:rgba(25,211,162,0.35);}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:rgba(25,211,162,0.12);
+    border:1px solid rgba(25,211,162,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:var(--accent);
+  }
+  .job-info{flex:1;min-width:0;}
+  .completing-tag{
+    display:block;
+    font-size:10px;letter-spacing:0.5px;
+    color:var(--accent);
+    margin-bottom:2px;
+    animation:tagPulse 1.4s ease-in-out infinite;
+    transition:opacity 800ms ease;
+  }
+  @keyframes tagPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  .job-name{font-size:14px;font-weight:600;}
+  .job-task{font-size:12px;color:var(--muted);margin-top:2px;}
+  .job-meta{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;}
+  .job-id{font-size:11px;color:var(--muted-dim);}
+
+  /* ===== SPLIT LAYOUT (states 2-4) ===== */
+  .split{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    height:100%;
+  }
+  .col{display:flex;flex-direction:column;gap:20px;min-height:0;}
+  .panel-label{
+    font-variant:small-caps;
+    letter-spacing:1.5px;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .recap-card{padding:26px 28px;}
+  .recap-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .recap-row:first-of-type{margin-top:18px;}
+  .recap-key{font-size:12px;color:var(--muted);}
+  .recap-val{font-size:13px;font-weight:600;}
+
+  /* invoice card */
+  .invoice-card{
+    padding:28px 30px;
+    opacity:0;
+    transform:translateX(36px);
+    transition:opacity 800ms ease, transform 800ms ease;
+  }
+  .invoice-card.show{opacity:1;transform:translateX(0);}
+  .invoice-card.static{opacity:1;transform:translateX(0);transition:none;}
+  .flash-pill{
+    display:inline-flex;align-items:center;
+    padding:5px 14px;border-radius:999px;
+    background:rgba(25,211,162,0.15);
+    border:1px solid rgba(25,211,162,0.35);
+    color:var(--accent);
+    font-size:11px;font-weight:600;letter-spacing:0.3px;
+    margin-bottom:18px;
+  }
+  .flash-pill.flash{animation:flashPulse 700ms ease-out 2;}
+  @keyframes flashPulse{
+    0%{box-shadow:0 0 0 rgba(25,211,162,0);}
+    50%{box-shadow:0 0 30px rgba(25,211,162,0.6);}
+    100%{box-shadow:0 0 24px rgba(25,211,162,0.3);}
+  }
+  .field-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;}
+  .field-key{font-size:12px;color:var(--muted);}
+  .field-val{font-size:15px;font-weight:600;}
+  .amount-val{font-size:26px;color:var(--accent);font-weight:700;}
+  .ref-val{font-size:15px;color:var(--accent);}
+
+  /* PO card */
+  .po-card{
+    padding:22px 28px;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 600ms ease, transform 600ms ease;
+  }
+  .po-card.show{opacity:1;transform:translateY(0);}
+  .po-title{font-size:13px;font-weight:600;margin-bottom:6px;}
+  .po-detail{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .po-amount{font-size:20px;color:var(--accent);font-weight:700;}
+
+  /* BigChange summary (state 4 left) */
+  .summary-card{padding:26px 28px;flex:1;}
+  .summary-title{font-size:16px;font-weight:700;margin-bottom:2px;}
+  .summary-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
+  .summary-row{display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(255,255,255,0.06);}
+  .summary-row:first-of-type{border-top:none;}
+  .summary-row.total{margin-top:6px;border-top:1px solid rgba(255,255,255,0.12);padding-top:14px;}
+  .summary-row .k{font-size:12px;color:var(--muted);}
+  .summary-row .v{font-size:13px;font-weight:600;}
+  .summary-row.total .v{color:var(--accent);font-size:16px;}
+
+  /* ledger (state 4 right) */
+  .ledger-card{padding:26px 28px;flex:1;display:flex;flex-direction:column;}
+  .ledger-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 0;
+    border-top:1px solid rgba(255,255,255,0.06);
+    opacity:0;transform:translateX(-14px);
+  }
+  .ledger-row:first-of-type{border-top:none;}
+  .ledger-card.run .ledger-row{animation:rowIn 500ms ease forwards;}
+  .ledger-card.run .ledger-row:nth-child(1){animation-delay:0ms;}
+  .ledger-card.run .ledger-row:nth-child(2){animation-delay:220ms;}
+  .ledger-card.run .ledger-row:nth-child(3){animation-delay:440ms;}
+  .ledger-card.run .ledger-row:nth-child(4){animation-delay:660ms;}
+  .ledger-card.run .ledger-row:nth-child(5){animation-delay:880ms;}
+  @keyframes rowIn{to{opacity:1;transform:translateX(0);}}
+  .ledger-desc{font-size:12px;}
+  .ledger-ref{font-size:11px;color:var(--muted-dim);margin-top:2px;}
+  .ledger-amt{font-size:14px;font-weight:600;color:var(--accent);}
+
+  footer{
+    position:relative;z-index:2;
+    text-align:center;
+    padding:8px 40px 22px;
+    font-size:12px;
+    color:var(--muted-dim);
+    letter-spacing:0.2px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <span class="dot"></span>
+    <span class="brand">invoice automation</span>
+  </div>
+
+  <div class="stage">
+
+    <!-- STATE 1 : JOBS BOARD -->
+    <div class="state" id="state0">
+      <div class="jobs-grid">
+        <div class="card job-card highlight" id="topCard">
+          <div class="avatar">JW</div>
+          <div class="job-info">
+            <span class="completing-tag" id="topTag">Completing&hellip;</span>
+            <div class="job-name">J. Whitfield &middot; Electrician</div>
+            <div class="job-task">Consumer unit upgrade &middot; JB-4821</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-yellow" id="topBadge">In progress</span>
+            <span class="job-id mono">14 Alder Close</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">RN</div>
+          <div class="job-info">
+            <div class="job-name">R. Ncube &middot; Plumber</div>
+            <div class="job-task">Boiler service &middot; JB-4790</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-yellow">In progress</span>
+            <span class="job-id mono">09:30</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">SO</div>
+          <div class="job-info">
+            <div class="job-name">S. Okafor &middot; Electrician</div>
+            <div class="job-task">EICR inspection &middot; JB-4774</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-neutral">Scheduled</span>
+            <span class="job-id mono">13:00</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">TM</div>
+          <div class="job-info">
+            <div class="job-name">T. Marsh &middot; Plumber</div>
+            <div class="job-task">Leak repair &middot; JB-4802</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-yellow">In progress</span>
+            <span class="job-id mono">11:15</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">AD</div>
+          <div class="job-info">
+            <div class="job-name">A. Doyle &middot; Electrician</div>
+            <div class="job-task">Fault finding &middot; JB-4795</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-green">Complete</span>
+            <span class="job-id mono">08:45</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">KN</div>
+          <div class="job-info">
+            <div class="job-name">K. Novak &middot; Plumber</div>
+            <div class="job-task">Bathroom install &middot; JB-4760</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-neutral">Scheduled</span>
+            <span class="job-id mono">15:30</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">MH</div>
+          <div class="job-info">
+            <div class="job-name">M. Higgins &middot; Electrician</div>
+            <div class="job-task">Kitchen rewire &middot; JB-4788</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-yellow">In progress</span>
+            <span class="job-id mono">10:00</span>
+          </div>
+        </div>
+
+        <div class="card job-card">
+          <div class="avatar">FA</div>
+          <div class="job-info">
+            <div class="job-name">F. Adeyemi &middot; Plumber</div>
+            <div class="job-task">Drain clearance &middot; JB-4811</div>
+          </div>
+          <div class="job-meta">
+            <span class="badge badge-yellow">In progress</span>
+            <span class="job-id mono">12:20</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE 2 : INVOICE AUTO-RAISED -->
+    <div class="state" id="state1">
+      <div class="split">
+        <div class="col">
+          <div class="card recap-card">
+            <div class="panel-label">Job closed</div>
+            <div class="job-name" style="font-size:18px;">J. Whitfield &middot; Consumer unit upgrade</div>
+            <div class="job-task">JB-4821 &middot; 14 Alder Close</div>
+            <div class="recap-row">
+              <span class="recap-key">Status</span>
+              <span class="badge badge-green glow">Complete</span>
+            </div>
+            <div class="recap-row">
+              <span class="recap-key">Signed off</span>
+              <span class="recap-val mono">14:52</span>
+            </div>
+            <div class="recap-row">
+              <span class="recap-key">Ready for billing</span>
+              <span class="recap-val" style="color:var(--accent);">Yes</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card invoice-card" id="invoiceCard2">
+            <span class="flash-pill" id="flashPill">Generated automatically</span>
+            <div class="field-row">
+              <span class="field-key">Reference</span>
+              <span class="field-val ref-val mono">#INV-2847</span>
+            </div>
+            <div class="field-row">
+              <span class="field-key">Amount</span>
+              <span class="amount-val mono">&pound;420.00</span>
+            </div>
+            <div class="field-row">
+              <span class="field-key">Status</span>
+              <span class="badge badge-green">Sent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE 3 : PO AUTO-RAISED -->
+    <div class="state" id="state2">
+      <div class="split">
+        <div class="col">
+          <div class="card recap-card">
+            <div class="panel-label">Job closed</div>
+            <div class="job-name" style="font-size:18px;">J. Whitfield &middot; Consumer unit upgrade</div>
+            <div class="job-task">JB-4821 &middot; 14 Alder Close</div>
+            <div class="recap-row">
+              <span class="recap-key">Status</span>
+              <span class="badge badge-green glow">Complete</span>
+            </div>
+            <div class="recap-row">
+              <span class="recap-key">Signed off</span>
+              <span class="recap-val mono">14:52</span>
+            </div>
+            <div class="recap-row">
+              <span class="recap-key">Ready for billing</span>
+              <span class="recap-val" style="color:var(--accent);">Yes</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card invoice-card static">
+            <span class="flash-pill">Generated automatically</span>
+            <div class="field-row">
+              <span class="field-key">Reference</span>
+              <span class="field-val ref-val mono">#INV-2847</span>
+            </div>
+            <div class="field-row">
+              <span class="field-key">Amount</span>
+              <span class="amount-val mono">&pound;420.00</span>
+            </div>
+            <div class="field-row">
+              <span class="field-key">Status</span>
+              <span class="badge badge-green">Sent</span>
+            </div>
+          </div>
+          <div class="card po-card" id="poCard">
+            <div class="panel-label" style="margin-bottom:8px;">Purchase order</div>
+            <div class="po-title">PO #2847 &middot; Parts &amp; Materials</div>
+            <div class="po-detail">Raised automatically from job materials list</div>
+            <div class="field-row" style="margin-top:0;">
+              <span class="po-amount mono">&pound;85.00</span>
+              <span class="badge badge-green">Raised automatically</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE 4 : ACCOUNTS SYNCED -->
+    <div class="state" id="state3">
+      <div class="split">
+        <div class="col">
+          <div class="card summary-card">
+            <div class="panel-label">BigChange &middot; job summary</div>
+            <div class="summary-title">JB-4821</div>
+            <div class="summary-sub">J. Whitfield &middot; Consumer unit upgrade &middot; 3h 40m</div>
+            <div class="summary-row"><span class="k">Labour</span><span class="v mono">&pound;240.00</span></div>
+            <div class="summary-row"><span class="k">Materials</span><span class="v mono">&pound;85.00</span></div>
+            <div class="summary-row"><span class="k">Call-out fee</span><span class="v mono">&pound;95.00</span></div>
+            <div class="summary-row total"><span class="k">Total</span><span class="v mono">&pound;420.00</span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card ledger-card" id="ledgerCard">
+            <div class="panel-label">Accounting ledger</div>
+            <div class="ledger-row">
+              <div><div class="ledger-desc">Labour</div><div class="ledger-ref mono">JB-4821</div></div>
+              <span class="ledger-amt mono">&pound;240.00</span>
+            </div>
+            <div class="ledger-row">
+              <div><div class="ledger-desc">Materials</div><div class="ledger-ref mono">JB-4821</div></div>
+              <span class="ledger-amt mono">&pound;85.00</span>
+            </div>
+            <div class="ledger-row">
+              <div><div class="ledger-desc">Call-out fee</div><div class="ledger-ref mono">JB-4821</div></div>
+              <span class="ledger-amt mono">&pound;95.00</span>
+            </div>
+            <div class="ledger-row">
+              <div><div class="ledger-desc">Invoice sent</div><div class="ledger-ref mono">INV-2847</div></div>
+              <span class="ledger-amt mono">&pound;420.00</span>
+            </div>
+            <div class="ledger-row">
+              <div><div class="ledger-desc">Purchase order</div><div class="ledger-ref mono">PO-2847</div></div>
+              <span class="ledger-amt mono">&pound;85.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Jobs complete. Billing follows. Nobody types a thing.</footer>
+
+<script>
+  var states = [
+    document.getElementById('state0'),
+    document.getElementById('state1'),
+    document.getElementById('state2'),
+    document.getElementById('state3')
+  ];
+  var idx = 0;
+  var jobTimer = null;
+
+  function reflow(el){ void el.offsetWidth; }
+
+  function runState0(){
+    var badge = document.getElementById('topBadge');
+    var tag = document.getElementById('topTag');
+    var card = document.getElementById('topCard');
+    clearTimeout(jobTimer);
+    badge.className = 'badge badge-yellow';
+    badge.textContent = 'In progress';
+    tag.style.opacity = '1';
+    card.classList.remove('highlight');
+    reflow(card);
+    card.classList.add('highlight');
+    jobTimer = setTimeout(function(){
+      badge.className = 'badge badge-green glow';
+      badge.textContent = 'Complete';
+      tag.style.animation = 'none';
+      tag.style.opacity = '0';
+    }, 1400);
+  }
+
+  function runState1(){
+    var invoice = document.getElementById('invoiceCard2');
+    var pill = document.getElementById('flashPill');
+    invoice.classList.remove('show');
+    pill.classList.remove('flash');
+    reflow(invoice);
+    setTimeout(function(){
+      invoice.classList.add('show');
+    }, 150);
+    setTimeout(function(){
+      reflow(pill);
+      pill.classList.add('flash');
+    }, 700);
+  }
+
+  function runState2(){
+    var po = document.getElementById('poCard');
+    po.classList.remove('show');
+    reflow(po);
+    setTimeout(function(){
+      po.classList.add('show');
+    }, 500);
+  }
+
+  function runState3(){
+    var ledger = document.getElementById('ledgerCard');
+    ledger.classList.remove('run');
+    reflow(ledger);
+    ledger.classList.add('run');
+  }
+
+  var runners = [runState0, runState1, runState2, runState3];
+
+  function activate(i){
+    for (var s = 0; s < states.length; s++){
+      states[s].classList.toggle('active', s === i);
+    }
+    runners[i]();
+  }
+
+  activate(0);
+  setInterval(function(){
+    idx = (idx + 1) % 4;
+    activate(idx);
+  }, 3000);
+</script>
+
+</body>
+</html>
