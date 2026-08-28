@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ask in Plain English</title>
+<style>
+  :root{
+    --bg:#070710;
+    --accent:#19D3A2;
+    --accent-dark:#0E7C66;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-2: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --text-main:#E9E9F0;
+    --text-muted:#8B8B9C;
+    --text-dim:#5C5C6C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    width:1280px;
+    height:800px;
+    overflow:hidden;
+    background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text-main);
+    position:relative;
+  }
+  .scanlines{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:repeating-linear-gradient(transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px);
+    z-index:50;
+  }
+  .glow-field{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(25,211,162,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 110%, rgba(14,124,102,0.10), transparent 60%);
+    z-index:0;
+  }
+
+  .app{
+    position:relative;
+    width:1280px;
+    height:800px;
+    display:flex;
+    flex-direction:column;
+    z-index:1;
+  }
+
+  /* ---------- Header ---------- */
+  .topbar{
+    height:56px;
+    flex:0 0 56px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    border-bottom:1px solid var(--glass-border);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 0 rgba(25,211,162,0.6);
+    animation:dotpulse 2s ease-in-out infinite;
+  }
+  @keyframes dotpulse{
+    0%{ box-shadow:0 0 0 0 rgba(25,211,162,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(25,211,162,0); }
+    100%{ box-shadow:0 0 0 0 rgba(25,211,162,0); }
+  }
+  .brand-name{
+    font-variant-caps:small-caps;
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.09em;
+    color:var(--text-main);
+  }
+  .conn-status{
+    font-size:12.5px;
+    color:var(--text-muted);
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- Status bar (thinking phase) ---------- */
+  .statusbar-wrap{
+    height:34px;
+    flex:0 0 34px;
+    display:flex;
+    align-items:center;
+    padding:0 28px;
+    position:relative;
+  }
+  .statusbar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    opacity:0;
+    transition:opacity 0.3s ease;
+    width:100%;
+  }
+  .statusbar.show{ opacity:1; }
+  .statusbar-text{
+    font-size:12.5px;
+    color:var(--accent);
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  .statusbar-track{
+    flex:0 0 220px;
+    height:3px;
+    border-radius:2px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+    opacity:0;
+    transition:opacity 0.25s ease;
+  }
+  .statusbar-track.show{ opacity:1; }
+  .statusbar-fill{
+    height:100%;
+    width:0%;
+    border-radius:2px;
+    background:linear-gradient(90deg,var(--accent-dark),var(--accent));
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    flex:1 1 auto;
+    display:flex;
+    gap:22px;
+    padding:8px 28px 28px 28px;
+    min-height:0;
+  }
+
+  .panel{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-border);
+    border-radius:16px;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  /* ---------- Chat panel ---------- */
+  .chat-panel{
+    flex:0 0 46%;
+    padding:20px 20px 16px 20px;
+  }
+  .panel-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--text-dim);
+    margin-bottom:14px;
+    font-weight:600;
+  }
+  .chat-log{
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-height:0;
+    overflow:hidden;
+    justify-content:flex-start;
+  }
+
+  @keyframes bubbleIn{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .msg-row{ display:none; }
+  .msg-row.show{ display:flex; animation:bubbleIn 0.4s ease both; }
+
+  .msg-row.user{ justify-content:flex-end; }
+  .msg-row.ai{ justify-content:flex-start; }
+
+  .bubble{
+    max-width:82%;
+    padding:12px 15px;
+    border-radius:14px;
+    font-size:14.5px;
+    line-height:1.5;
+  }
+  .bubble.user{
+    background:rgba(25,211,162,0.15);
+    border:1px solid rgba(25,211,162,0.3);
+    border-bottom-right-radius:4px;
+    color:#DFFCF3;
+  }
+  .bubble.ai{
+    background:var(--glass-bg-2);
+    border:1px solid var(--glass-border);
+    border-bottom-left-radius:4px;
+    color:var(--text-main);
+  }
+
+  .thinking-bubble{
+    display:flex;
+    gap:5px;
+    align-items:center;
+    padding:14px 17px;
+    background:var(--glass-bg-2);
+    border:1px solid var(--glass-border);
+    border-radius:14px;
+    border-bottom-left-radius:4px;
+    width:fit-content;
+  }
+  .thinking-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    opacity:0.35;
+    animation:dotwave 1.1s ease-in-out infinite;
+  }
+  .thinking-dot:nth-child(2){ animation-delay:0.15s; }
+  .thinking-dot:nth-child(3){ animation-delay:0.3s; }
+  @keyframes dotwave{
+    0%,60%,100%{ opacity:0.3; transform:translateY(0); }
+    30%{ opacity:1; transform:translateY(-3px); }
+  }
+
+  /* ---------- Chat input ---------- */
+  .chat-input-row{
+    flex:0 0 auto;
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:13px 16px;
+  }
+  .chat-input-text{
+    flex:1 1 auto;
+    font-size:14.5px;
+    color:var(--text-main);
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  .chat-input-placeholder{
+    font-size:14.5px;
+    color:var(--text-dim);
+    position:absolute;
+    pointer-events:none;
+  }
+  .cursor{
+    display:inline-block;
+    width:2px;
+    height:16px;
+    background:var(--accent);
+    margin-left:2px;
+    vertical-align:middle;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{
+    0%,49%{ opacity:1; }
+    50%,100%{ opacity:0; }
+  }
+  .send-btn{
+    flex:0 0 auto;
+    width:30px;
+    height:30px;
+    border-radius:8px;
+    background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0.9;
+  }
+  .send-btn svg{ width:14px; height:14px; }
+
+  /* ---------- Results panel ---------- */
+  .results-panel{
+    flex:1 1 auto;
+    padding:20px 24px 22px 24px;
+    position:relative;
+    font-family:"Cascadia Code","SF Mono",Consolas,"Roboto Mono",monospace;
+  }
+  .results-empty{
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-dim);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:13.5px;
+    letter-spacing:0.02em;
+    transition:opacity 0.3s ease;
+  }
+  .results-empty.hide{ display:none; }
+
+  .results-body{
+    display:none;
+    flex-direction:column;
+    min-height:0;
+    flex:1 1 auto;
+  }
+  .results-body.show{ display:flex; }
+
+  .table-wrap{
+    border:1px solid var(--glass-border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .table-head-row, .table-row, .table-total-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    padding:10px 16px;
+  }
+  .table-head-row{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--text-dim);
+    border-bottom:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.02);
+  }
+  .table-row{
+    font-size:14px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    opacity:0;
+    transform:translateX(-14px);
+    transition:opacity 0.4s ease, transform 0.4s ease;
+  }
+  .table-row.show{ opacity:1; transform:translateX(0); }
+  .table-row:last-of-type{ border-bottom:none; }
+  .table-row .office{ color:var(--text-main); }
+  .table-row .clients, .table-total-row .clients{
+    text-align:right;
+    color:var(--accent);
+    text-shadow:0 0 10px rgba(25,211,162,0.55);
+    font-weight:600;
+  }
+  .table-total-row{
+    font-size:14px;
+    font-weight:700;
+    border-top:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.03);
+    opacity:0;
+    transition:opacity 0.4s ease;
+  }
+  .table-total-row.show{ opacity:1; }
+  .table-total-row .office{ color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.08em; align-self:center;}
+  .table-total-row .clients{ font-size:16px; }
+
+  .chart-wrap{
+    margin-top:20px;
+    display:none;
+    flex-direction:column;
+    gap:14px;
+  }
+  .chart-wrap.show{ display:flex; }
+  .chart-title{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--text-dim);
+  }
+  .chart-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .chart-label{
+    flex:0 0 70px;
+    font-size:12.5px;
+    color:var(--text-muted);
+  }
+  .chart-track{
+    flex:1 1 auto;
+    height:16px;
+    background:rgba(255,255,255,0.06);
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .chart-fill{
+    height:100%;
+    width:0%;
+    border-radius:5px;
+    background:linear-gradient(90deg,#0E7C66,#19D3A2);
+    transition:width 0.7s cubic-bezier(0.22,0.9,0.3,1);
+  }
+  .chart-value{
+    flex:0 0 56px;
+    text-align:right;
+    font-size:12.5px;
+    color:var(--accent);
+    text-shadow:0 0 8px rgba(25,211,162,0.5);
+  }
+</style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="glow-field"></div>
+
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">Jagent</span>
+      </div>
+      <div class="conn-status">Connected to your database</div>
+    </div>
+
+    <div class="statusbar-wrap">
+      <div class="statusbar" id="statusbar">
+        <span class="statusbar-text" id="statusbar-text">Reading your data...</span>
+        <div class="statusbar-track" id="statusbar-track">
+          <div class="statusbar-fill" id="statusbar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="panel chat-panel">
+        <div class="panel-title">Chat</div>
+        <div class="chat-log">
+          <div class="msg-row user" id="msg-user">
+            <div class="bubble user">How many clients does each office manage?</div>
+          </div>
+          <div class="msg-row ai" id="msg-thinking">
+            <div class="thinking-bubble">
+              <span class="thinking-dot"></span>
+              <span class="thinking-dot"></span>
+              <span class="thinking-dot"></span>
+            </div>
+          </div>
+          <div class="msg-row ai" id="msg-ai-1">
+            <div class="bubble ai">Riyadh manages 65% of all clients.</div>
+          </div>
+          <div class="msg-row ai" id="msg-ai-2">
+            <div class="bubble ai">Want me to break this down by active vs inactive?</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <div style="flex:1 1 auto; position:relative; height:18px;">
+            <span class="chat-input-placeholder" id="chat-placeholder">Ask your data anything...</span>
+            <span class="chat-input-text" id="chat-input-text"></span><span class="cursor" id="chat-cursor"></span>
+          </div>
+          <div class="send-btn">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12L20 4L13 20L11 13L4 12Z" fill="#04120E"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel results-panel">
+        <div class="panel-title" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">Results</div>
+        <div class="results-empty" id="results-empty">Ask a question to see results here</div>
+        <div class="results-body" id="results-body">
+          <div class="table-wrap">
+            <div class="table-head-row"><span>Office</span><span style="text-align:right;">Clients</span></div>
+            <div class="table-row" id="row-riyadh"><span class="office">Riyadh</span><span class="clients">2,660</span></div>
+            <div class="table-row" id="row-khobar"><span class="office">Khobar</span><span class="clients">920</span></div>
+            <div class="table-row" id="row-jeddah"><span class="office">Jeddah</span><span class="clients">375</span></div>
+            <div class="table-row" id="row-qassim"><span class="office">Qassim</span><span class="clients">57</span></div>
+            <div class="table-row" id="row-bahrain"><span class="office">Bahrain</span><span class="clients">19</span></div>
+            <div class="table-total-row" id="row-total"><span class="office">Total</span><span class="clients">4,081</span></div>
+          </div>
+
+          <div class="chart-wrap" id="chart-wrap">
+            <div class="chart-title">Clients by office</div>
+            <div class="chart-row">
+              <span class="chart-label">Riyadh</span>
+              <div class="chart-track"><div class="chart-fill" id="bar-riyadh"></div></div>
+              <span class="chart-value">2,660</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Khobar</span>
+              <div class="chart-track"><div class="chart-fill" id="bar-khobar"></div></div>
+              <span class="chart-value">920</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Jeddah</span>
+              <div class="chart-track"><div class="chart-fill" id="bar-jeddah"></div></div>
+              <span class="chart-value">375</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Qassim</span>
+              <div class="chart-track"><div class="chart-fill" id="bar-qassim"></div></div>
+              <span class="chart-value">57</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Bahrain</span>
+              <div class="chart-track"><div class="chart-fill" id="bar-bahrain"></div></div>
+              <span class="chart-value">19</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var LOOP = 12000;
+  var MESSAGE = "How many clients does each office manage?";
+  var TYPE_START = 200;
+  var CHAR_MS = 50;
+  var SEND_T = 2600;
+
+  var els = {
+    statusbar: document.getElementById('statusbar'),
+    statusbarText: document.getElementById('statusbar-text'),
+    statusbarTrack: document.getElementById('statusbar-track'),
+    statusbarFill: document.getElementById('statusbar-fill'),
+    placeholder: document.getElementById('chat-placeholder'),
+    inputText: document.getElementById('chat-input-text'),
+    msgUser: document.getElementById('msg-user'),
+    msgThinking: document.getElementById('msg-thinking'),
+    msgAi1: document.getElementById('msg-ai-1'),
+    msgAi2: document.getElementById('msg-ai-2'),
+    resultsEmpty: document.getElementById('results-empty'),
+    resultsBody: document.getElementById('results-body'),
+    chartWrap: document.getElementById('chart-wrap'),
+    rows: {
+      riyadh: document.getElementById('row-riyadh'),
+      khobar: document.getElementById('row-khobar'),
+      jeddah: document.getElementById('row-jeddah'),
+      qassim: document.getElementById('row-qassim'),
+      bahrain: document.getElementById('row-bahrain'),
+      total: document.getElementById('row-total')
+    },
+    bars: {
+      riyadh: document.getElementById('bar-riyadh'),
+      khobar: document.getElementById('bar-khobar'),
+      jeddah: document.getElementById('bar-jeddah'),
+      qassim: document.getElementById('bar-qassim'),
+      bahrain: document.getElementById('bar-bahrain')
+    }
+  };
+
+  var MAXV = 2660;
+  var barTargets = { riyadh: 2660/MAXV*100, khobar: 920/MAXV*100, jeddah: 375/MAXV*100, qassim: 57/MAXV*100, bahrain: 19/MAXV*100 };
+  var rowTimes = { riyadh:6200, khobar:6500, jeddah:6800, qassim:7100, bahrain:7400, total:7700 };
+  var barTimes = { riyadh:9000, khobar:9200, jeddah:9400, qassim:9600, bahrain:9800 };
+
+  function setShow(el, on){
+    if(on){ if(!el.classList.contains('show')) el.classList.add('show'); }
+    else { el.classList.remove('show'); }
+  }
+
+  var start = performance.now();
+
+  function render(now){
+    var t = (now - start) % LOOP;
+
+    // ---- chat input typing (state 1) ----
+    if (t < SEND_T){
+      var chars = 0;
+      if (t >= TYPE_START){
+        chars = Math.min(MESSAGE.length, Math.floor((t - TYPE_START) / CHAR_MS));
+      }
+      els.inputText.textContent = MESSAGE.substring(0, chars);
+      els.placeholder.style.display = chars > 0 ? 'none' : 'block';
+    } else {
+      els.inputText.textContent = '';
+      els.placeholder.style.display = 'block';
+    }
+
+    // ---- user message sent ----
+    setShow(els.msgUser, t >= SEND_T);
+
+    // ---- status bar (state 2 window) ----
+    var statusOn = t >= 3000 && t < 6000;
+    setShow(els.statusbar, statusOn);
+    if (statusOn){
+      if (t < 4000){
+        els.statusbarText.textContent = 'Reading your data...';
+        setShow(els.statusbarTrack, false);
+      } else if (t < 5000){
+        els.statusbarText.textContent = 'Planning the query...';
+        setShow(els.statusbarTrack, false);
+      } else {
+        els.statusbarText.textContent = 'Running...';
+        setShow(els.statusbarTrack, true);
+        var pct = Math.max(0, Math.min(100, (t - 5000) / 1000 * 100));
+        els.statusbarFill.style.width = pct + '%';
+      }
+    } else {
+      els.statusbarFill.style.width = '0%';
+    }
+
+    // ---- thinking dots ----
+    setShow(els.msgThinking, t >= 3000 && t < 6000);
+
+    // ---- results empty state ----
+    var hasResults = t >= 6000;
+    setShow(els.resultsBody, hasResults);
+    if (hasResults) els.resultsEmpty.classList.add('hide'); else els.resultsEmpty.classList.remove('hide');
+
+    // ---- table rows ----
+    for (var key in els.rows){
+      setShow(els.rows[key], t >= rowTimes[key]);
+    }
+
+    // ---- ai bubble 1 ----
+    setShow(els.msgAi1, t >= 8000);
+
+    // ---- chart ----
+    var chartOn = t >= 9000;
+    setShow(els.chartWrap, chartOn);
+    for (var bkey in els.bars){
+      var w = (t >= barTimes[bkey]) ? barTargets[bkey] : 0;
+      els.bars[bkey].style.width = w + '%';
+    }
+
+    // ---- ai bubble 2 ----
+    setShow(els.msgAi2, t >= 10800);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
