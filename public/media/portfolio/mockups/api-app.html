@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Sync</title>
+<style>
+  :root {
+    --bg: #060A12;
+    --brand: #38BDF8;
+    --brand-dim: rgba(56,189,248,0.12);
+    --brand-border: rgba(56,189,248,0.3);
+    --text: #F0F6FC;
+    --muted: #94A3B8;
+    --radius: 14px;
+    --glass-bg: rgba(255,255,255,0.10);
+    --glass-blur: blur(20px);
+    --glass-border: rgba(255,255,255,0.12);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+  }
+
+  .glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    pointer-events: none;
+  }
+
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(560px 400px at 12% -8%, rgba(56,189,248,0.14), transparent 65%),
+      radial-gradient(640px 480px at 88% 10%, rgba(56,189,248,0.10), transparent 65%),
+      radial-gradient(560px 420px at 55% 112%, rgba(56,189,248,0.08), transparent 65%);
+  }
+
+  .topbar, .shell { z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 56px;
+    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #04202E;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(56,189,248,0.45);
+  }
+  .logo-name { font-weight: 500; font-size: 15px; color: var(--text); }
+
+  .breadcrumb {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+  .breadcrumb .crumb-current { color: var(--text); font-weight: 500; }
+  .breadcrumb .crumb-sep { margin: 0 8px; opacity: 0.5; }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .platforms-connected {
+    display: flex; align-items: center; gap: 7px;
+    color: var(--brand); font-size: 12.5px; font-weight: 500;
+  }
+  .platforms-connected .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .clock {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    font-size: 13px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255,255,255,0.10);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.85); }
+  }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; gap: 12px; min-height: 0; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 220px;
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 12px 16px;
+  }
+  .sidebar-title {
+    font-variant: small-caps;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 10px 14px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .nav-item .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.65;
+  }
+  .nav-item.active {
+    color: var(--brand);
+    background: var(--brand-dim);
+    border-color: var(--brand-border);
+    box-shadow: 0 0 18px rgba(56,189,248,0.14), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .nav-item.active .nav-dot {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .sync-label { font-size: 12px; color: var(--muted); }
+  .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; }
+  .view { display: none; height: 100%; }
+
+  .page-head { display: flex; align-items: center; gap: 12px; margin: 4px 2px 16px; }
+  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .count-badge {
+    background: var(--brand-dim);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-left: auto;
+  }
+
+  /* Status pill */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .pill.cyan { color: var(--brand); background: var(--brand-dim); border: 1px solid var(--brand-border); }
+  .pill.grey { color: var(--muted); background: rgba(148,163,184,0.10); border: 1px solid rgba(148,163,184,0.28); }
+
+  /* ============ VIEW 1: OVERVIEW ============ */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .platform-card { padding: 16px 18px; }
+  .platform-card:nth-child(5) { grid-column: 1 / -1; width: 505px; margin: 0 auto; }
+  .platform-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .platform-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--brand-dim);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .platform-name { font-weight: 600; font-size: 14.5px; }
+  .platform-type { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .platform-status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    color: var(--brand); font-size: 12px; font-weight: 600;
+  }
+  .platform-status .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 7px rgba(56,189,248,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .platform-meta { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+  .meta-row .meta-label { color: var(--muted); }
+  .meta-row .meta-value { color: var(--text); font-variant-numeric: tabular-nums; }
+  .meta-row .meta-value.accent { color: var(--brand); font-weight: 600; }
+
+  .stat-bar {
+    margin-top: 14px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .stat-bar .accent { color: var(--brand); font-weight: 700; }
+  .stat-bar .sep { opacity: 0.4; }
+
+  /* ============ VIEW 2: ACTIVITY FEED ============ */
+  .feed-list { display: flex; flex-direction: column; gap: 8px; overflow: hidden; height: calc(100% - 54px); }
+  .feed-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    transition: background 0.3s ease;
+  }
+  .feed-row.flash { animation: flashIn 1.2s ease; }
+  @keyframes flashIn {
+    0% { background: rgba(56,189,248,0.22); transform: translateY(-6px); opacity: 0; }
+    15% { opacity: 1; transform: translateY(0); }
+    100% { background: rgba(255,255,255,0.10); }
+  }
+  .feed-time { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; width: 66px; flex: 0 0 66px; }
+  .feed-platform { font-weight: 600; font-size: 13px; width: 108px; flex: 0 0 108px; }
+  .feed-event { font-size: 13px; flex: 1.4; min-width: 0; }
+  .feed-detail { color: var(--muted); font-size: 12.5px; flex: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .feed-status { flex: 0 0 auto; }
+
+  /* ============ VIEW 3: PLATFORMS ============ */
+  .platforms-shell { display: flex; gap: 14px; height: 100%; }
+  .platform-list { width: 260px; flex: 0 0 260px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .plat-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    color: var(--muted);
+  }
+  .plat-row .plat-mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: rgba(148,163,184,0.10);
+    border: 1px solid rgba(148,163,184,0.24);
+    color: var(--muted);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plat-row .plat-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .plat-row .plat-dot { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); opacity: 0.7; }
+  .plat-row.selected {
+    background: var(--brand-dim);
+    border-color: var(--brand-border);
+    box-shadow: 0 0 18px rgba(56,189,248,0.12);
+  }
+  .plat-row.selected .plat-mark {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #04202E;
+  }
+  .plat-row.selected .plat-dot { box-shadow: 0 0 7px rgba(56,189,248,0.8); }
+
+  .platform-detail { flex: 1; min-width: 0; padding: 20px 22px; display: flex; flex-direction: column; }
+  .detail-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+  .detail-logo {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--brand-dim);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-name { font-size: 17px; font-weight: 600; }
+  .detail-sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+  .detail-sub .live { color: var(--brand); font-weight: 500; }
+  .detail-sub .mini-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 6px rgba(56,189,248,0.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  .sync-table { margin-top: 18px; display: flex; gap: 10px; }
+  .sync-cell {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .sync-cell .sc-name { font-size: 13px; font-weight: 600; }
+  .sync-cell .sc-mode { font-size: 11px; color: var(--brand); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .sync-cell.read .sc-mode { color: var(--muted); }
+
+  .detail-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 600; margin: 20px 2px 10px; }
+  .xero-activity { display: flex; flex-direction: column; gap: 8px; }
+  .xa-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 12.5px;
+  }
+  .xa-row .xa-time { color: var(--muted); width: 60px; flex: 0 0 60px; font-variant-numeric: tabular-nums; }
+  .xa-row .xa-desc { flex: 1; }
+  .xa-row .xa-amount { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* ============ VIEW 4: LOGS ============ */
+  .filter-chips { display: flex; gap: 8px; margin-left: auto; }
+  .chip {
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .chip.active { color: var(--brand); background: var(--brand-dim); border-color: var(--brand-border); }
+
+  .log-table { overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  td {
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12.5px;
+    color: var(--text);
+    white-space: nowrap;
+    font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr.alt td { background: rgba(255,255,255,0.02); }
+  td.muted { color: var(--muted); }
+  td.dur { font-variant-numeric: tabular-nums; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar glass">
+    <div class="topbar-left">
+      <div class="logo-mark">S</div>
+      <div class="logo-name">Platform Sync</div>
+    </div>
+    <div class="breadcrumb">Platform Sync<span class="crumb-sep">/</span><span class="crumb-current" id="crumb">Overview</span></div>
+    <div class="topbar-right">
+      <div class="platforms-connected"><span class="dot"></span>5 platforms connected</div>
+      <div class="clock" id="clock">22:41:28</div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar glass">
+      <div class="sidebar-title">Platform Sync</div>
+      <nav class="nav">
+        <div class="nav-item active" data-view="overview"><span class="nav-dot"></span>Overview</div>
+        <div class="nav-item" data-view="activity"><span class="nav-dot"></span>Activity Feed</div>
+        <div class="nav-item" data-view="platforms"><span class="nav-dot"></span>Platforms</div>
+        <div class="nav-item" data-view="logs"><span class="nav-dot"></span>Logs</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Auto-sync<strong>Running</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- VIEW 1: OVERVIEW -->
+      <section class="view" id="view-overview">
+        <div class="page-head">
+          <span class="page-title">Platform Status</span>
+        </div>
+        <div class="platform-grid">
+          <div class="glass platform-card">
+            <div class="platform-head">
+              <div class="platform-icon">Xe</div>
+              <div>
+                <div class="platform-name">Xero</div>
+                <div class="platform-type">Accounting</div>
+              </div>
+              <div class="platform-status"><span class="dot"></span>Online</div>
+            </div>
+            <div class="platform-meta">
+              <div class="meta-row"><span class="meta-label">Last sync</span><span class="meta-value" data-sync="0">2s ago</span></div>
+              <div class="meta-row"><span class="meta-label">Today</span><span class="meta-value accent">847 records synced</span></div>
+            </div>
+          </div>
+
+          <div class="glass platform-card">
+            <div class="platform-head">
+              <div class="platform-icon">W</div>
+              <div>
+                <div class="platform-name">WorkflowMax</div>
+                <div class="platform-type">Jobs</div>
+              </div>
+              <div class="platform-status"><span class="dot"></span>Online</div>
+            </div>
+            <div class="platform-meta">
+              <div class="meta-row"><span class="meta-label">Last sync</span><span class="meta-value" data-sync="1">8s ago</span></div>
+              <div class="meta-row"><span class="meta-label">Today</span><span class="meta-value accent">124 jobs tracked</span></div>
+            </div>
+          </div>
+
+          <div class="glass platform-card">
+            <div class="platform-head">
+              <div class="platform-icon">G</div>
+              <div>
+                <div class="platform-name">Glofox</div>
+                <div class="platform-type">Memberships</div>
+              </div>
+              <div class="platform-status"><span class="dot"></span>Online</div>
+            </div>
+            <div class="platform-meta">
+              <div class="meta-row"><span class="meta-label">Last sync</span><span class="meta-value" data-sync="2">15s ago</span></div>
+              <div class="meta-row"><span class="meta-label">Today</span><span class="meta-value accent">2,341 members synced</span></div>
+            </div>
+          </div>
+
+          <div class="glass platform-card">
+            <div class="platform-head">
+              <div class="platform-icon">A</div>
+              <div>
+                <div class="platform-name">Acorn</div>
+                <div class="platform-type">Learning</div>
+              </div>
+              <div class="platform-status"><span class="dot"></span>Online</div>
+            </div>
+            <div class="platform-meta">
+              <div class="meta-row"><span class="meta-label">Last sync</span><span class="meta-value" data-sync="3">1m ago</span></div>
+              <div class="meta-row"><span class="meta-label">Today</span><span class="meta-value accent">98 completions recorded</span></div>
+            </div>
+          </div>
+
+          <div class="glass platform-card">
+            <div class="platform-head">
+              <div class="platform-icon">J</div>
+              <div>
+                <div class="platform-name">JISR</div>
+                <div class="platform-type">Payroll</div>
+              </div>
+              <div class="platform-status"><span class="dot"></span>Online</div>
+            </div>
+            <div class="platform-meta">
+              <div class="meta-row"><span class="meta-label">Last sync</span><span class="meta-value" data-sync="4">3m ago</span></div>
+              <div class="meta-row"><span class="meta-label">Today</span><span class="meta-value accent">156 employees updated</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass stat-bar">
+          <span><span class="accent" id="stat-total">3,366</span> records synced today</span>
+          <span class="sep">&middot;</span>
+          <span><span class="accent">0</span> errors</span>
+          <span class="sep">&middot;</span>
+          <span><span class="accent">100%</span> success</span>
+        </div>
+      </section>
+
+      <!-- VIEW 2: ACTIVITY FEED -->
+      <section class="view" id="view-activity">
+        <div class="page-head">
+          <span class="page-title">Activity Feed</span>
+          <span class="count-badge"><span id="event-count">847</span> events today</span>
+        </div>
+        <div class="glass feed-list" id="feed-list">
+          <div class="feed-row">
+            <span class="feed-time">22:41:28</span>
+            <span class="feed-platform">Xero</span>
+            <span class="feed-event">Invoice INV-2853 created</span>
+            <span class="feed-detail">&pound;380.00 &middot; Thornwick Group</span>
+            <span class="feed-status"><span class="pill cyan">Synced</span></span>
+          </div>
+          <div class="feed-row">
+            <span class="feed-time">22:41:24</span>
+            <span class="feed-platform">WorkflowMax</span>
+            <span class="feed-event">Job JB-2849 completed</span>
+            <span class="feed-detail">Fairview Care</span>
+            <span class="feed-status"><span class="pill cyan">Status updated</span></span>
+          </div>
+          <div class="feed-row">
+            <span class="feed-time">22:41:19</span>
+            <span class="feed-platform">Glofox</span>
+            <span class="feed-event">Member #8821 renewed</span>
+            <span class="feed-detail">Premium plan</span>
+            <span class="feed-status"><span class="pill cyan">Synced to Acorn</span></span>
+          </div>
+          <div class="feed-row">
+            <span class="feed-time">22:41:11</span>
+            <span class="feed-platform">Xero</span>
+            <span class="feed-event">PO-0924 raised</span>
+            <span class="feed-detail">&pound;85.00</span>
+            <span class="feed-status"><span class="pill cyan">Auto-generated</span></span>
+          </div>
+          <div class="feed-row">
+            <span class="feed-time">22:41:05</span>
+            <span class="feed-platform">JISR</span>
+            <span class="feed-event">Timesheet approved</span>
+            <span class="feed-detail">D. Collins &middot; 8.5 hrs</span>
+            <span class="feed-status"><span class="pill cyan">Synced</span></span>
+          </div>
+          <div class="feed-row">
+            <span class="feed-time">22:40:58</span>
+            <span class="feed-platform">WorkflowMax</span>
+            <span class="feed-event">Quote QT-441 accepted</span>
+            <span class="feed-detail">Atlantic Works</span>
+            <span class="feed-status"><span class="pill cyan">Invoice triggered</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PLATFORMS -->
+      <section class="view" id="view-platforms">
+        <div class="page-head">
+          <span class="page-title">Platforms</span>
+        </div>
+        <div class="platforms-shell">
+          <div class="glass platform-list">
+            <div class="plat-row selected">
+              <span class="plat-mark">Xe</span>
+              <span class="plat-name">Xero</span>
+              <span class="plat-dot"></span>
+            </div>
+            <div class="plat-row">
+              <span class="plat-mark">W</span>
+              <span class="plat-name">WorkflowMax</span>
+              <span class="plat-dot"></span>
+            </div>
+            <div class="plat-row">
+              <span class="plat-mark">G</span>
+              <span class="plat-name">Glofox</span>
+              <span class="plat-dot"></span>
+            </div>
+            <div class="plat-row">
+              <span class="plat-mark">A</span>
+              <span class="plat-name">Acorn</span>
+              <span class="plat-dot"></span>
+            </div>
+            <div class="plat-row">
+              <span class="plat-mark">J</span>
+              <span class="plat-name">JISR</span>
+              <span class="plat-dot"></span>
+            </div>
+          </div>
+
+          <div class="glass platform-detail">
+            <div class="detail-head">
+              <div class="detail-logo">Xe</div>
+              <div>
+                <div class="detail-name">Xero</div>
+                <div class="detail-sub">Connected since Jun 2025 &middot; <span class="mini-dot"></span> Last sync: <span class="live">just now</span></div>
+              </div>
+            </div>
+
+            <div class="detail-section-title">What syncs</div>
+            <div class="sync-table">
+              <div class="sync-cell"><div class="sc-name">Invoices</div><div class="sc-mode">Auto</div></div>
+              <div class="sync-cell"><div class="sc-name">POs</div><div class="sc-mode">Auto</div></div>
+              <div class="sync-cell"><div class="sc-name">Bills</div><div class="sc-mode">Auto</div></div>
+              <div class="sync-cell read"><div class="sc-name">Contacts</div><div class="sc-mode">Read</div></div>
+            </div>
+
+            <div class="detail-section-title">Recent activity</div>
+            <div class="xero-activity">
+              <div class="xa-row">
+                <span class="xa-time">22:41:28</span>
+                <span class="xa-desc">Invoice INV-2853 created &middot; Thornwick Group</span>
+                <span class="xa-amount">&pound;380.00</span>
+              </div>
+              <div class="xa-row">
+                <span class="xa-time">22:41:11</span>
+                <span class="xa-desc">PO-0924 raised &middot; Auto-generated</span>
+                <span class="xa-amount">&pound;85.00</span>
+              </div>
+              <div class="xa-row">
+                <span class="xa-time">22:38:47</span>
+                <span class="xa-desc">Bill BL-1182 recorded &middot; Auto-generated</span>
+                <span class="xa-amount">&pound;212.50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: LOGS -->
+      <section class="view" id="view-logs">
+        <div class="page-head">
+          <span class="page-title">Logs</span>
+          <div class="filter-chips">
+            <span class="chip active">All</span>
+            <span class="chip">Errors</span>
+            <span class="chip">Today</span>
+          </div>
+        </div>
+        <div class="glass log-table">
+          <table>
+            <thead>
+              <tr><th>Timestamp</th><th>Platform</th><th>Event</th><th>Status</th><th>Duration</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>22:41:28</td><td>Xero</td><td class="muted">Invoice INV-2853 created</td><td><span class="pill cyan">Synced</span></td><td class="dur">12ms</td></tr>
+              <tr class="alt"><td>22:41:24</td><td>WorkflowMax</td><td class="muted">Job JB-2849 status updated</td><td><span class="pill cyan">Synced</span></td><td class="dur">34ms</td></tr>
+              <tr><td>22:41:19</td><td>Glofox</td><td class="muted">Member #8821 renewed</td><td><span class="pill cyan">Synced</span></td><td class="dur">8ms</td></tr>
+              <tr class="alt"><td>22:41:11</td><td>Xero</td><td class="muted">PO-0924 raised</td><td><span class="pill cyan">Synced</span></td><td class="dur">19ms</td></tr>
+              <tr><td>22:41:05</td><td>JISR</td><td class="muted">Timesheet approved &middot; D. Collins</td><td><span class="pill cyan">Synced</span></td><td class="dur">27ms</td></tr>
+              <tr class="alt"><td>22:40:58</td><td>WorkflowMax</td><td class="muted">Quote QT-441 accepted</td><td><span class="pill cyan">Synced</span></td><td class="dur">41ms</td></tr>
+              <tr><td>22:40:52</td><td>Acorn</td><td class="muted">Completion recorded &middot; H&amp;S Module 4</td><td><span class="pill cyan">Synced</span></td><td class="dur">15ms</td></tr>
+              <tr class="alt"><td>22:40:45</td><td>Xero</td><td class="muted">Contact updated &middot; Halberd Retail</td><td><span class="pill cyan">Synced</span></td><td class="dur">9ms</td></tr>
+              <tr><td>22:40:39</td><td>JISR</td><td class="muted">Employee record updated</td><td><span class="pill cyan">Synced</span></td><td class="dur">22ms</td></tr>
+              <tr class="alt"><td>22:40:31</td><td>Glofox</td><td class="muted">Member #8790 checked in</td><td><span class="pill cyan">Synced</span></td><td class="dur">6ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  const views = ['overview', 'activity', 'platforms', 'logs'];
+  const viewNames = ['Overview', 'Activity Feed', 'Platforms', 'Logs'];
+  const navItems = document.querySelectorAll('.nav-item');
+  const crumb = document.getElementById('crumb');
+  let current = 0;
+
+  const showView = (i) => {
+    views.forEach((v, idx) => {
+      const el = document.getElementById('view-' + v);
+      el.style.display = idx === i ? 'block' : 'none';
+      navItems[idx].classList.toggle('active', idx === i);
+    });
+    crumb.textContent = viewNames[i];
+    current = i;
+  };
+
+  // Live clock
+  const clock = document.getElementById('clock');
+  const tick = () => {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    clock.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  };
+  tick();
+  setInterval(tick, 1000);
+
+  // "Last sync: Ns ago" counters ticking upward per platform
+  const syncBases = [2, 8, 15, 58, 178];
+  const formatAgo = (s) => {
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s / 60);
+    return m + 'm ago';
+  };
+  let elapsed = 0;
+  setInterval(() => {
+    elapsed += 1;
+    document.querySelectorAll('[data-sync]').forEach((el) => {
+      const idx = parseInt(el.getAttribute('data-sync'), 10);
+      el.textContent = formatAgo(syncBases[idx] + elapsed);
+    });
+  }, 1000);
+
+  // Activity feed: rolling live insert
+  const feedPool = [
+    { p: 'Xero', ev: 'Invoice INV-2854 created', det: '£142.00 · Halberd Retail', st: 'Synced' },
+    { p: 'JISR', ev: 'Timesheet approved', det: 'R. Osei · 7.5 hrs', st: 'Synced' },
+    { p: 'Glofox', ev: 'Member #8802 checked in', det: 'Standard plan', st: 'Synced' },
+    { p: 'WorkflowMax', ev: 'Job JB-2852 started', det: 'Crestline Property', st: 'Status updated' },
+    { p: 'Acorn', ev: 'Completion recorded', det: 'Fire Safety Module 2', st: 'Synced' },
+    { p: 'Xero', ev: 'Bill BL-1183 recorded', det: '£96.40 · Auto-generated', st: 'Synced' },
+    { p: 'Glofox', ev: 'Member #8815 renewed', det: 'Premium plan', st: 'Synced to Acorn' },
+    { p: 'WorkflowMax', ev: 'Quote QT-442 sent', det: 'Northgate Schools', st: 'Awaiting response' },
+    { p: 'JISR', ev: 'Payroll run completed', det: '156 employees', st: 'Synced' },
+    { p: 'Xero', ev: 'PO-0925 raised', det: '£210.00', st: 'Auto-generated' },
+    { p: 'Acorn', ev: 'New enrolment', det: 'D. Collins · Manual Handling', st: 'Synced' },
+    { p: 'Glofox', ev: 'Member #8760 cancelled', det: 'Reason: relocating', st: 'Synced to Xero' },
+    { p: 'WorkflowMax', ev: 'Job JB-2853 completed', det: 'Meridian Heating', st: 'Invoice triggered' },
+    { p: 'JISR', ev: 'Timesheet approved', det: 'E. Hayes · 8 hrs', st: 'Synced' }
+  ];
+  let poolIdx = 0;
+  let feedClock = { h: 22, m: 41, s: 32 };
+  const nextTime = () => {
+    feedClock.s += 6;
+    if (feedClock.s >= 60) { feedClock.s -= 60; feedClock.m += 1; }
+    if (feedClock.m >= 60) { feedClock.m -= 60; feedClock.h += 1; }
+    const p = (n) => String(n).padStart(2, '0');
+    return p(feedClock.h) + ':' + p(feedClock.m) + ':' + p(feedClock.s);
+  };
+  const eventCountEl = document.getElementById('event-count');
+  const totalStatEl = document.getElementById('stat-total');
+  let eventCount = 847;
+  let totalRecords = 3366;
+
+  const pushFeedEvent = () => {
+    const item = feedPool[poolIdx % feedPool.length];
+    poolIdx += 1;
+    const list = document.getElementById('feed-list');
+    const row = document.createElement('div');
+    row.className = 'feed-row flash';
+    row.innerHTML =
+      '<span class="feed-time">' + nextTime() + '</span>' +
+      '<span class="feed-platform">' + item.p + '</span>' +
+      '<span class="feed-event">' + item.ev + '</span>' +
+      '<span class="feed-detail">' + item.det + '</span>' +
+      '<span class="feed-status"><span class="pill cyan">' + item.st + '</span></span>';
+    list.insertBefore(row, list.firstChild);
+    while (list.children.length > 7) {
+      list.removeChild(list.lastChild);
+    }
+    eventCount += 1;
+    eventCountEl.textContent = eventCount;
+    totalRecords += 1;
+    totalStatEl.textContent = totalRecords.toLocaleString('en-US');
+  };
+  setInterval(pushFeedEvent, 2000);
+
+  // Cycle views
+  showView(0);
+  setInterval(() => {
+    const next = (current + 1) % views.length;
+    showView(next);
+  }, 3500);
+</script>
+</body>
+</html>
