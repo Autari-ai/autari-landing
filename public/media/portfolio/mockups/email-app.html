@@ -6,15 +6,21 @@
 <title>Inbox Guard</title>
 <style>
   :root {
-    --bg: #060A12;
-    --brand: #EF4444;
-    --brand-dim: rgba(239,68,68,0.10);
-    --brand-border: rgba(239,68,68,0.3);
-    --text: #F0F6FC;
-    --muted: #94A3B8;
-    --safe: #22C55E;
-    --radius: 14px;
-    --glass-blur: blur(20px);
+    --bg: #f0f0f5;
+    --surface: rgba(255,255,255,0.85);
+    --surface-2: rgba(255,255,255,0.6);
+    --panel: #f7f7f9;
+    --border: rgba(0,0,0,0.08);
+    --border-soft: rgba(0,0,0,0.05);
+    --sidebar-bg: rgba(240,240,245,0.9);
+    --brand: #ff3b30;
+    --brand-light: #fff0ef;
+    --safe: #34c759;
+    --safe-light: #f0fdf4;
+    --text: #1c1c1e;
+    --muted: #8e8e93;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
 
   * { box-sizing: border-box; }
@@ -22,227 +28,231 @@
   body {
     margin: 0;
     background: var(--bg);
+    background-image: radial-gradient(1100px 460px at 50% -12%, rgba(255,255,255,0.65), transparent 60%);
     color: var(--text);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+    font-size: 13px;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding: 12px;
-    gap: 12px;
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .glass {
-    background: rgba(255,255,255,0.10);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid rgba(255,255,255,0.12);
+  svg.i { width: 15px; height: 15px; flex: 0 0 auto; display: block; }
+
+  /* ============ APP WINDOW ============ */
+  .app-window {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
-    position: relative;
-  }
-  .glass::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 20px; right: 20px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-    pointer-events: none;
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
 
-  /* Ambient background glow so the glass has something to blur */
-  .ambient {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(520px 380px at 12% -8%, rgba(239,68,68,0.14), transparent 65%),
-      radial-gradient(640px 480px at 88% 12%, rgba(76,110,245,0.10), transparent 65%),
-      radial-gradient(560px 420px at 55% 110%, rgba(239,68,68,0.08), transparent 65%);
-  }
-
-  .topbar, .shell { z-index: 1; }
-
-  /* ============ TOP BAR ============ */
-  .topbar {
-    height: 56px;
-    flex: 0 0 56px;
+  /* ============ TOOLBAR ============ */
+  .toolbar {
+    height: 52px;
+    flex: 0 0 52px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 18px;
+    padding: 0 16px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: relative;
   }
-  .topbar-left { display: flex; align-items: center; gap: 10px; }
-  .logo-mark {
-    width: 26px; height: 26px;
-    border-radius: 50%;
+  .traffic-lights { display: flex; align-items: center; gap: 8px; }
+  .tl { width: 12px; height: 12px; border-radius: 50%; }
+  .tl.red { background: #ff5f57; }
+  .tl.yellow { background: #febc2e; }
+  .tl.green { background: #28c840; }
+
+  .toolbar-left { display: flex; align-items: center; gap: 16px; }
+  .brand-mark {
+    width: 22px; height: 22px;
+    border-radius: 7px;
     background: var(--brand);
-    color: #2B0A0A;
-    font-weight: 700;
-    font-size: 14px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 16px rgba(239,68,68,0.45);
+    color: #fff;
   }
-  .logo-name { font-weight: 500; font-size: 15px; color: var(--text); }
+  .brand-mark svg { width: 13px; height: 13px; }
+  .brand-name { font-weight: 600; font-size: 13.5px; color: var(--text); }
 
   .breadcrumb {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 0.01em;
+    font-size: 12.5px;
   }
-  .breadcrumb .crumb-current { color: var(--text); font-weight: 500; }
-  .breadcrumb .crumb-sep { margin: 0 8px; opacity: 0.5; }
+  .breadcrumb .crumb-current { color: var(--text); font-weight: 600; }
+  .breadcrumb .crumb-sep { margin: 0 6px; opacity: 0.5; }
 
-  .topbar-right { display: flex; align-items: center; gap: 16px; }
-  .scan-status { display: flex; align-items: center; gap: 7px; color: var(--brand); font-size: 12.5px; font-weight: 500; }
+  .toolbar-right { display: flex; align-items: center; gap: 14px; }
+  .scan-status { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 500; }
   .scan-status .live-dot {
-    width: 8px; height: 8px;
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--brand);
-    box-shadow: 0 0 8px rgba(239,68,68,0.8);
-    animation: pulse 2s ease-in-out infinite;
+    background: var(--safe);
+    box-shadow: 0 0 0 3px rgba(52,199,89,0.15);
   }
   .clock {
     font-variant-numeric: tabular-nums;
     color: var(--muted);
-    font-size: 13px;
-    padding-left: 16px;
-    border-left: 1px solid rgba(255,255,255,0.10);
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.55; transform: scale(0.85); }
+    font-size: 12.5px;
+    padding-left: 14px;
+    border-left: 1px solid var(--border);
   }
 
   /* ============ SHELL ============ */
-  .shell {
-    flex: 1;
-    display: flex;
-    gap: 12px;
-    min-height: 0;
-  }
+  .shell { flex: 1; display: flex; min-height: 0; }
 
   /* ============ SIDEBAR ============ */
   .sidebar {
-    width: 220px;
-    flex: 0 0 220px;
+    width: 196px;
+    flex: 0 0 196px;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding: 18px 12px 16px;
+    padding: 14px 10px;
   }
-  .sidebar-title {
-    font-variant: small-caps;
-    letter-spacing: 0.14em;
-    font-size: 12px;
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
     color: var(--muted);
-    padding: 0 10px 14px;
+    padding: 2px 10px 10px;
   }
-  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    color: var(--muted);
-    font-size: 13.5px;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
     font-weight: 500;
-    border: 1px solid transparent;
-    transition: all 0.4s ease;
     cursor: default;
   }
-  .nav-item .nav-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.65;
-    transition: all 0.4s ease;
+  .nav-item svg { color: var(--muted); }
+  .nav-item.active { background: var(--brand-light); color: var(--brand); }
+  .nav-item.active svg { color: var(--brand); }
+  .nav-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(0,0,0,0.05);
+    padding: 1px 7px;
+    border-radius: 999px;
   }
-  .nav-item.active {
-    color: var(--brand);
-    background: var(--brand-dim);
-    border-color: var(--brand-border);
-    box-shadow: 0 0 18px rgba(239,68,68,0.14), inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .nav-item.active .nav-dot {
-    opacity: 1;
-    box-shadow: 0 0 8px rgba(239,68,68,0.8);
-  }
+  .nav-item.active .nav-count { background: rgba(255,59,48,0.14); color: var(--brand); }
 
   .sidebar-footer {
     margin-top: auto;
-    padding: 12px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 10px 4px;
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
   }
   .sync-dot {
-    width: 8px; height: 8px;
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--brand);
-    box-shadow: 0 0 8px rgba(239,68,68,0.8);
-    animation: pulse 1.6s ease-in-out infinite;
+    background: var(--safe);
+    box-shadow: 0 0 0 3px rgba(52,199,89,0.15);
   }
-  .sync-label { font-size: 12px; color: var(--muted); }
-  .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+  .sync-label { font-size: 11.5px; color: var(--muted); }
+  .sync-label strong { display: block; color: var(--text); font-weight: 600; font-size: 12px; }
 
   /* ============ MAIN ============ */
-  .main {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    position: relative;
-  }
-  .view {
-    display: none;
-    animation: viewIn 0.45s ease both;
-    height: 100%;
-  }
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; background: #ffffff; }
+  .view { display: none; height: 100%; }
+  .view.is-visible { animation: viewIn 0.4s ease both; }
   @keyframes viewIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .page-head {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 4px 2px 16px;
-  }
-  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .view-padded { padding: 22px 28px; height: 100%; overflow: hidden; }
+
+  .page-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
   .count-badge {
-    background: var(--brand-dim);
-    border: 1px solid var(--brand-border);
+    background: var(--brand-light);
     color: var(--brand);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 999px;
   }
 
   /* ============ VIEW 1: INBOX ============ */
-  .inbox-split { display: flex; gap: 12px; height: calc(100% - 46px); min-height: 0; }
-  .email-list { width: 40%; flex: 0 0 40%; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-  .email-row {
+  .inbox-split { display: flex; height: 100%; }
+  .list-pane {
+    width: 300px;
+    flex: 0 0 300px;
+    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 11px 14px;
+    overflow: hidden;
+  }
+  .list-header {
+    flex: 0 0 auto;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .list-title { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .list-count {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(0,0,0,0.05);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .email-rows { flex: 1; overflow: hidden; }
+
+  .email-row {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 16px 10px 18px;
+    border-bottom: 1px solid var(--border-soft);
     cursor: default;
   }
-  .email-row.threat { border-color: var(--brand-border); box-shadow: 0 0 0 1px rgba(239,68,68,0.25), 0 8px 32px rgba(0,0,0,0.1); }
-  .email-row.selected { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
-  .email-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .email-row.selected { background: rgba(0,0,0,0.035); }
+  .email-row.blocked-row { background: var(--brand-light); }
+  .email-row.blocked-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--brand);
+  }
+  .email-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .email-sender { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .email-time { color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
-  .email-subject { color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .email-time { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+  .email-subject { color: var(--text); opacity: 0.82; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .email-bottom { margin-top: 2px; }
 
   .pill {
@@ -250,159 +260,162 @@
     align-items: center;
     gap: 5px;
     padding: 2px 9px;
-    border-radius: 999px;
-    font-size: 11px;
+    border-radius: 20px;
+    font-size: 10.5px;
     font-weight: 600;
     line-height: 1.6;
     white-space: nowrap;
   }
-  .pill.clean {
-    color: var(--safe);
-    background: rgba(34,197,94,0.10);
-    border: 1px solid rgba(34,197,94,0.3);
-  }
-  .pill.blocked {
-    color: var(--brand);
-    background: rgba(239,68,68,0.14);
-    border: 1px solid rgba(239,68,68,0.4);
-  }
   .pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-  .pill.blocked .shield { margin-left: 1px; }
+  .pill.clean { color: var(--safe); background: var(--safe-light); }
+  .pill.blocked { color: var(--brand); background: var(--brand-light); }
 
   /* Detail panel */
-  .detail-panel { flex: 1; min-width: 0; padding: 22px 24px; overflow: hidden; display: flex; flex-direction: column; }
-  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
-  .detail-sender-block .detail-sender { font-weight: 600; font-size: 15px; }
-  .detail-sender-block .detail-warning { color: var(--brand); font-size: 12.5px; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
-  .detail-subject { font-size: 18px; font-weight: 600; margin: 2px 0 18px; letter-spacing: -0.01em; }
+  .detail-pane { flex: 1; min-width: 0; padding: 24px 30px; overflow: hidden; display: flex; flex-direction: column; }
+  .detail-header { margin-bottom: 14px; }
+  .detail-sender { font-weight: 700; font-size: 15px; }
+  .detail-warning {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--brand); font-size: 12.5px; margin-top: 5px;
+  }
+  .detail-warning svg { color: var(--brand); }
+  .detail-subject { font-size: 19px; font-weight: 700; margin: 2px 0 18px; letter-spacing: -0.01em; }
 
   .threat-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: rgba(239,68,68,0.10);
-    border: 1px solid var(--brand-border);
-    border-radius: 12px;
-    margin-bottom: 14px;
+    gap: 12px;
+    padding: 13px 16px;
+    background: var(--brand-light);
+    border-radius: 14px;
+    margin-bottom: 16px;
   }
   .threat-badge .icon {
-    width: 30px; height: 30px; flex: 0 0 30px;
-    border-radius: 8px;
-    background: rgba(239,68,68,0.18);
+    width: 32px; height: 32px; flex: 0 0 32px;
+    border-radius: 9px;
+    background: rgba(255,59,48,0.14);
     color: var(--brand);
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
   }
-  .threat-badge .threat-title { font-weight: 600; font-size: 13.5px; color: var(--brand); }
-  .threat-badge .threat-detail { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'SFMono-Regular', Consolas, monospace; }
+  .threat-badge .threat-title { font-weight: 700; font-size: 13.5px; color: var(--brand); }
+  .threat-badge .threat-detail { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'SFMono-Regular', Menlo, Consolas, monospace; }
 
-  .detail-meta-row { display: flex; gap: 24px; margin-bottom: 16px; }
-  .detail-meta-item .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
-  .detail-meta-item .meta-value { font-size: 15px; font-weight: 600; }
+  .detail-meta-row { display: flex; gap: 28px; margin-bottom: 18px; }
+  .detail-meta-item .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px; }
+  .detail-meta-item .meta-value { font-size: 15px; font-weight: 700; }
   .detail-meta-item .meta-value.confidence { color: var(--brand); }
 
-  .action-line {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    font-size: 13px;
-    padding: 12px 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: auto;
-  }
-  .action-line .check-dot {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--brand);
-    color: #fff;
-    font-size: 10px;
-    display: flex; align-items: center; justify-content: center;
-    flex: 0 0 16px;
-  }
-  .action-line strong { color: var(--text); font-weight: 600; }
-
-  .detail-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .detail-actions { display: flex; gap: 10px; margin-bottom: 16px; }
   .btn-ghost {
-    padding: 8px 16px;
-    border-radius: 9px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(255,255,255,0.04);
+    padding: 7px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.015);
     color: var(--text);
     font-size: 12.5px;
     font-weight: 500;
     cursor: default;
   }
 
+  .action-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12.5px;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .action-line .check-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--safe);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex: 0 0 16px;
+  }
+  .action-line .check-dot svg { width: 9px; height: 9px; }
+  .action-line strong { color: var(--text); font-weight: 600; }
+
+  /* ============ SHARED CARD ============ */
+  .panel-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+
   /* ============ VIEW 2: BLOCKED ============ */
-  .blocked-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .blocked-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
   .threat-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 18px;
-    border-color: var(--brand-border);
+    gap: 14px;
+    padding: 13px 16px;
   }
   .threat-card .t-icon {
-    width: 38px; height: 38px; flex: 0 0 38px;
+    width: 36px; height: 36px; flex: 0 0 36px;
     border-radius: 10px;
-    background: rgba(239,68,68,0.14);
+    background: rgba(255,59,48,0.12);
     color: var(--brand);
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px;
   }
-  .threat-card .t-type { font-weight: 600; font-size: 13.5px; }
-  .threat-card .t-sender { color: var(--muted); font-size: 12.5px; margin-top: 2px; font-family: 'SFMono-Regular', Consolas, monospace; }
+  .threat-card .t-type { font-weight: 700; font-size: 13px; }
+  .threat-card .t-sender { color: var(--muted); font-size: 12px; margin-top: 2px; font-family: 'SFMono-Regular', Menlo, Consolas, monospace; }
   .threat-card .t-meta { margin-left: auto; text-align: right; }
-  .threat-card .t-time { color: var(--muted); font-size: 12px; }
-  .threat-card .t-confidence { color: var(--brand); font-weight: 600; font-size: 13px; margin-top: 3px; }
+  .threat-card .t-time { color: var(--muted); font-size: 11.5px; }
+  .threat-card .t-confidence { color: var(--brand); font-weight: 600; font-size: 12.5px; margin-top: 3px; }
 
-  .stats-row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
   .stat-card { flex: 1; padding: 14px 18px; }
-  .stat-value { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .stat-value { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
   .stat-value .accent { color: var(--brand); }
-  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .stat-label { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
 
-  .footnote {
-    color: var(--muted);
-    font-size: 12.5px;
-    padding: 0 4px;
-  }
-  .footnote .accent { color: var(--brand); font-weight: 500; }
+  .footnote { color: var(--muted); font-size: 12px; padding: 0 2px; }
+  .footnote .accent { color: var(--brand); font-weight: 600; }
 
   /* ============ VIEW 3: SCAN LOG ============ */
-  .filter-chips { display: flex; gap: 6px; margin-left: 10px; }
+  .segmented {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.05);
+    margin-left: 12px;
+  }
   .chip {
-    padding: 5px 14px;
-    border-radius: 999px;
-    font-size: 12.5px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--muted);
-    border: 1px solid transparent;
   }
   .chip.active {
-    color: var(--brand);
-    background: var(--brand-dim);
-    border-color: var(--brand-border);
+    color: var(--text);
+    background: #fff;
+    box-shadow: var(--shadow);
+    font-weight: 600;
   }
 
-  .table-card { padding: 6px 0; overflow: hidden; }
+  .table-card { overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
   th {
     text-align: left;
-    font-size: 11px;
+    font-size: 10.5px;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.07em;
     color: var(--muted);
     font-weight: 600;
-    padding: 12px 18px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.09);
+    padding: 11px 18px 9px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.015);
   }
   td {
-    padding: 11px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    font-size: 13.5px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 13px;
     color: var(--text);
     white-space: nowrap;
   }
@@ -416,47 +429,38 @@
     gap: 6px;
     padding: 3px 10px;
     border-radius: 999px;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 600;
   }
   .status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .status.clean {
-    color: var(--safe);
-    background: rgba(34,197,94,0.10);
-    border: 1px solid rgba(34,197,94,0.3);
-  }
-  .status.threat {
-    color: var(--brand);
-    background: rgba(239,68,68,0.14);
-    border: 1px solid rgba(239,68,68,0.4);
-  }
+  .status.clean { color: var(--safe); background: var(--safe-light); }
+  .status.threat { color: var(--brand); background: var(--brand-light); }
 
   .log-stats {
-    margin-top: 14px;
-    padding: 14px 18px;
+    margin-top: 12px;
+    padding: 13px 18px;
     display: flex;
     gap: 22px;
     color: var(--muted);
-    font-size: 12.5px;
+    font-size: 12px;
   }
-  .log-stats strong { color: var(--text); font-weight: 600; }
+  .log-stats strong { color: var(--text); font-weight: 700; }
   .log-stats .accent strong { color: var(--brand); }
 
   /* ============ VIEW 4: SETTINGS ============ */
-  .rules-list { display: flex; flex-direction: column; gap: 10px; }
+  .rules-list { display: flex; flex-direction: column; gap: 8px; }
   .rule-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 15px 18px;
   }
-  .rule-info .rule-title { font-weight: 600; font-size: 14px; }
-  .rule-info .rule-sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .rule-info .rule-title { font-weight: 700; font-size: 13.5px; }
+  .rule-info .rule-sub { color: var(--muted); font-size: 12px; margin-top: 3px; }
   .toggle {
-    width: 40px; height: 22px;
+    width: 40px; height: 24px;
     border-radius: 999px;
-    background: rgba(34,197,94,0.18);
-    border: 1px solid rgba(34,197,94,0.4);
+    background: var(--safe);
     position: relative;
     flex: 0 0 40px;
   }
@@ -464,316 +468,348 @@
     content: '';
     position: absolute;
     top: 2px; right: 2px;
-    width: 16px; height: 16px;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    background: var(--safe);
-    box-shadow: 0 0 8px rgba(34,197,94,0.6);
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
   }
-  .settings-footnote { margin-top: 16px; padding: 0 4px; color: var(--muted); font-size: 12.5px; }
+  .settings-footnote { margin-top: 14px; padding: 0 2px; color: var(--muted); font-size: 12px; }
 </style>
 </head>
 <body>
-  <div class="ambient"></div>
+  <div class="app-window">
 
-  <!-- TOP BAR -->
-  <header class="topbar glass">
-    <div class="topbar-left">
-      <div class="logo-mark">G</div>
-      <div class="logo-name">Inbox Guard</div>
-    </div>
-    <div class="breadcrumb">Inbox Guard<span class="crumb-sep">/</span><span class="crumb-current" id="crumb">Inbox</span></div>
-    <div class="topbar-right">
-      <div class="scan-status"><span class="live-dot"></span>247 scanned today &middot; 3 blocked</div>
-      <div class="clock" id="clock">10:42:07</div>
-    </div>
-  </header>
-
-  <div class="shell">
-    <!-- SIDEBAR -->
-    <aside class="sidebar glass">
-      <div class="sidebar-title">Inbox Guard</div>
-      <nav class="nav">
-        <div class="nav-item active" id="nav-inbox"><span class="nav-dot"></span>Inbox</div>
-        <div class="nav-item" id="nav-blocked"><span class="nav-dot"></span>Blocked</div>
-        <div class="nav-item" id="nav-log"><span class="nav-dot"></span>Scan Log</div>
-        <div class="nav-item" id="nav-settings"><span class="nav-dot"></span>Settings</div>
-      </nav>
-      <div class="sidebar-footer">
-        <span class="sync-dot"></span>
-        <span class="sync-label">Scanning<strong>Active</strong></span>
+    <!-- TOOLBAR -->
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <div class="traffic-lights">
+          <span class="tl red"></span><span class="tl yellow"></span><span class="tl green"></span>
+        </div>
+        <div class="brand-mark">
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg>
+        </div>
+        <span class="brand-name">Inbox Guard</span>
       </div>
-    </aside>
+      <div class="breadcrumb"><span class="crumb-current" id="crumb">Inbox</span></div>
+      <div class="toolbar-right">
+        <div class="scan-status"><span class="live-dot"></span>247 scanned today &middot; 3 blocked</div>
+        <div class="clock" id="clock">10:42:07</div>
+      </div>
+    </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="main">
-
-      <!-- VIEW 1: INBOX -->
-      <section class="view" id="view-inbox">
-        <div class="page-head">
-          <span class="page-title">Inbox</span>
-          <span class="count-badge">8</span>
-        </div>
-        <div class="inbox-split">
-          <div class="email-list">
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">Amazon Orders</span><span class="email-time">10:42</span></div>
-              <div class="email-subject">Your order has shipped</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">HSBC Alerts</span><span class="email-time">10:38</span></div>
-              <div class="email-subject">Account statement ready</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row threat selected">
-              <div class="email-top"><span class="email-sender">security@paypall-verify.net</span><span class="email-time">10:31</span></div>
-              <div class="email-subject">Urgent: Verify your account</div>
-              <div class="email-bottom"><span class="pill blocked"><span class="shield">&#128737;</span>Blocked</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">Notion</span><span class="email-time">09:55</span></div>
-              <div class="email-subject">Your weekly digest</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">hr@company.com</span><span class="email-time">09:40</span></div>
-              <div class="email-subject">Q3 payroll summary</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">Slack</span><span class="email-time">09:12</span></div>
-              <div class="email-subject">Weekly workspace summary</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">Figma</span><span class="email-time">08:47</span></div>
-              <div class="email-subject">New comment on Dashboard v2</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
-            <div class="glass email-row">
-              <div class="email-top"><span class="email-sender">GitHub</span><span class="email-time">08:20</span></div>
-              <div class="email-subject">Pull request merged</div>
-              <div class="email-bottom"><span class="pill clean">Clean</span></div>
-            </div>
+    <div class="shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-label">Mailboxes</div>
+        <nav class="nav">
+          <div class="nav-item active" id="nav-inbox">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2 3h4l2-3h4"/><path d="M4 12V6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6"/><path d="M4 12v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/></svg>
+            Inbox<span class="nav-count">8</span>
           </div>
+          <div class="nav-item" id="nav-blocked">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg>
+            Blocked<span class="nav-count">3</span>
+          </div>
+          <div class="nav-item" id="nav-log">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+            Scan Log
+          </div>
+          <div class="nav-item" id="nav-settings">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </div>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sync-dot"></span>
+          <span class="sync-label">Scanning<strong>Active</strong></span>
+        </div>
+      </aside>
 
-          <div class="glass detail-panel">
-            <div class="detail-header">
-              <div class="detail-sender-block">
+      <!-- MAIN CONTENT -->
+      <main class="main">
+
+        <!-- VIEW 1: INBOX -->
+        <section class="view is-visible" id="view-inbox">
+          <div class="inbox-split">
+            <div class="list-pane">
+              <div class="list-header">
+                <span class="list-title">Inbox</span>
+                <span class="list-count">8</span>
+              </div>
+              <div class="email-rows">
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">Amazon Orders</span><span class="email-time">10:42</span></div>
+                  <div class="email-subject">Your order has shipped</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">HSBC Alerts</span><span class="email-time">10:38</span></div>
+                  <div class="email-subject">Account statement ready</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row blocked-row selected">
+                  <div class="email-top"><span class="email-sender">security@paypall-verify.net</span><span class="email-time">10:31</span></div>
+                  <div class="email-subject">Urgent: Verify your account</div>
+                  <div class="email-bottom"><span class="pill blocked">Blocked</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">Notion</span><span class="email-time">09:55</span></div>
+                  <div class="email-subject">Your weekly digest</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">hr@company.com</span><span class="email-time">09:40</span></div>
+                  <div class="email-subject">Q3 payroll summary</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">Slack</span><span class="email-time">09:12</span></div>
+                  <div class="email-subject">Weekly workspace summary</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">Figma</span><span class="email-time">08:47</span></div>
+                  <div class="email-subject">New comment on Dashboard v2</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+                <div class="email-row">
+                  <div class="email-top"><span class="email-sender">GitHub</span><span class="email-time">08:20</span></div>
+                  <div class="email-subject">Pull request merged</div>
+                  <div class="email-bottom"><span class="pill clean">Clean</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-pane">
+              <div class="detail-header">
                 <div class="detail-sender">security@paypall-verify.net</div>
-                <div class="detail-warning">&#9888; Sender domain does not match PayPal</div>
+                <div class="detail-warning">
+                  <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.8" fill="currentColor" stroke="none"/></svg>
+                  Sender domain does not match PayPal
+                </div>
+              </div>
+              <div class="detail-subject">Urgent: Verify your account</div>
+
+              <div class="threat-badge">
+                <div class="icon">
+                  <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.8" fill="currentColor" stroke="none"/></svg>
+                </div>
+                <div>
+                  <div class="threat-title">Phishing URL detected</div>
+                  <div class="threat-detail">paypa11-secure.ru/verify</div>
+                </div>
+              </div>
+
+              <div class="detail-meta-row">
+                <div class="detail-meta-item">
+                  <div class="meta-label">Confidence</div>
+                  <div class="meta-value confidence">97%</div>
+                </div>
+                <div class="detail-meta-item">
+                  <div class="meta-label">Status</div>
+                  <div class="meta-value">Blocked</div>
+                </div>
+              </div>
+
+              <div class="detail-actions">
+                <span class="btn-ghost">View in trash</span>
+                <span class="btn-ghost">Report false positive</span>
+              </div>
+
+              <div class="action-line">
+                <span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+                Moved to trash automatically &middot; <strong>10:31</strong>
               </div>
             </div>
-            <div class="detail-subject">Urgent: Verify your account</div>
+          </div>
+        </section>
 
-            <div class="threat-badge">
-              <div class="icon">&#9888;</div>
-              <div>
-                <div class="threat-title">Phishing URL detected</div>
-                <div class="threat-detail">paypa11-secure.ru/verify</div>
+        <!-- VIEW 2: BLOCKED -->
+        <section class="view" id="view-blocked">
+          <div class="view-padded">
+            <div class="page-head">
+              <span class="page-title">Blocked Threats</span>
+              <span class="count-badge">3 today</span>
+            </div>
+            <div class="blocked-cards">
+              <div class="panel-card threat-card">
+                <div class="t-icon"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg></div>
+                <div>
+                  <div class="t-type">Credential phishing</div>
+                  <div class="t-sender">security@paypall-verify.net</div>
+                </div>
+                <div class="t-meta">
+                  <div class="t-time">10:31</div>
+                  <div class="t-confidence">97% confidence</div>
+                </div>
+              </div>
+              <div class="panel-card threat-card">
+                <div class="t-icon"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg></div>
+                <div>
+                  <div class="t-type">Invoice fraud</div>
+                  <div class="t-sender">billing@invoice-secure-pay.ru</div>
+                </div>
+                <div class="t-meta">
+                  <div class="t-time">08:15</div>
+                  <div class="t-confidence">91% confidence</div>
+                </div>
+              </div>
+              <div class="panel-card threat-card">
+                <div class="t-icon"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg></div>
+                <div>
+                  <div class="t-type">Account takeover</div>
+                  <div class="t-sender">support@netf1ix-billing.com</div>
+                </div>
+                <div class="t-meta">
+                  <div class="t-time">07:02</div>
+                  <div class="t-confidence">94% confidence</div>
+                </div>
               </div>
             </div>
-
-            <div class="detail-meta-row">
-              <div class="detail-meta-item">
-                <div class="meta-label">Confidence</div>
-                <div class="meta-value confidence">97%</div>
+            <div class="stats-row">
+              <div class="panel-card stat-card">
+                <div class="stat-value"><span class="accent">14</span></div>
+                <div class="stat-label">threats blocked this week</div>
               </div>
-              <div class="detail-meta-item">
-                <div class="meta-label">Status</div>
-                <div class="meta-value">Blocked</div>
+              <div class="panel-card stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">auto-trashed, no manual review</div>
+              </div>
+              <div class="panel-card stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">reached the inbox</div>
               </div>
             </div>
+            <div class="footnote">All from <span class="accent">known phishing patterns</span> matched against 1,247 monitored domains.</div>
+          </div>
+        </section>
 
-            <div class="detail-actions">
-              <span class="btn-ghost">View in trash</span>
-              <span class="btn-ghost">Report false positive</span>
+        <!-- VIEW 3: SCAN LOG -->
+        <section class="view" id="view-log">
+          <div class="view-padded">
+            <div class="page-head">
+              <span class="page-title">Scan Log</span>
+              <div class="segmented">
+                <span class="chip active">All</span>
+                <span class="chip">Threats</span>
+                <span class="chip">Clean</span>
+                <span class="chip">Today</span>
+              </div>
             </div>
+            <div class="panel-card table-card">
+              <table>
+                <thead>
+                  <tr><th>Time</th><th>Sender</th><th>Subject</th><th>Result</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="num muted">10:42</td><td>Amazon Orders</td><td class="muted">Your order has shipped</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">10:38</td><td>HSBC Alerts</td><td class="muted">Account statement ready</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">10:31</td><td>security@paypall...</td><td class="muted">Urgent: Verify...</td>
+                    <td><span class="status threat">Threat</span></td><td>Blocked</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">09:55</td><td>Notion</td><td class="muted">Weekly digest</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">09:40</td><td>hr@company.com</td><td class="muted">Q3 payroll</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">09:12</td><td>Slack</td><td class="muted">Weekly workspace summary</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">08:47</td><td>Figma</td><td class="muted">New comment on Dashboard v2</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                  <tr>
+                    <td class="num muted">08:20</td><td>GitHub</td><td class="muted">Pull request merged</td>
+                    <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="panel-card log-stats">
+              <span><strong>247</strong> scanned</span>
+              <span class="accent"><strong>3</strong> blocked</span>
+              <span><strong>244</strong> delivered</span>
+              <span><strong>0</strong> false positives</span>
+            </div>
+          </div>
+        </section>
 
-            <div class="action-line">
-              <span class="check-dot">&#10003;</span>
-              Moved to trash automatically &middot; <strong>10:31</strong>
+        <!-- VIEW 4: SETTINGS -->
+        <section class="view" id="view-settings">
+          <div class="view-padded">
+            <div class="page-head">
+              <span class="page-title">Detection Rules</span>
             </div>
+            <div class="rules-list">
+              <div class="panel-card rule-card">
+                <div class="rule-info">
+                  <div class="rule-title">Phishing Detection</div>
+                  <div class="rule-sub">Scans every incoming message for phishing indicators</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="panel-card rule-card">
+                <div class="rule-info">
+                  <div class="rule-title">Suspicious domains</div>
+                  <div class="rule-sub">1,247 known phishing domains monitored</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="panel-card rule-card">
+                <div class="rule-info">
+                  <div class="rule-title">Link scanner</div>
+                  <div class="rule-sub">Checks all URLs before delivery</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="panel-card rule-card">
+                <div class="rule-info">
+                  <div class="rule-title">Auto-trash</div>
+                  <div class="rule-sub">Threats moved to trash immediately</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+            </div>
+            <div class="settings-footnote">Last model update: <span style="color: var(--text); font-weight: 500;">2 hours ago</span></div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- VIEW 2: BLOCKED -->
-      <section class="view" id="view-blocked">
-        <div class="page-head">
-          <span class="page-title">Blocked Threats</span>
-          <span class="count-badge">3 today</span>
-        </div>
-        <div class="blocked-cards">
-          <div class="glass threat-card">
-            <div class="t-icon">&#128737;</div>
-            <div>
-              <div class="t-type">Credential phishing</div>
-              <div class="t-sender">security@paypall-verify.net</div>
-            </div>
-            <div class="t-meta">
-              <div class="t-time">10:31</div>
-              <div class="t-confidence">97% confidence</div>
-            </div>
-          </div>
-          <div class="glass threat-card">
-            <div class="t-icon">&#128737;</div>
-            <div>
-              <div class="t-type">Invoice fraud</div>
-              <div class="t-sender">billing@invoice-secure-pay.ru</div>
-            </div>
-            <div class="t-meta">
-              <div class="t-time">08:15</div>
-              <div class="t-confidence">91% confidence</div>
-            </div>
-          </div>
-          <div class="glass threat-card">
-            <div class="t-icon">&#128737;</div>
-            <div>
-              <div class="t-type">Account takeover</div>
-              <div class="t-sender">support@netf1ix-billing.com</div>
-            </div>
-            <div class="t-meta">
-              <div class="t-time">07:02</div>
-              <div class="t-confidence">94% confidence</div>
-            </div>
-          </div>
-        </div>
-        <div class="stats-row">
-          <div class="glass stat-card">
-            <div class="stat-value"><span class="accent">14</span></div>
-            <div class="stat-label">threats blocked this week</div>
-          </div>
-          <div class="glass stat-card">
-            <div class="stat-value">100%</div>
-            <div class="stat-label">auto-trashed, no manual review</div>
-          </div>
-          <div class="glass stat-card">
-            <div class="stat-value">0</div>
-            <div class="stat-label">reached the inbox</div>
-          </div>
-        </div>
-        <div class="footnote">All from <span class="accent">known phishing patterns</span> matched against 1,247 monitored domains.</div>
-      </section>
-
-      <!-- VIEW 3: SCAN LOG -->
-      <section class="view" id="view-log">
-        <div class="page-head">
-          <span class="page-title">Scan Log</span>
-          <div class="filter-chips">
-            <span class="chip active">All</span>
-            <span class="chip">Threats</span>
-            <span class="chip">Clean</span>
-            <span class="chip">Today</span>
-          </div>
-        </div>
-        <div class="glass table-card">
-          <table>
-            <thead>
-              <tr><th>Time</th><th>Sender</th><th>Subject</th><th>Result</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="num muted">10:42</td><td>Amazon Orders</td><td class="muted">Your order has shipped</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">10:38</td><td>HSBC Alerts</td><td class="muted">Account statement ready</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">10:31</td><td>security@paypall...</td><td class="muted">Urgent: Verify...</td>
-                <td><span class="status threat">Threat</span></td><td>Blocked</td>
-              </tr>
-              <tr>
-                <td class="num muted">09:55</td><td>Notion</td><td class="muted">Weekly digest</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">09:40</td><td>hr@company.com</td><td class="muted">Q3 payroll</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">09:12</td><td>Slack</td><td class="muted">Weekly workspace summary</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">08:47</td><td>Figma</td><td class="muted">New comment on Dashboard v2</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-              <tr>
-                <td class="num muted">08:20</td><td>GitHub</td><td class="muted">Pull request merged</td>
-                <td><span class="status clean">Clean</span></td><td class="muted">Delivered</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="glass log-stats">
-          <span><strong>247</strong> scanned</span>
-          <span class="accent"><strong>3</strong> blocked</span>
-          <span><strong>244</strong> delivered</span>
-          <span><strong>0</strong> false positives</span>
-        </div>
-      </section>
-
-      <!-- VIEW 4: SETTINGS -->
-      <section class="view" id="view-settings">
-        <div class="page-head">
-          <span class="page-title">Detection Rules</span>
-        </div>
-        <div class="rules-list">
-          <div class="glass rule-card">
-            <div class="rule-info">
-              <div class="rule-title">Phishing Detection</div>
-              <div class="rule-sub">Scans every incoming message for phishing indicators</div>
-            </div>
-            <div class="toggle"></div>
-          </div>
-          <div class="glass rule-card">
-            <div class="rule-info">
-              <div class="rule-title">Suspicious domains</div>
-              <div class="rule-sub">1,247 known phishing domains monitored</div>
-            </div>
-            <div class="toggle"></div>
-          </div>
-          <div class="glass rule-card">
-            <div class="rule-info">
-              <div class="rule-title">Link scanner</div>
-              <div class="rule-sub">Checks all URLs before delivery</div>
-            </div>
-            <div class="toggle"></div>
-          </div>
-          <div class="glass rule-card">
-            <div class="rule-info">
-              <div class="rule-title">Auto-trash</div>
-              <div class="rule-sub">Threats moved to trash immediately</div>
-            </div>
-            <div class="toggle"></div>
-          </div>
-        </div>
-        <div class="settings-footnote">Last model update: <span style="color: var(--text); font-weight: 500;">2 hours ago</span></div>
-      </section>
-
-    </main>
+      </main>
+    </div>
   </div>
 
 <script>
   const views = ['inbox', 'blocked', 'log', 'settings'];
   const viewNames = ['Inbox', 'Blocked', 'Scan Log', 'Settings'];
   const navIds = ['nav-inbox', 'nav-blocked', 'nav-log', 'nav-settings'];
+  const flexViews = new Set(['inbox']);
   const crumb = document.getElementById('crumb');
   let current = 0;
 
   const showView = (i) => {
     views.forEach((v, idx) => {
       const el = document.getElementById('view-' + v);
-      el.style.display = idx === i ? 'block' : 'none';
-      if (idx === i) {
+      const isActive = idx === i;
+      el.style.display = isActive ? (flexViews.has(v) ? 'flex' : 'block') : 'none';
+      el.classList.toggle('is-visible', isActive);
+      if (isActive) {
         el.style.animation = 'none';
         void el.offsetWidth;
         el.style.animation = '';
       }
-      document.getElementById(navIds[idx]).classList.toggle('active', idx === i);
+      document.getElementById(navIds[idx]).classList.toggle('active', isActive);
     });
     crumb.textContent = viewNames[i];
     current = i;
