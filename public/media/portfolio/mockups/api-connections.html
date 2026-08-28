@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Multi-Platform API Connections</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+    background: #070710;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #e8ecef;
+  }
+
+  .scene {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+  }
+
+  .bg-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(25,211,162,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, transparent 1px 40px);
+  }
+
+  /* ---------- header ---------- */
+  .title-block {
+    position: absolute;
+    left: 48px;
+    top: 40px;
+    z-index: 6;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #19D3A2;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+  .title-block h1 {
+    font-size: 25px;
+    margin: 8px 0 4px;
+    font-weight: 600;
+    color: #f4f6f7;
+    letter-spacing: -0.01em;
+  }
+  .title-block p {
+    font-size: 14px;
+    color: rgba(232,236,239,0.55);
+    margin: 0;
+  }
+
+  .live-pill {
+    position: absolute;
+    right: 48px;
+    top: 44px;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: rgba(255,255,255,0.055);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(232,236,239,0.75);
+    font-weight: 600;
+  }
+  .live-pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #19D3A2;
+    box-shadow: 0 0 8px rgba(25,211,162,0.9);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ---------- connections svg ---------- */
+  svg.connections {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+    z-index: 2;
+  }
+  .conn-line {
+    fill: none;
+    stroke: rgba(25,211,162,0.4);
+    stroke-width: 2;
+    stroke-dasharray: 6 8;
+    animation: dashflow 2.4s linear infinite;
+  }
+  .flow-dot {
+    fill: #19D3A2;
+    opacity: 0.12;
+    transition: opacity 0.6s ease;
+  }
+  [data-state="2"] .flow-dot { opacity: 1; }
+
+  /* ---------- hub node ---------- */
+  .hub-ring {
+    position: absolute;
+    left: 560px;
+    top: 400px;
+    width: 168px;
+    height: 168px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px dashed rgba(25,211,162,0.28);
+    animation: spin 20s linear infinite;
+    z-index: 3;
+  }
+  .hub-node {
+    position: absolute;
+    left: 560px;
+    top: 400px;
+    width: 140px;
+    height: 140px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(25,211,162,0.35);
+    box-shadow: 0 0 46px rgba(25,211,162,0.16), inset 0 0 30px rgba(25,211,162,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    z-index: 4;
+    text-align: center;
+  }
+  .hub-node .hub-glyph {
+    width: 30px;
+    height: 30px;
+  }
+  .hub-node .hub-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #dff7ef;
+    font-weight: 700;
+  }
+  .hub-node .hub-sub {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(25,211,162,0.7);
+  }
+
+  /* ---------- platform nodes ---------- */
+  .platform-node {
+    position: absolute;
+    width: 108px;
+    height: 108px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.055);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
+  .platform-node .node-label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-caps: all-small-caps;
+    color: rgba(232,236,239,0.88);
+    font-weight: 600;
+  }
+  .platform-node .node-pulse {
+    position: absolute;
+    top: 8px;
+    right: 13px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #19D3A2;
+    box-shadow: 0 0 8px rgba(25,211,162,0.85);
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  /* ---------- right info panel ---------- */
+  .info-panel {
+    position: absolute;
+    left: 940px;
+    top: 150px;
+    width: 300px;
+    height: 500px;
+    z-index: 6;
+  }
+  .info-panel .panel {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.055);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 22px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  [data-state="2"] .panel-feed  { opacity: 1; }
+  [data-state="3"] .panel-record { opacity: 1; }
+  [data-state="4"] .panel-stats  { opacity: 1; }
+
+  .panel .panel-eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #19D3A2;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  /* feed */
+  .feed-list { display: flex; flex-direction: column; gap: 12px; }
+  .feed-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    animation: slideInFade 0.5s ease both;
+  }
+  .feed-item .feed-dot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    border-radius: 50%;
+    background: #19D3A2;
+    box-shadow: 0 0 6px rgba(25,211,162,0.8);
+  }
+  .feed-item .feed-text {
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: rgba(232,236,239,0.9);
+  }
+
+  /* record card */
+  .record-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .record-card .record-body {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  .record-card .record-body.show {
+    animation: recordExpand 0.55s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+  .record-customer {
+    font-size: 19px;
+    font-weight: 600;
+    color: #f4f6f7;
+    margin-bottom: 4px;
+  }
+  .record-service {
+    font-size: 12.5px;
+    color: rgba(232,236,239,0.55);
+    margin-bottom: 20px;
+  }
+  .record-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .record-row .r-label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(232,236,239,0.45);
+  }
+  .record-row .r-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #dff7ef;
+    font-variant-numeric: tabular-nums;
+  }
+  .record-status {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 14px;
+    background: rgba(25,211,162,0.08);
+    border: 1px solid rgba(25,211,162,0.3);
+    border-radius: 10px;
+  }
+  .record-status svg { width: 16px; height: 16px; flex: none; }
+  .record-status span {
+    font-size: 12.5px;
+    color: #dff7ef;
+    font-weight: 500;
+  }
+
+  /* stats */
+  .stats-list { display: flex; flex-direction: column; gap: 14px; }
+  .stat-tile {
+    padding: 16px 16px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .stat-tile.show {
+    animation: tileIn 0.5s ease forwards;
+  }
+  .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #19D3A2;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(232,236,239,0.6);
+  }
+
+  /* ---------- keyframes ---------- */
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.7); opacity: 0.3; }
+  }
+  @keyframes dashflow { to { stroke-dashoffset: -70; } }
+  @keyframes slideInFade {
+    from { transform: translateX(26px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes recordExpand {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes tileIn {
+    from { transform: translateY(14px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+  <div class="scene" id="scene" data-state="1">
+    <div class="bg-glow"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="title-block">
+      <div class="eyebrow">Multi-Platform API Connections</div>
+      <h1>Five platforms. One flow.</h1>
+      <p>Data moves on its own.</p>
+    </div>
+
+    <div class="live-pill"><span class="dot"></span><span>Live</span></div>
+
+    <svg class="connections" viewBox="0 0 1280 800">
+      <path id="line-xero"   class="conn-line" d="M560,400 L560,180" />
+      <path id="line-wfm"    class="conn-line" d="M560,400 L769,332" />
+      <path id="line-glofox" class="conn-line" d="M560,400 L689,578" />
+      <path id="line-acorn"  class="conn-line" d="M560,400 L431,578" />
+      <path id="line-jisr"   class="conn-line" d="M560,400 L351,332" />
+
+      <circle class="flow-dot" r="5">
+        <animateMotion dur="3s" begin="0s" repeatCount="indefinite" keyPoints="1;0;1" keyTimes="0;0.5;1" calcMode="linear">
+          <mpath href="#line-xero"></mpath>
+        </animateMotion>
+      </circle>
+      <circle class="flow-dot" r="5">
+        <animateMotion dur="3s" begin="0.3s" repeatCount="indefinite" keyPoints="1;0;1" keyTimes="0;0.5;1" calcMode="linear">
+          <mpath href="#line-wfm"></mpath>
+        </animateMotion>
+      </circle>
+      <circle class="flow-dot" r="5">
+        <animateMotion dur="3s" begin="0.6s" repeatCount="indefinite" keyPoints="1;0;1" keyTimes="0;0.5;1" calcMode="linear">
+          <mpath href="#line-glofox"></mpath>
+        </animateMotion>
+      </circle>
+      <circle class="flow-dot" r="5">
+        <animateMotion dur="3s" begin="0.9s" repeatCount="indefinite" keyPoints="1;0;1" keyTimes="0;0.5;1" calcMode="linear">
+          <mpath href="#line-acorn"></mpath>
+        </animateMotion>
+      </circle>
+      <circle class="flow-dot" r="5">
+        <animateMotion dur="3s" begin="1.2s" repeatCount="indefinite" keyPoints="1;0;1" keyTimes="0;0.5;1" calcMode="linear">
+          <mpath href="#line-jisr"></mpath>
+        </animateMotion>
+      </circle>
+    </svg>
+
+    <div class="hub-ring"></div>
+    <div class="hub-node">
+      <div class="hub-label">Automation</div>
+      <div class="hub-sub">core</div>
+    </div>
+
+    <div class="platform-node" style="left:560px; top:180px;">
+      <div class="node-pulse" style="animation-delay:0s;"></div>
+      <div class="node-label">Xero</div>
+    </div>
+    <div class="platform-node" style="left:769px; top:332px;">
+      <div class="node-pulse" style="animation-delay:0.4s;"></div>
+      <div class="node-label">WorkflowMax</div>
+    </div>
+    <div class="platform-node" style="left:689px; top:578px;">
+      <div class="node-pulse" style="animation-delay:0.8s;"></div>
+      <div class="node-label">Glofox</div>
+    </div>
+    <div class="platform-node" style="left:431px; top:578px;">
+      <div class="node-pulse" style="animation-delay:1.2s;"></div>
+      <div class="node-label">Acorn</div>
+    </div>
+    <div class="platform-node" style="left:351px; top:332px;">
+      <div class="node-pulse" style="animation-delay:1.6s;"></div>
+      <div class="node-label">JISR</div>
+    </div>
+
+    <div class="info-panel">
+      <div class="panel panel-feed">
+        <div class="panel-eyebrow">Live Sync Feed</div>
+        <div class="feed-list" id="feedList"></div>
+      </div>
+
+      <div class="panel panel-record">
+        <div class="record-card">
+          <div class="panel-eyebrow">Record Updated</div>
+          <div class="record-body" id="recordBody">
+            <div class="record-customer">Horizon Performance Studio</div>
+            <div class="record-service">Personal Training, Quarterly Package</div>
+            <div class="record-row">
+              <span class="r-label">Service Type</span>
+              <span class="r-value">Training Package</span>
+            </div>
+            <div class="record-row">
+              <span class="r-label">Billed Amount</span>
+              <span class="r-value">$1,240.00</span>
+            </div>
+            <div class="record-status">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#19D3A2" stroke-width="1.5"/><path d="M7 12.5l3 3 7-7" stroke="#19D3A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Synced across 3 platforms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-stats">
+        <div class="panel-eyebrow">Sync Summary</div>
+        <div class="stats-list" id="statsList">
+          <div class="stat-tile" data-target="847">
+            <div class="stat-number">0</div>
+            <div class="stat-label">records synced today</div>
+          </div>
+          <div class="stat-tile" data-target="0">
+            <div class="stat-number">0</div>
+            <div class="stat-label">manual entries</div>
+          </div>
+          <div class="stat-tile" data-target="5">
+            <div class="stat-number">0</div>
+            <div class="stat-label">platforms connected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const scene = document.getElementById('scene');
+  const feedList = document.getElementById('feedList');
+  const recordBody = document.getElementById('recordBody');
+  const statTiles = Array.from(document.querySelectorAll('.stat-tile'));
+
+  const feedMessages = [
+    'Invoice synced · Xero',
+    'Member updated · Glofox',
+    'Timesheet pushed · WorkflowMax'
+  ];
+
+  let feedTimers = [];
+
+  function clearFeedTimers() {
+    feedTimers.forEach(clearTimeout);
+    feedTimers = [];
+  }
+
+  function addFeedItem(text) {
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.innerHTML = '<span class="feed-dot"></span><span class="feed-text">' + text + '</span>';
+    feedList.appendChild(item);
+    while (feedList.children.length > 3) {
+      feedList.removeChild(feedList.firstChild);
+    }
+  }
+
+  function runFeedSequence() {
+    clearFeedTimers();
+    feedList.innerHTML = '';
+    feedMessages.forEach((msg, i) => {
+      feedTimers.push(setTimeout(() => addFeedItem(msg), i * 750));
+    });
+  }
+
+  function runRecordAnimation() {
+    recordBody.classList.remove('show');
+    void recordBody.offsetWidth;
+    recordBody.classList.add('show');
+  }
+
+  function countUp(el, target, duration) {
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function runStatsAnimation() {
+    statTiles.forEach((tile, i) => {
+      tile.classList.remove('show');
+      void tile.offsetWidth;
+      tile.style.animationDelay = (i * 0.15) + 's';
+      tile.classList.add('show');
+      const target = parseInt(tile.getAttribute('data-target'), 10);
+      const numberEl = tile.querySelector('.stat-number');
+      numberEl.textContent = '0';
+      setTimeout(() => countUp(numberEl, target, 1000), i * 150);
+    });
+  }
+
+  const states = [
+    function enterHub() {},
+    runFeedSequence,
+    runRecordAnimation,
+    runStatsAnimation
+  ];
+
+  let idx = 0;
+
+  function enterState(newIdx) {
+    idx = newIdx;
+    scene.setAttribute('data-state', String(idx + 1));
+    states[idx]();
+  }
+
+  enterState(0);
+  setInterval(() => {
+    enterState((idx + 1) % 4);
+  }, 3000);
+})();
+</script>
+</body>
+</html>
