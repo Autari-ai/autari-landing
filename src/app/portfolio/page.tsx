@@ -296,7 +296,7 @@ export default function PortfolioPage() {
                 meta: [
                   { label: "What", value: "Telecom Automation" },
                   { label: "Scale", value: "2.4M operations" },
-                  { label: "Stack", value: "Python + Go" },
+                  { label: "How", value: "Python workers + Go agents" },
                   { label: "Result", value: "99.7% success" },
                 ],
               },
@@ -379,7 +379,7 @@ export default function PortfolioPage() {
               meta={[
                 { label: "What", value: "Operations Automation" },
                 { label: "Client", value: "Hybrid Solutions Group, UK" },
-                { label: "Tools", value: "Airflow + BigChange + Xero" },
+                { label: "Connected", value: "Job management + accounting" },
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
@@ -458,7 +458,7 @@ export default function PortfolioPage() {
               hook="No more chasing invoices. No more raising POs by hand. Jobs complete, billing follows."
               meta={[
                 { label: "What", value: "Billing Automation" },
-                { label: "Tools", value: "BigChange + Xero" },
+                { label: "Connected", value: "Job management + accounting" },
                 { label: "Client", value: "UK businesses" },
                 { label: "Year", value: "2025" },
               ]}
@@ -489,9 +489,9 @@ export default function PortfolioPage() {
               name="Enterprise AI Agent"
               hook="Ask it anything about your business. It finds the data, writes the query, and reports back."
               meta={[
-                { label: "What", value: "AI Data Agent" },
+                { label: "What", value: "AI Data Assistant" },
                 { label: "For", value: "Enterprise teams" },
-                { label: "Database", value: "PostgreSQL" },
+                { label: "Data", value: "Your live business data" },
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
@@ -511,9 +511,9 @@ export default function PortfolioPage() {
               name="Natural Language → Database Results"
               hook="You describe what you want. It figures out how to get it. Results arrive in the chat."
               meta={[
-                { label: "What", value: "AI Query Engine" },
-                { label: "Protocol", value: "MCP (Anthropic)" },
-                { label: "Database", value: "PostgreSQL" },
+                { label: "What", value: "AI Data Insights" },
+                { label: "How", value: "Connects live to your data" },
+                { label: "Data", value: "Your live business data" },
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
@@ -532,8 +532,8 @@ export default function PortfolioPage() {
               name="AI Employee Orchestration"
               hook="Give each AI a job title. They work together in channels, pick up tasks, and report back."
               meta={[
-                { label: "What", value: "Agent Orchestration" },
-                { label: "Engine", value: "CrewAI" },
+                { label: "What", value: "AI Team Builder" },
+                { label: "How", value: "Each agent has a role and a job" },
                 { label: "For", value: "Automation teams" },
                 { label: "Year", value: "2025" },
               ]}
@@ -550,9 +550,9 @@ export default function PortfolioPage() {
               name="AI That Asks Before It Acts"
               hook="It drafts the work. You approve it on Telegram. Nothing lands without your say-so."
               meta={[
-                { label: "What", value: "Human-in-the-Loop AI" },
-                { label: "Interface", value: "Telegram" },
-                { label: "Trigger", value: "GitHub activity" },
+                { label: "What", value: "AI with Human Approval" },
+                { label: "Review via", value: "Telegram" },
+                { label: "Triggered by", value: "Your work on GitHub" },
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/gig-copilot/telegram-inline-keyboard.png"
@@ -568,8 +568,8 @@ export default function PortfolioPage() {
               name="AI Haircut Advisor"
               hook="Take a selfie. Get a ranked list of the cuts that actually suit your face shape — offline, instant, private."
               meta={[
-                { label: "What", value: "Computer Vision App" },
-                { label: "Model", value: "Fine-tuned ViT" },
+                { label: "What", value: "AI Photo Analysis" },
+                { label: "How", value: "AI trained on face shapes" },
                 { label: "Platform", value: "Desktop (offline)" },
                 { label: "Year", value: "2025" },
               ]}
@@ -603,7 +603,7 @@ export default function PortfolioPage() {
               meta={[
                 { label: "What", value: "Market Analysis" },
                 { label: "Data", value: "6 years, all CA counties" },
-                { label: "Method", value: "HHI concentration index" },
+                { label: "Method", value: "6 years, county by county" },
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/analytics/metabase-dashboard.webp"
@@ -619,9 +619,9 @@ export default function PortfolioPage() {
               name="Real-Time Business Monitoring"
               hook="Every API, every request, every error — visible in one place, updating every 30 seconds."
               meta={[
-                { label: "What", value: "Observability Dashboards" },
-                { label: "Tools", value: "Grafana + OpenTelemetry" },
-                { label: "Coverage", value: "All API integrations" },
+                { label: "What", value: "Live Monitoring" },
+                { label: "Updates", value: "Every 30 seconds, live" },
+                { label: "Coverage", value: "Every connected platform" },
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
@@ -670,34 +670,14 @@ export default function PortfolioPage() {
               accent="#EAF2EF"
             />
 
-            <ProjectEntry
-              name="A SaaS Platform, Built from Scratch"
-              hook="Accounts, billing, device locking, and team management — a full product running in production."
-              meta={[
-                { label: "What", value: "SaaS Platform" },
-                { label: "Stack", value: "Next.js + Python + Tauri" },
-                { label: "License", value: "Device-locked activation" },
-                { label: "Year", value: "2025" },
-              ]}
-              carouselImages={[
-                { src: "/media/portfolio/autari-portal-dashboard.png", caption: "Customer portal — active plan and device management" },
-                { src: "/media/portfolio/autari-portal-admin.png", caption: "Staff admin — accounts, license issue and revoke" },
-                { src: "/media/portfolio/autari-portal-billing.png", caption: "Billing — individual and org license purchase" },
-              ]}
-              cols={[
-                { title: "What it does", body: "A complete SaaS platform — customers manage their subscription, devices activate with a signed token, admins fulfill orders and revoke access, billing integrates with Stripe." },
-                { title: "Who it helped", body: "Autari's own clients, who needed a self-service portal that worked without any manual admin intervention." },
-                { title: "What changed", body: "Onboarding became instant. License management became self-service. The business can scale without adding headcount." },
-              ]}
-            />
 
             <ProjectEntry
               name="Xbox Game Pass, Actually Searchable"
               hook="600+ games. Filter by genre, theme, and tier. Runs offline. AI does the categorisation."
               meta={[
                 { label: "What", value: "Desktop App" },
-                { label: "Platform", value: "Electron + React" },
-                { label: "AI", value: "On-device classification" },
+                { label: "Runs on", value: "Your desktop, offline" },
+                { label: "AI", value: "Offline, no account needed" },
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
@@ -716,9 +696,9 @@ export default function PortfolioPage() {
               name="Upwork Job Finder, With a Brain"
               hook="Syncs your Upwork feed. Scores every job against rules you write. Shows exactly why each one ranked where it did."
               meta={[
-                { label: "What", value: "Freelance Intelligence" },
-                { label: "Stack", value: "FastAPI + React" },
-                { label: "API", value: "Upwork GraphQL" },
+                { label: "What", value: "Job Scoring Tool" },
+                { label: "Syncs", value: "Jobs automatically" },
+                { label: "Shows", value: "Why each job scored how it did" },
                 { label: "Year", value: "2025" },
               ]}
               noImage={true}
@@ -751,8 +731,8 @@ export default function PortfolioPage() {
               hook="Schedule content, generate descriptions, create thumbnails, upload. No one needs to be at a keyboard."
               meta={[
                 { label: "What", value: "Content Automation" },
-                { label: "Platform", value: "YouTube API" },
-                { label: "AI", value: "Descriptions + thumbnails" },
+                { label: "Platform", value: "YouTube" },
+                { label: "AI writes", value: "Descriptions and titles" },
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/youtube/demo.gif"
@@ -768,7 +748,7 @@ export default function PortfolioPage() {
               hook="Add styled, animated captions to any video — ready for TikTok, YouTube Shorts, or Instagram Reels."
               meta={[
                 { label: "What", value: "Video Tool" },
-                { label: "Output", value: "Animated CSS subtitles" },
+                { label: "Output", value: "Captions synced to speech" },
                 { label: "Platform", value: "Short-form video" },
                 { label: "Year", value: "2025" },
               ]}
@@ -803,8 +783,8 @@ export default function PortfolioPage() {
               hook="It scans every email for suspicious links. Anything malicious goes to trash — automatically."
               meta={[
                 { label: "What", value: "Email Security" },
-                { label: "Method", value: "ML URL classification" },
-                { label: "Integration", value: "Gmail API" },
+                { label: "How", value: "AI checks every link" },
+                { label: "Works with", value: "Gmail" },
                 { label: "Year", value: "2024" },
               ]}
               noImage={true}
@@ -820,9 +800,9 @@ export default function PortfolioPage() {
               name="A Searchable Malware Archive"
               hook="Daily malware feeds, downloaded, extracted, hashed, and organised — automatically."
               meta={[
-                { label: "What", value: "Security Research Tool" },
+                { label: "What", value: "Security Dataset Builder" },
                 { label: "Source", value: "MalwareBazaar" },
-                { label: "Hashing", value: "MD5 + SHA1 + SHA256" },
+                { label: "Verified by", value: "Fingerprints, not guesses" },
                 { label: "Year", value: "2024" },
               ]}
               noImage={true}
