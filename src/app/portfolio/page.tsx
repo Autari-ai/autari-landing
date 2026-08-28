@@ -433,7 +433,10 @@ export default function PortfolioPage() {
                 { label: "For", value: "UK + international clients" },
                 { label: "Year", value: "2021–present" },
               ]}
-              image="/media/portfolio/api-integrations/automation-trigger-action.jpg"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/api-app.gif", caption: "Platform Sync — five business platforms connected and updating in real time" },
+                { src: "/media/portfolio/api-integrations/automation-trigger-action.jpg", caption: "Every integration follows the same logic: something happens in one system, something happens automatically in another" },
+              ]}
               cols={[
                 { title: "What it does", body: "Connects five business platforms so data moves on its own — no copy-paste, no re-entry, no waiting for things to catch up." },
                 { title: "Who it helped", body: "Businesses running multiple tools that didn't talk to each other. Every update meant opening another tab and doing the same thing twice." },
@@ -450,7 +453,10 @@ export default function PortfolioPage() {
                 { label: "Client", value: "UK businesses" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/bigchange-xero/bigchange-invoices.png"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/invoice-app.gif", caption: "Jobs, invoices, purchase orders, and accounts — the full billing cycle running automatically" },
+                { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoice raised the moment a job is marked complete" },
+              ]}
               cols={[
                 { title: "What it does", body: "The moment a job is marked done, an invoice raises in the accounting system. Purchase orders generate from approved quotes. Nothing needs a human to push it through." },
                 { title: "Who it helped", body: "Operations and finance teams spending hours each week manually matching jobs to bills." },
@@ -483,7 +489,8 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
-                { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Jagent in a live analytics dashboard — ask questions while looking at the data" },
+                { src: "/media/portfolio/mockups/jagent-app.gif", caption: "Jagent in action — ask a question, watch the answer arrive with charts" },
+                { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Embedded in a live analytics dashboard — ask questions while looking at the data" },
                 { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Plain English in, charts out — the agent picks the right visualisation" },
                 { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Every answer shows exactly where the numbers came from — no guessing" },
               ]}
@@ -621,6 +628,26 @@ export default function PortfolioPage() {
                 { title: "What it does", body: "Dashboards that show the health of every business connection in real time — how much is flowing, how fast it's moving, and what's failing." },
                 { title: "Who it helped", body: "Engineering and operations teams who needed to know immediately when something broke, not an hour later when a client complained." },
                 { title: "What changed", body: "Issues get spotted and fixed before customers notice. Error patterns become visible. Performance problems get diagnosed in minutes." },
+              ]}
+              accent="#4479A1"
+            />
+
+            <ProjectEntry
+              name="20 Stores. Watched Around the Clock."
+              hook="The moment stock drops below your threshold, you know — and so does your reorder system."
+              meta={[
+                { label: "What", value: "Stock Monitoring" },
+                { label: "Scale", value: "20+ stores simultaneously" },
+                { label: "For", value: "E-commerce businesses" },
+                { label: "Year", value: "2021–present" },
+              ]}
+              carouselImages={[
+                { src: "/media/portfolio/mockups/stock-app.gif", caption: "Stock Monitor — 20 stores, live inventory levels, alerts firing the moment stock drops" },
+              ]}
+              cols={[
+                { title: "What it does", body: "Watches inventory levels across 20+ e-commerce stores simultaneously. Fires an alert the moment stock drops below your threshold — before the shelf is empty." },
+                { title: "Who it helped", body: "E-commerce businesses with multiple stores who found out stock had run out when a customer couldn't find the product." },
+                { title: "What changed", body: "Stockouts stopped happening unnoticed. Reorders trigger before anything runs out. The whole operation runs without anyone checking dashboards manually." },
               ]}
               accent="#4479A1"
             />
@@ -775,7 +802,9 @@ export default function PortfolioPage() {
                 { label: "Works with", value: "Gmail" },
                 { label: "Year", value: "2024" },
               ]}
-              noImage={true}
+              carouselImages={[
+                { src: "/media/portfolio/mockups/email-app.gif", caption: "Inbox Guard — phishing emails detected, blocked, and logged before you see them" },
+              ]}
               cols={[
                 { title: "What it does", body: "Watches incoming email, checks every link against what it has learned about phishing, and moves anything malicious to trash before it can do harm." },
                 { title: "Who it helped", body: "Anyone who gets phishing emails and can't always spot them — which is everyone." },
