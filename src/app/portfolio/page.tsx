@@ -291,12 +291,12 @@ export default function PortfolioPage() {
               {
                 num: "01",
                 name: "Telecom Portal Automation",
-                hook: "2.4 million DSL line checks. 99.7% success rate. Zero manual work.",
+                hook: "2.4 million line checks. 99.7% success rate. Zero manual work.",
                 image: "/media/portfolio/et-system/dashboard.png",
                 meta: [
                   { label: "What", value: "Telecom Automation" },
                   { label: "Scale", value: "2.4M operations" },
-                  { label: "How", value: "Python workers + Go agents" },
+                  { label: "How", value: "Handles millions without slowing down" },
                   { label: "Result", value: "99.7% success" },
                 ],
               },
@@ -309,7 +309,7 @@ export default function PortfolioPage() {
                   { label: "What", value: "AI Agent Platform" },
                   { label: "For", value: "Enterprise teams" },
                   { label: "When", value: "2024–25" },
-                  { label: "Result", value: "NL → SQL → Charts" },
+                  { label: "Result", value: "Question in. Answer out." },
                 ],
               },
               {
@@ -327,11 +327,11 @@ export default function PortfolioPage() {
               {
                 num: "04",
                 name: "SaaS Platform",
-                hook: "Accounts, billing, device locking, and activation — a full product in production.",
+                hook: "Accounts, billing, device locking, activation — live and in use every day.",
                 image: "/media/portfolio/autari-portal-admin.png",
                 meta: [
                   { label: "What", value: "SaaS Platform" },
-                  { label: "For", value: "B2B clients" },
+                  { label: "For", value: "Business clients" },
                   { label: "When", value: "2025" },
                   { label: "Result", value: "Live with paying customers" },
                 ],
@@ -385,10 +385,10 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "Job scheduling — every engineer and job in one view" },
                 { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoices raised automatically when the job is complete" },
-                { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "Xero accounting updated live as jobs flow through" },
+                { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "The books update themselves as jobs flow through" },
               ]}
               cols={[
-                { title: "What it does", body: "Every job raised in BigChange flows automatically through quoting, invoicing, and purchase orders — synced live with Xero accounting." },
+                { title: "What it does", body: "Every job flows automatically from booking through quoting, invoicing, and purchase orders — with the accounts updated the moment anything changes." },
                 { title: "Who it helped", body: "A UK field service company managing dozens of engineers and hundreds of jobs a month. The back-office was drowning in manual work." },
                 { title: "What changed", body: "Billing happens the moment a job is marked complete. Purchase orders raise themselves. The office team stopped chasing paperwork." },
               ]}
@@ -396,20 +396,20 @@ export default function PortfolioPage() {
 
             <ProjectEntry
               name="Telecom Portal Automation"
-              hook="2.4 million DSL line checks. One system. No one sitting at a screen."
+              hook="2.4 million line checks. One system. No one sitting at a screen."
               meta={[
                 { label: "What", value: "Telecom Automation" },
-                { label: "Client", value: "Egyptian ISP" },
+                { label: "Client", value: "Egyptian internet provider" },
                 { label: "Scale", value: "2.4M operations" },
                 { label: "Success", value: "99.7%" },
               ]}
               carouselImages={[
                 { src: "/media/portfolio/et-system/dashboard.png", caption: "Dashboard: 2.4M numbers processed at 99.7% success rate" },
-                { src: "/media/portfolio/et-system/modules.png", caption: "Module view — live success and error counts per task type" },
+                { src: "/media/portfolio/et-system/modules.png", caption: "Every task type tracked — successes and errors, live" },
                 { src: "/media/portfolio/et-system/scrape.png", caption: "Queue numbers and watch results arrive live" },
               ]}
               cols={[
-                { title: "What it does", body: "Automates the entire process of checking DSL line availability and submitting leads for a major Egyptian ISP — at a scale and speed no human team could match." },
+                { title: "What it does", body: "Checks whether service is available on a line and files the lead — for a major Egyptian internet provider, at a scale and speed no human team could match." },
                 { title: "Who it helped", body: "A telecom operations team manually running thousands of searches a day, copying results, and filing leads one by one." },
                 { title: "What changed", body: "2.4 million operations processed at 99.7% success. Multiple teams each run their own workspace. Results export to Excel whenever they're ready." },
               ]}
@@ -420,8 +420,8 @@ export default function PortfolioPage() {
               hook="Walk in, pick a console, start playing. The system handles everything else."
               meta={[
                 { label: "What", value: "Business Management" },
-                { label: "Language", value: "Arabic RTL" },
-                { label: "Platform", value: "Full-stack web" },
+                { label: "Language", value: "Arabic" },
+                { label: "Platform", value: "Works in any browser" },
                 { label: "Year", value: "2023" },
               ]}
               carouselImages={[
@@ -438,24 +438,24 @@ export default function PortfolioPage() {
 
             <ProjectEntry
               name="Five Platforms, One Flow"
-              hook="Data that used to travel by hand now moves on its own — between Xero, WorkflowMax, Glofox, Acorn, and JISR."
+              hook="Data that used to travel by hand now moves on its own — across accounting, job tracking, memberships, learning, and payroll."
               meta={[
-                { label: "What", value: "API Integration" },
-                { label: "Platforms", value: "Xero, WorkflowMax, Glofox, Acorn, JISR" },
+                { label: "What", value: "Connected Systems" },
+                { label: "Platforms", value: "Five, working as one" },
                 { label: "For", value: "UK + international clients" },
                 { label: "Year", value: "2021–present" },
               ]}
               image="/media/portfolio/api-integrations/automation-trigger-action.jpg"
               cols={[
-                { title: "What it does", body: "Connects five business platforms via their APIs so data moves automatically — no copy-pasting, no re-entry, no sync delays." },
+                { title: "What it does", body: "Connects five business platforms so data moves on its own — no copy-paste, no re-entry, no waiting for things to catch up." },
                 { title: "Who it helped", body: "Businesses running multiple tools that didn't talk to each other. Every update meant opening another tab and doing the same thing twice." },
-                { title: "What changed", body: "Invoices land in Xero the moment they're raised elsewhere. Member records update across systems. Reports pull from live data." },
+                { title: "What changed", body: "Invoices land in the accounts the moment they're raised anywhere else. Member records update everywhere at once. Reports pull from live numbers." },
               ]}
             />
 
             <ProjectEntry
               name="Billing on Autopilot"
-              hook="No more chasing invoices. No more raising POs by hand. Jobs complete, billing follows."
+              hook="No more chasing invoices. No more raising purchase orders by hand. Jobs complete, billing follows."
               meta={[
                 { label: "What", value: "Billing Automation" },
                 { label: "Connected", value: "Job management + accounting" },
@@ -487,43 +487,43 @@ export default function PortfolioPage() {
 
             <ProjectEntry
               name="Enterprise AI Agent"
-              hook="Ask it anything about your business. It finds the data, writes the query, and reports back."
+              hook="Ask it anything about your business. It finds the answer and reports back — charts included."
               meta={[
                 { label: "What", value: "AI Data Assistant" },
                 { label: "For", value: "Enterprise teams" },
-                { label: "Data", value: "Your live business data" },
+                { label: "Data", value: "The same numbers your team sees every day" },
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
                 { src: "/media/portfolio/jagent/jagent-dashboard-chat.png", caption: "Jagent in a live analytics dashboard — ask questions while looking at the data" },
                 { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Plain English in, charts out — the agent picks the right visualisation" },
-                { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Tables returned with exact SQL source cited — no guessing" },
+                { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Every answer shows exactly where the numbers came from — no guessing" },
               ]}
               cols={[
-                { title: "What it does", body: "A conversational AI that connects to your database. Ask a question in plain English — it works out which tables to check, runs the query, and returns the answer with charts if they help." },
-                { title: "Who it helped", body: "Teams drowning in data they couldn't easily query — waiting on a developer every time they wanted a business insight." },
-                { title: "What changed", body: "Managers get answers in seconds. No SQL needed. No tickets raised. The AI remembers what you've asked before and builds on it." },
+                { title: "What it does", body: "A conversational AI that talks directly to your database. Ask a question in plain English — it finds the right records, pulls the answer, and adds charts when they help." },
+                { title: "Who it helped", body: "Teams drowning in data they couldn't get answers from — waiting on a developer every time they wanted a business insight." },
+                { title: "What changed", body: "Managers get answers in seconds. No technical skills needed. No tickets raised. It remembers what you've asked before and builds on it." },
               ]}
               accent="#7C5CFF"
             />
 
             <ProjectEntry
-              name="Natural Language → Database Results"
+              name="Ask in Plain English"
               hook="You describe what you want. It figures out how to get it. Results arrive in the chat."
               meta={[
                 { label: "What", value: "AI Data Insights" },
-                { label: "How", value: "Connects live to your data" },
-                { label: "Data", value: "Your live business data" },
+                { label: "How", value: "Talks directly to your database — no exports" },
+                { label: "Data", value: "Always current — never a stale export" },
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
-                { src: "/media/portfolio/mcp-query/nlq-demo.gif", caption: "Natural language querying in action: type a question, get results" },
-                { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "PostgreSQL live: server sessions and transactions monitored in real time" },
+                { src: "/media/portfolio/mcp-query/nlq-demo.gif", caption: "Type a question, watch the answer arrive" },
+                { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "The system watches itself — every question tracked live as it runs" },
               ]}
               cols={[
-                { title: "What it does", body: "A backend system that reads your database schema, plans exactly which queries to run, executes them against real data, and reports results back in the chat." },
-                { title: "Who it helped", body: "Any business where data sits in a database but nobody can query it without a developer." },
-                { title: "What changed", body: "Business questions get answered without a ticket to engineering. The system cites exactly which data it used." },
+                { title: "What it does", body: "It learns how your data is organised, works out exactly what to look up, checks the real numbers, and reports back in the chat." },
+                { title: "Who it helped", body: "Any business where the answers exist somewhere in the data — but nobody can get at them without a developer." },
+                { title: "What changed", body: "Business questions get answered without waiting on anyone. Every answer shows exactly which data it used." },
               ]}
               accent="#7C5CFF"
             />
@@ -552,12 +552,12 @@ export default function PortfolioPage() {
               meta={[
                 { label: "What", value: "AI with Human Approval" },
                 { label: "Review via", value: "Telegram" },
-                { label: "Triggered by", value: "Your work on GitHub" },
+                { label: "Triggered by", value: "The work you're already doing" },
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/gig-copilot/telegram-inline-keyboard.png"
               cols={[
-                { title: "What it does", body: "An AI assistant that watches your GitHub activity, drafts case studies and task summaries, then sends them to your Telegram for review — with Approve, Revise, and Reject buttons." },
+                { title: "What it does", body: "An AI assistant that watches your work as it happens, drafts case studies and task summaries, then sends them to your Telegram for review — with Approve, Revise, and Reject buttons." },
                 { title: "Who it helped", body: "Freelancers and founders who want AI doing the drafting but still want to stay in control." },
                 { title: "What changed", body: "Portfolio case studies write themselves. Task outputs get captured automatically. Nothing is published without a deliberate human approval." },
               ]}
@@ -569,15 +569,15 @@ export default function PortfolioPage() {
               hook="Take a selfie. Get a ranked list of the cuts that actually suit your face shape — offline, instant, private."
               meta={[
                 { label: "What", value: "AI Photo Analysis" },
-                { label: "How", value: "AI trained on face shapes" },
+                { label: "How", value: "Trained on thousands of real faces" },
                 { label: "Platform", value: "Desktop (offline)" },
                 { label: "Year", value: "2025" },
               ]}
               haircutSvg={true}
               cols={[
-                { title: "What it does", body: "A desktop app that analyses your face shape using AI, measures facial geometry, and ranks haircut styles by how well they'd suit you — cross-referencing a celebrity database to show real examples." },
+                { title: "What it does", body: "A desktop app that studies your face shape, takes real measurements, and ranks haircut styles by how well they'd suit you — with celebrity examples so you can see each cut on a real face." },
                 { title: "Who it helped", body: "Anyone tired of guessing at a haircut. Runs entirely on your laptop, no internet needed, no data shared." },
-                { title: "What changed", body: "Real AI hair advice without a subscription, an app store, or an API key. Download, run, find out." },
+                { title: "What changed", body: "Real hair advice without a subscription, an account, or an internet connection. Download, run, find out." },
               ]}
               accent="#7C5CFF"
             />
@@ -610,27 +610,27 @@ export default function PortfolioPage() {
               cols={[
                 { title: "What it does", body: "Tracks retail market concentration across every California county from 2018 to 2024 — measuring whether the cannabis industry is becoming dominated by a few large players or staying diverse." },
                 { title: "Who it helped", body: "Researchers and policymakers who needed hard data on market structure, not guesswork." },
-                { title: "What changed", body: "Six years of licensing and sales data — mapped, measured, and visualised. The analysis moved from manual Stata scripts to a reproducible Python pipeline." },
+                { title: "What changed", body: "Six years of licensing and sales data — mapped, measured, and visualised. An analysis that once took weeks of hand-work now reruns at the press of a button." },
               ]}
               accent="#4479A1"
             />
 
             <ProjectEntry
               name="Real-Time Business Monitoring"
-              hook="Every API, every request, every error — visible in one place, updating every 30 seconds."
+              hook="Every connection, every request, every error — one screen, always current."
               meta={[
                 { label: "What", value: "Live Monitoring" },
-                { label: "Updates", value: "Every 30 seconds, live" },
+                { label: "Updates", value: "Always current. Refreshes automatically." },
                 { label: "Coverage", value: "Every connected platform" },
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
-                { src: "/media/portfolio/grafana/grafana-013857.png", caption: "Xero pipeline: span rate, p95 latency, error traces" },
-                { src: "/media/portfolio/grafana/grafana-013848.png", caption: "Glofox pipeline: live request monitoring" },
-                { src: "/media/portfolio/grafana/grafana-013914.png", caption: "All services: RED metrics across every integration" },
+                { src: "/media/portfolio/grafana/grafana-013857.png", caption: "The billing connection — health, speed, and errors at a glance" },
+                { src: "/media/portfolio/grafana/grafana-013848.png", caption: "The membership connection — watched live, around the clock" },
+                { src: "/media/portfolio/grafana/grafana-013914.png", caption: "Every connection on one screen — nothing runs unwatched" },
               ]}
               cols={[
-                { title: "What it does", body: "Operational monitoring dashboards showing the health of every business integration in real time — request rates, error rates, response times, and live traces." },
+                { title: "What it does", body: "Dashboards that show the health of every business connection in real time — how much is flowing, how fast it's moving, and what's failing." },
                 { title: "Who it helped", body: "Engineering and operations teams who needed to know immediately when something broke, not an hour later when a client complained." },
                 { title: "What changed", body: "Issues get spotted and fixed before customers notice. Error patterns become visible. Performance problems get diagnosed in minutes." },
               ]}
@@ -682,13 +682,13 @@ export default function PortfolioPage() {
               ]}
               carouselImages={[
                 { src: "/media/portfolio/gamepass/demo.gif", caption: "Full catalog with AI-generated genre and theme tags" },
-                { src: "/media/portfolio/gamepass/screenshot-browse.png", caption: "Browse 626 games with faceted filters" },
+                { src: "/media/portfolio/gamepass/screenshot-browse.png", caption: "Browse 626 games with filters that actually work" },
                 { src: "/media/portfolio/gamepass/screenshot-filter.png", caption: "Include or exclude genres and themes simultaneously" },
               ]}
               cols={[
-                { title: "What it does", body: "A desktop app that downloads the full Xbox Game Pass library, classifies every game by genre and theme using an on-device AI model, and lets you filter with a Steam-style interface." },
+                { title: "What it does", body: "A desktop app that pulls in the full Xbox Game Pass library, sorts every game by genre and theme, and lets you filter the way a proper game store should." },
                 { title: "Who it helped", body: "Anyone who subscribes to Game Pass and gets lost in the catalog. The official app doesn't have real filters." },
-                { title: "What changed", body: "Finding something to actually play takes seconds. No internet needed after the first sync. The AI classification runs entirely on your machine." },
+                { title: "What changed", body: "Finding something to actually play takes seconds. No internet needed after the first sync. Everything runs on your own machine." },
               ]}
             />
 
@@ -703,7 +703,7 @@ export default function PortfolioPage() {
               ]}
               noImage={true}
               cols={[
-                { title: "What it does", body: "Connects to Upwork via OAuth, downloads jobs, profiles, and contract history, and runs each job through a scoring engine you configure — field by field, rule by rule." },
+                { title: "What it does", body: "Signs in to your Upwork account securely, pulls in jobs, profiles, and contract history, and scores every job against rules you set — field by field, rule by rule." },
                 { title: "Who it helped", body: "Freelancers spending hours filtering through job listings to find the ones worth applying to." },
                 { title: "What changed", body: "The best-fit jobs surface immediately. Each job shows a receipt of exactly which rules made it score high or low. Nothing hidden." },
               ]}
@@ -757,7 +757,7 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/pycaps/demo-2.gif", caption: "Different subtitle style on the same video" },
               ]}
               cols={[
-                { title: "What it does", body: "Adds CSS-animated captions to any video. Choose a style, provide the video, and get a file ready to upload with captions that move and animate." },
+                { title: "What it does", body: "Adds styled, animated captions to any video. Choose a look, hand over the video, and get back a file ready to post — captions moving in time with the speech." },
                 { title: "Who it helped", body: "Creators making short-form content who want professional-looking captions without editing software." },
                 { title: "What changed", body: "Captions that used to require an editor now generate automatically in seconds." },
               ]}
@@ -789,27 +789,27 @@ export default function PortfolioPage() {
               ]}
               noImage={true}
               cols={[
-                { title: "What it does", body: "Monitors incoming email, runs every URL through a machine learning classifier, and moves phishing attempts to trash before they can cause harm." },
+                { title: "What it does", body: "Watches incoming email, checks every link against what it has learned about phishing, and moves anything malicious to trash before it can do harm." },
                 { title: "Who it helped", body: "Anyone who gets phishing emails and can't always spot them — which is everyone." },
-                { title: "What changed", body: "Phishing emails stop reaching the inbox. The model improves as it learns what's legitimate and what isn't." },
+                { title: "What changed", body: "Phishing emails stop reaching the inbox. And it keeps getting sharper — learning what's legitimate and what isn't." },
               ]}
               accent="#FF5A50"
             />
 
             <ProjectEntry
               name="A Searchable Malware Archive"
-              hook="Daily malware feeds, downloaded, extracted, hashed, and organised — automatically."
+              hook="Fresh malware samples arrive every day — collected, unpacked, fingerprinted, and filed automatically."
               meta={[
-                { label: "What", value: "Security Dataset Builder" },
-                { label: "Source", value: "MalwareBazaar" },
+                { label: "What", value: "Security Research Archive" },
+                { label: "Source", value: "Daily public threat feeds" },
                 { label: "Verified by", value: "Fingerprints, not guesses" },
                 { label: "Year", value: "2024" },
               ]}
               noImage={true}
               cols={[
-                { title: "What it does", body: "Downloads daily malware sample feeds, extracts them, calculates hashes for every file, and organises them into a searchable, hash-indexed local dataset." },
+                { title: "What it does", body: "Collects new malware samples every day, unpacks them, gives every file a unique fingerprint, and files it all into a searchable archive." },
                 { title: "Who it helped", body: "Security researchers who need a local collection of samples for analysis and pattern matching." },
-                { title: "What changed", body: "Building a research-grade malware dataset went from a manual multi-day process to a scheduled background task." },
+                { title: "What changed", body: "Building a research-grade sample collection went from days of manual work to something that simply happens overnight." },
               ]}
               accent="#FF5A50"
             />
@@ -833,7 +833,7 @@ export default function PortfolioPage() {
                   Started freelancing in automation in 2021. Within two years was running Autari, delivering automation and AI systems for businesses across the UK.
                 </p>
                 <p className="mt-4 text-base leading-relaxed text-fga/65">
-                  Now working as a software engineer at Jigsol Business Solutions alongside client work — building data pipelines, AI agent platforms, and the kind of tools that stop teams from doing things by hand.
+                  Now working as a software engineer at Jigsol Business Solutions alongside client work — building data systems, AI platforms, and the kind of tools that stop teams from doing things by hand.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button href="mailto:noorossamazakaria@gmail.com" variant="primary">Get in touch</Button>
