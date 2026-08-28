@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ask in Plain English</title>
+<style>
+  :root {
+    --bg: #0a0f0f;
+    --surface: #111818;
+    --surface-2: #0d1313;
+    --border: rgba(45,212,191,0.12);
+    --border-strong: rgba(45,212,191,0.28);
+    --brand: #2dd4bf;
+    --brand-dim: rgba(45,212,191,0.08);
+    --text: #f0fdf4;
+    --muted: #64748b;
+    --code: #a3e635;
+    --danger: #f87171;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 900px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .glow-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 800px 420px at 10% -10%, rgba(45,212,191,0.06), transparent 60%),
+      radial-gradient(ellipse 700px 460px at 100% 105%, rgba(45,212,191,0.05), transparent 60%);
+    z-index: 0;
+  }
+  .surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .mono { font-family: 'SF Mono', 'JetBrains Mono', Consolas, 'Roboto Mono', monospace; font-size: 12px; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: relative;
+    z-index: 1;
+    height: 52px;
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #0f766e, var(--brand));
+    color: #04211c;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+  }
+  .logo-name { font-weight: 600; font-size: 14.5px; color: var(--text); letter-spacing: -0.01em; }
+
+  .breadcrumb {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+  }
+  .breadcrumb .crumb-current { color: var(--brand); font-weight: 600; }
+  .breadcrumb .crumb-sep { margin: 0 8px; opacity: 0.5; }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .conn-status {
+    display: flex; align-items: center; gap: 7px;
+    color: var(--brand); font-size: 12px; font-weight: 600;
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+  }
+  .conn-status .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--brand);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .clock {
+    font-variant-numeric: tabular-nums;
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+    color: var(--muted);
+    font-size: 12.5px;
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============ SHELL ============ */
+  .shell { position: relative; z-index: 1; flex: 1; display: flex; min-height: 0; }
+
+  .panel-title {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ============ SCHEMA PANEL ============ */
+  .panel-schema {
+    width: 220px; flex: 0 0 220px;
+    border-right: 1px solid var(--border);
+    padding: 18px 12px 16px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .schema-tree { display: flex; flex-direction: column; gap: 2px; }
+  .tbl-row {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    cursor: default;
+    color: var(--text);
+  }
+  .tbl-row:hover, .tbl.expanded .tbl-row { background: var(--brand-dim); }
+  .chevron { color: var(--muted); font-size: 9px; width: 8px; flex: 0 0 8px; transition: transform 0.25s ease; }
+  .tbl.expanded .chevron { transform: rotate(90deg); color: var(--brand); }
+  .tbl-icon { color: var(--muted); font-size: 11px; opacity: 0.8; }
+  .tbl-name {
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+    font-size: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tbl.expanded .tbl-name { color: var(--brand); font-weight: 600; }
+  .tbl-count {
+    font-size: 10.5px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+  .tbl-fields {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.22,0.9,0.3,1);
+    padding-left: 24px;
+  }
+  .tbl.expanded .tbl-fields { max-height: 160px; }
+  .field {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'SF Mono','JetBrains Mono',monospace;
+    font-size: 11px;
+    color: var(--text);
+    padding: 4px 6px;
+    opacity: 0.85;
+  }
+  .field .ftype { color: var(--muted); font-size: 10px; }
+  .field-more { font-size: 10.5px; color: var(--muted); padding: 4px 6px; font-style: italic; }
+
+  .schema-footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .schema-footer .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); animation: pulse 2s ease-in-out infinite; }
+
+  /* ============ QUERY PLANNER PANEL ============ */
+  .panel-query {
+    flex: 0 0 55%;
+    border-right: 1px solid var(--border);
+    padding: 18px 22px 20px;
+    display: flex; flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+  .query-empty {
+    flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; color: var(--muted);
+  }
+  .query-empty.show { display: flex; }
+  .empty-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono',monospace; font-size: 16px; color: var(--brand); opacity: 0.6;
+  }
+  .empty-hint { font-size: 12.5px; }
+  .empty-sub { font-size: 11px; color: var(--muted); opacity: 0.7; }
+
+  .query-active { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  .query-active.show { display: flex; }
+  .query-session { display: none; flex-direction: column; min-height: 0; }
+  .query-session.show { display: flex; }
+
+  .question-row { margin-bottom: 18px; }
+  .q-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; display: block; font-weight: 700; }
+  .question-bubble {
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 14px;
+    color: var(--text);
+    min-height: 20px;
+  }
+  .cursor {
+    display: inline-block; width: 2px; height: 14px;
+    background: var(--brand); margin-left: 2px; vertical-align: middle;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+  .plan-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .step {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--muted);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .step.show { opacity: 1; transform: translateY(0); color: var(--text); }
+  .step-icon {
+    width: 16px; height: 16px; flex: 0 0 16px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .step-icon.check { background: rgba(45,212,191,0.15); color: var(--brand); border: 1px solid var(--border-strong); }
+  .step-icon.spin {
+    border: 2px solid rgba(45,212,191,0.2);
+    border-top-color: var(--brand);
+    background: transparent;
+  }
+  .step.spinning .step-icon.spin { animation: spin 0.8s linear infinite; }
+
+  .sql-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .sql-block.show { opacity: 1; transform: translateY(0); }
+  .sql-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--muted);
+    font-family: 'SF Mono',monospace;
+  }
+  .exec-badge {
+    color: var(--brand); font-weight: 600;
+    background: var(--brand-dim);
+    border: 1px solid var(--border-strong);
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 10.5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .exec-badge.show { opacity: 1; }
+  .sql-code {
+    margin: 0;
+    padding: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .kw { color: var(--brand); font-weight: 600; }
+  .fn { color: var(--code); }
+  .id { color: var(--text); }
+  .tb { color: #7dd3fc; }
+
+  /* History (renders inside query panel) */
+  .history-list { flex: 1; display: none; flex-direction: column; gap: 8px; min-height: 0; overflow: hidden; }
+  .history-list.show { display: flex; }
+  .hist-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.3s ease, border-color 0.3s ease;
+  }
+  .hist-row.show { opacity: 1; transform: translateX(0); }
+  .hist-row.hovered { background: var(--brand-dim); border-color: var(--border-strong); }
+  .hist-time { flex: 0 0 60px; color: var(--muted); font-family: 'SF Mono',monospace; font-size: 11px; }
+  .hist-main { flex: 1 1 auto; min-width: 0; }
+  .hist-q { font-size: 12.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-tables { font-size: 10.5px; color: var(--muted); font-family: 'SF Mono',monospace; margin-top: 3px; }
+  .hist-rows { flex: 0 0 auto; font-size: 11px; color: var(--muted); font-family: 'SF Mono',monospace; }
+  .hist-rerun {
+    flex: 0 0 auto;
+    font-size: 11px; font-weight: 600; color: var(--brand);
+    background: rgba(45,212,191,0.12);
+    border: 1px solid var(--border-strong);
+    padding: 4px 10px; border-radius: 6px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .hist-row.hovered .hist-rerun { opacity: 1; transform: translateX(0); }
+
+  /* ============ RESULTS PANEL ============ */
+  .panel-results {
+    flex: 1 1 auto;
+    padding: 18px 22px 20px;
+    display: flex; flex-direction: column;
+    min-width: 0; min-height: 0;
+  }
+  .results-empty {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 12.5px; text-align: center; padding: 0 10px;
+  }
+  .results-empty.hide { display: none; }
+
+  .results-body { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  .results-body.show { display: flex; }
+
+  .table-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .t-head-row, .t-row, .t-total-row {
+    display: grid; grid-template-columns: 1fr 1fr; padding: 9px 14px;
+  }
+  .t-head-row {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .t-row {
+    font-size: 12.5px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .t-row.show { opacity: 1; transform: translateX(0); }
+  .t-row:last-of-type { border-bottom: none; }
+  .t-row .branch { color: var(--text); }
+  .t-row .clients, .t-total-row .clients {
+    text-align: right; color: var(--brand); font-weight: 600;
+    font-family: 'SF Mono',monospace;
+  }
+  .t-total-row {
+    font-size: 12.5px; font-weight: 700; border-top: 1px solid var(--border-strong);
+    background: rgba(45,212,191,0.05);
+    opacity: 0; transition: opacity 0.35s ease;
+  }
+  .t-total-row.show { opacity: 1; }
+  .t-total-row .branch { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.08em; align-self: center; }
+  .t-total-row .clients { font-size: 14px; }
+
+  .results-footer {
+    margin-top: 14px;
+    font-size: 11px; color: var(--muted);
+    font-family: 'SF Mono',monospace;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .results-footer.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="glow-field"></div>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">&gt;_</div>
+      <div class="logo-name">Ask in Plain English</div>
+    </div>
+    <div class="breadcrumb">query-planner<span class="crumb-sep">/</span><span class="crumb-current" id="crumb">Schema Explorer</span></div>
+    <div class="topbar-right">
+      <div class="conn-status"><span class="dot"></span>prod-replica (read-only)</div>
+      <div class="clock" id="clock">09:41:03</div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SCHEMA PANEL -->
+    <aside class="panel-schema">
+      <div class="panel-title">Schema</div>
+      <div class="schema-tree">
+        <div class="tbl" id="tbl-client_master">
+          <div class="tbl-row"><span class="chevron">&#9656;</span><span class="tbl-icon">&#9638;</span><span class="tbl-name">client_master</span><span class="tbl-count">12</span></div>
+          <div class="tbl-fields">
+            <div class="field">client_uuid <span class="ftype">uuid</span></div>
+            <div class="field">branch <span class="ftype">text</span></div>
+            <div class="field">active_status <span class="ftype">bool</span></div>
+            <div class="field">created_at <span class="ftype">timestamp</span></div>
+            <div class="field-more">+8 more fields</div>
+          </div>
+        </div>
+        <div class="tbl" id="tbl-staff_active">
+          <div class="tbl-row"><span class="chevron">&#9656;</span><span class="tbl-icon">&#9638;</span><span class="tbl-name">staff_active</span><span class="tbl-count">8</span></div>
+        </div>
+        <div class="tbl" id="tbl-invoices">
+          <div class="tbl-row"><span class="chevron">&#9656;</span><span class="tbl-icon">&#9638;</span><span class="tbl-name">invoices</span><span class="tbl-count">15</span></div>
+        </div>
+        <div class="tbl" id="tbl-branches">
+          <div class="tbl-row"><span class="chevron">&#9656;</span><span class="tbl-icon">&#9638;</span><span class="tbl-name">branches</span><span class="tbl-count">4</span></div>
+        </div>
+      </div>
+      <div class="schema-footer"><span class="dot"></span>4 tables indexed</div>
+    </aside>
+
+    <!-- QUERY PLANNER PANEL -->
+    <section class="panel-query">
+      <div class="panel-title">Query Planner</div>
+
+      <div class="query-empty" id="query-empty">
+        <div class="empty-icon">?</div>
+        <div class="empty-hint">Enter a question to generate a query</div>
+        <div class="empty-sub">Plain English in. SQL out.</div>
+      </div>
+
+      <div class="query-active" id="query-active">
+        <div class="query-session" id="query-session">
+        <div class="question-row">
+          <span class="q-label">You asked</span>
+          <div class="question-bubble"><span id="question-text"></span><span class="cursor" id="q-cursor"></span></div>
+        </div>
+        <div class="plan-steps" id="plan-steps">
+          <div class="step" id="step-1"><span class="step-icon check">&#10003;</span><span class="step-text">Read schema &mdash; client_master.branch</span></div>
+          <div class="step" id="step-2"><span class="step-icon check">&#10003;</span><span class="step-text">Group by branch, count distinct client_uuid</span></div>
+          <div class="step" id="step-3"><span class="step-icon spin" id="step-3-icon"></span><span class="step-text" id="step-3-text">Generate SQL...</span></div>
+        </div>
+        <div class="sql-block" id="sql-block">
+          <div class="sql-block-header"><span>generated_query.sql</span><span class="exec-badge" id="exec-badge">Executed &middot; 28ms</span></div>
+          <pre class="mono sql-code"><span class="kw">SELECT</span> <span class="id">branch</span>, <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="id">client_uuid</span>) <span class="kw">AS</span> <span class="id">clients</span>
+<span class="kw">FROM</span> <span class="tb">client_master</span>
+<span class="kw">GROUP BY</span> <span class="id">branch</span>
+<span class="kw">ORDER BY</span> <span class="id">clients</span> <span class="kw">DESC</span></pre>
+        </div>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="hist-row" id="hist-1">
+            <span class="hist-time">09:41:12</span>
+            <div class="hist-main">
+              <div class="hist-q">How many clients does each office manage?</div>
+              <div class="hist-tables">client_master</div>
+            </div>
+            <span class="hist-rows">6 rows</span>
+            <span class="hist-rerun">Re-run</span>
+          </div>
+          <div class="hist-row" id="hist-2">
+            <span class="hist-time">09:38:47</span>
+            <div class="hist-main">
+              <div class="hist-q">List invoices overdue by more than 30 days</div>
+              <div class="hist-tables">invoices</div>
+            </div>
+            <span class="hist-rows">142 rows</span>
+            <span class="hist-rerun">Re-run</span>
+          </div>
+          <div class="hist-row" id="hist-3">
+            <span class="hist-time">09:35:03</span>
+            <div class="hist-main">
+              <div class="hist-q">Which staff members are active in Jeddah?</div>
+              <div class="hist-tables">staff_active, branches</div>
+            </div>
+            <span class="hist-rows">23 rows</span>
+            <span class="hist-rerun">Re-run</span>
+          </div>
+          <div class="hist-row" id="hist-4">
+            <span class="hist-time">09:31:56</span>
+            <div class="hist-main">
+              <div class="hist-q">Total revenue by branch this quarter</div>
+              <div class="hist-tables">invoices, branches</div>
+            </div>
+            <span class="hist-rows">6 rows</span>
+            <span class="hist-rerun">Re-run</span>
+          </div>
+          <div class="hist-row" id="hist-5">
+            <span class="hist-time">09:28:14</span>
+            <div class="hist-main">
+              <div class="hist-q">Show clients with no invoices in the last 90 days</div>
+              <div class="hist-tables">client_master, invoices</div>
+            </div>
+            <span class="hist-rows">88 rows</span>
+            <span class="hist-rerun">Re-run</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS PANEL -->
+    <section class="panel-results">
+      <div class="panel-title">Results</div>
+      <div class="results-empty" id="results-empty">Results will appear here</div>
+      <div class="results-body" id="results-body">
+        <div class="table-wrap">
+          <div class="t-head-row"><span>Branch</span><span style="text-align:right;">Clients</span></div>
+          <div class="t-row" id="row-riyadh"><span class="branch">Riyadh</span><span class="clients">2,660</span></div>
+          <div class="t-row" id="row-khobar"><span class="branch">Khobar</span><span class="clients">920</span></div>
+          <div class="t-row" id="row-jeddah"><span class="branch">Jeddah</span><span class="clients">375</span></div>
+          <div class="t-row" id="row-qassim"><span class="branch">Qassim</span><span class="clients">57</span></div>
+          <div class="t-row" id="row-bahrain"><span class="branch">Bahrain</span><span class="clients">19</span></div>
+          <div class="t-row" id="row-egypt"><span class="branch">Egypt</span><span class="clients">15</span></div>
+          <div class="t-total-row" id="row-total"><span class="branch">Total</span><span class="clients">4,081</span></div>
+        </div>
+        <div class="results-footer" id="results-footer">Source: client_master &middot; Grouped by branch &middot; 6 rows &middot; 28ms</div>
+      </div>
+    </section>
+  </div>
+
+<script>
+(function(){
+  var VIEW_MS = 3500;
+  var LOOP = VIEW_MS * 4;
+  var VIEW_NAMES = ['Schema Explorer', 'Query Planning', 'Results', 'History'];
+  var MESSAGE = 'How many clients does each office manage?';
+  var TYPE_START = 150;
+  var CHAR_MS = 34;
+
+  var els = {
+    crumb: document.getElementById('crumb'),
+    tblClientMaster: document.getElementById('tbl-client_master'),
+    queryEmpty: document.getElementById('query-empty'),
+    queryActive: document.getElementById('query-active'),
+    querySession: document.getElementById('query-session'),
+    questionText: document.getElementById('question-text'),
+    qCursor: document.getElementById('q-cursor'),
+    step1: document.getElementById('step-1'),
+    step2: document.getElementById('step-2'),
+    step3: document.getElementById('step-3'),
+    step3Icon: document.getElementById('step-3-icon'),
+    step3Text: document.getElementById('step-3-text'),
+    sqlBlock: document.getElementById('sql-block'),
+    execBadge: document.getElementById('exec-badge'),
+    historyList: document.getElementById('history-list'),
+    resultsEmpty: document.getElementById('results-empty'),
+    resultsBody: document.getElementById('results-body'),
+    resultsFooter: document.getElementById('results-footer')
+  };
+
+  var rows = ['riyadh','khobar','jeddah','qassim','bahrain','egypt'].map(function(k){
+    return document.getElementById('row-' + k);
+  });
+  var rowTotal = document.getElementById('row-total');
+  var histRows = [1,2,3,4,5].map(function(n){ return document.getElementById('hist-' + n); });
+
+  function setShow(el, on, cls){
+    cls = cls || 'show';
+    if (!el) return;
+    if (on) { if (!el.classList.contains(cls)) el.classList.add(cls); }
+    else { el.classList.remove(cls); }
+  }
+
+  var start = performance.now();
+
+  function render(now){
+    var t = (now - start) % LOOP;
+    var view = Math.floor(t / VIEW_MS);
+    var tv = t - view * VIEW_MS;
+
+    els.crumb.textContent = VIEW_NAMES[view];
+
+    // ---- schema tree: expand client_master shortly after loop starts, stays open ----
+    setShow(els.tblClientMaster, t > 500 || view > 0, 'expanded');
+
+    // ---- VIEW 0: Schema Explorer ----
+    // ---- VIEW 1: Query Planning ----
+    var showQueryActive = (view === 1) || (view === 2) || (view === 3);
+    setShow(els.queryEmpty, view === 0);
+    setShow(els.queryActive, showQueryActive);
+    setShow(els.querySession, view === 1 || view === 2);
+    setShow(els.historyList, view === 3);
+
+    if (view === 1) {
+      var chars = 0;
+      if (tv >= TYPE_START) chars = Math.min(MESSAGE.length, Math.floor((tv - TYPE_START) / CHAR_MS));
+      els.questionText.textContent = MESSAGE.substring(0, chars);
+      setShow(els.qCursor, chars < MESSAGE.length);
+
+      setShow(els.step1, tv >= 1500);
+      setShow(els.step2, tv >= 1850);
+      setShow(els.step3, tv >= 2200);
+      var spinning = tv >= 2200 && tv < 3100;
+      setShow(els.step3, spinning || tv >= 2200, 'spinning');
+      if (tv >= 3100) {
+        els.step3Icon.className = 'step-icon check';
+        els.step3Icon.textContent = '✓';
+        els.step3Text.textContent = 'SQL generated';
+      } else {
+        els.step3Icon.className = 'step-icon spin';
+        els.step3Icon.textContent = '';
+        els.step3Text.textContent = 'Generate SQL...';
+      }
+      setShow(els.sqlBlock, tv >= 3200);
+      setShow(els.execBadge, false);
+    } else if (view === 2) {
+      els.questionText.textContent = MESSAGE;
+      setShow(els.qCursor, false);
+      setShow(els.step1, true);
+      setShow(els.step2, true);
+      setShow(els.step3, true);
+      els.step3Icon.className = 'step-icon check';
+      els.step3Icon.textContent = '✓';
+      els.step3Text.textContent = 'SQL generated';
+      setShow(els.sqlBlock, true);
+      setShow(els.execBadge, true);
+    }
+
+    // ---- VIEW 2: Results ----
+    var showResults = view === 2;
+    setShow(els.resultsBody, showResults);
+    setShow(els.resultsEmpty, !showResults, 'hide');
+    if (showResults) {
+      var rowTimes = [300, 550, 800, 1050, 1300, 1550];
+      rows.forEach(function(el, i){ setShow(el, tv >= rowTimes[i]); });
+      setShow(rowTotal, tv >= 1850);
+      setShow(els.resultsFooter, tv >= 2150);
+    } else {
+      rows.forEach(function(el){ setShow(el, false); });
+      setShow(rowTotal, false);
+      setShow(els.resultsFooter, false);
+    }
+
+    // ---- VIEW 3: History ----
+    if (view === 3) {
+      var histTimes = [150, 380, 610, 840, 1070];
+      histRows.forEach(function(el, i){ setShow(el, tv >= histTimes[i]); });
+      var hoverIdx = Math.floor((tv - 1400) / 550);
+      histRows.forEach(function(el, i){ setShow(el, tv >= 1400 && i === (hoverIdx % 5 + 5) % 5, 'hovered'); });
+    } else {
+      histRows.forEach(function(el){ setShow(el, false); setShow(el, false, 'hovered'); });
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+
+  // live clock (real wall time, cosmetic)
+  var clockEl = document.getElementById('clock');
+  var base = new Date('2026-01-01T09:41:03');
+  function tick(){
+    base.setSeconds(base.getSeconds() + 1);
+    var p = function(n){ return String(n).padStart(2,'0'); };
+    clockEl.textContent = p(base.getHours()) + ':' + p(base.getMinutes()) + ':' + p(base.getSeconds());
+  }
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
