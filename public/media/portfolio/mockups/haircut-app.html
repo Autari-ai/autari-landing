@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Haircut Advisor</title>
+<style>
+  :root {
+    --bg: #0c0a12;
+    --surface: #13101e;
+    --surface-2: #17131f;
+    --border: rgba(167,139,250,0.15);
+    --brand: #7c3aed;
+    --brand-light: #a78bfa;
+    --brand-dim: rgba(124,58,237,0.12);
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* ambient purple glow */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(620px 440px at 82% -8%, rgba(124,58,237,0.14), transparent 65%),
+      radial-gradient(520px 420px at 6% 105%, rgba(167,139,250,0.08), transparent 65%);
+  }
+
+  .topbar, .main { position: relative; z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 60px;
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(19,16,30,0.7);
+    backdrop-filter: blur(6px);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 11px; }
+  .logo-mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(167,139,250,0.35);
+    color: var(--brand-light);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(124,58,237,0.3);
+  }
+  .logo-name { font-weight: 600; font-size: 15.5px; letter-spacing: -0.01em; }
+  .logo-name span { color: var(--brand-light); font-weight: 700; }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12.5px; }
+  .offline-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(167,139,250,0.3);
+    color: var(--brand-light);
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+  }
+  .offline-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74,222,128,0.8);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.82); }
+  }
+  .step-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .step-indicator .sep { opacity: 0.4; }
+
+  /* ============ MAIN ============ */
+  .main { flex: 1; min-height: 0; padding: 36px 48px; display: flex; flex-direction: column; }
+  .view { display: none; height: 100%; flex-direction: column; min-height: 0; }
+  .view.active { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ VIEW 1: UPLOAD ============ */
+  #view-upload { align-items: center; justify-content: center; }
+  .upload-wrap { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .upload-card {
+    width: 460px;
+    padding: 52px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    border-style: dashed;
+    border-color: rgba(167,139,250,0.3);
+    background: linear-gradient(180deg, rgba(124,58,237,0.05), transparent);
+  }
+  .camera-icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: var(--brand-dim);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--brand-light);
+  }
+  .upload-title { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .upload-sub { font-size: 13px; color: var(--muted); margin-top: -10px; }
+  .browse-btn {
+    margin-top: 6px;
+    padding: 10px 22px;
+    border-radius: 9px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 4px 18px rgba(124,58,237,0.35);
+  }
+  .privacy-line {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .privacy-line svg { flex: 0 0 auto; color: var(--brand-light); }
+  .hint-line { font-size: 12.5px; color: var(--muted); opacity: 0.7; font-style: italic; }
+
+  /* ============ VIEW 2: ANALYSIS ============ */
+  #view-analysis { flex-direction: row; gap: 28px; align-items: stretch; }
+  .photo-panel {
+    flex: 0 0 340px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+  }
+  .photo-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: 560px;
+    aspect-ratio: 4 / 5;
+    border-radius: 10px;
+    background: linear-gradient(160deg, #1c1730, #0f0c18);
+    border: 1px solid rgba(167,139,250,0.18);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .face-guide {
+    width: 62%;
+    opacity: 0.55;
+  }
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--brand-light), transparent);
+    box-shadow: 0 0 12px 2px rgba(167,139,250,0.7);
+    animation: scan 2.6s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0% { top: 6%; opacity: 0; }
+    10% { opacity: 1; }
+    50% { top: 92%; opacity: 1; }
+    60% { opacity: 0; }
+    100% { top: 6%; opacity: 0; }
+  }
+  .analysis-steps { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 0 12px; }
+  .steps-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .steps-sub { font-size: 13px; color: var(--muted); margin-top: -14px; margin-bottom: 8px; }
+  .step {
+    display: flex; align-items: center; gap: 14px;
+    opacity: 0;
+  }
+  .view.active .step { animation: fadeUp 0.45s ease-out forwards; }
+  .step:nth-child(3) { animation-delay: 0.05s; }
+  .step:nth-child(4) { animation-delay: 0.75s; }
+  .step:nth-child(5) { animation-delay: 1.45s; }
+  .step:nth-child(6) { animation-delay: 2.15s; }
+  .check-badge {
+    flex: 0 0 26px; width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--brand-dim);
+    border: 1px solid rgba(167,139,250,0.4);
+    color: var(--brand-light);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-text { font-size: 14.5px; color: var(--text); }
+  .step.final .step-text { font-weight: 700; color: var(--brand-light); }
+  .step.final .check-badge { background: var(--brand); color: #fff; box-shadow: 0 0 14px rgba(124,58,237,0.5); }
+
+  /* ============ VIEW 3: RESULTS ============ */
+  #view-results { flex-direction: row; gap: 24px; align-items: stretch; }
+  .shape-card { flex: 0 0 400px; padding: 28px; display: flex; flex-direction: column; }
+  .shape-card-title { font-size: 17px; font-weight: 600; margin-bottom: 20px; letter-spacing: -0.01em; }
+  .shape-svg-wrap { display: flex; justify-content: center; margin-bottom: 22px; }
+  .measurements { display: flex; flex-direction: column; gap: 16px; margin-top: auto; }
+  .measure-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+  .measure-label { color: var(--muted); }
+  .measure-value { font-weight: 700; color: var(--text); }
+  .measure-bar { height: 6px; border-radius: 3px; background: rgba(148,163,184,0.12); overflow: hidden; }
+  .measure-fill { height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-light)); border-radius: 3px; }
+
+  .recs-panel { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .recs-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
+  .rec-card {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+  }
+  .rec-card.rank-1 { border-color: rgba(167,139,250,0.4); background: linear-gradient(90deg, rgba(124,58,237,0.08), transparent); }
+  .rec-rank {
+    flex: 0 0 34px;
+    font-size: 15px; font-weight: 800;
+    color: var(--muted);
+  }
+  .rec-card.rank-1 .rec-rank { color: var(--brand-light); }
+  .rec-body { flex: 1; min-width: 0; }
+  .rec-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .rec-bar { height: 7px; border-radius: 4px; background: rgba(148,163,184,0.12); overflow: hidden; }
+  .rec-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--brand-light)); }
+  .rec-score { flex: 0 0 auto; font-size: 18px; font-weight: 800; color: var(--brand-light); }
+
+  /* ============ VIEW 4: STAR MATCHES ============ */
+  .stars-header { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
+  .stars-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .stars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; flex: 1; min-height: 0; }
+  .star-card { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .star-photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 9px;
+    background: linear-gradient(150deg, #1c1730, #0f0c18);
+    border: 1px solid rgba(167,139,250,0.15);
+  }
+  .star-name { font-size: 14.5px; font-weight: 700; }
+  .star-cut { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .star-cut strong { color: var(--brand-light); font-weight: 600; }
+  .star-score-row { display: flex; align-items: center; gap: 8px; }
+  .star-bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(148,163,184,0.12); overflow: hidden; }
+  .star-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--brand), var(--brand-light)); }
+  .star-pct { font-size: 12px; font-weight: 700; color: var(--brand-light); flex: 0 0 auto; }
+  .view-cut-btn {
+    margin-top: auto;
+    padding: 9px 0;
+    border-radius: 8px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(167,139,250,0.35);
+    color: var(--brand-light);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 3c-4 0-6 3-6 7 0 2 .5 3.6 1.3 5-.6.6-1.3 1.6-1.3 3 0 1.7 1.3 3 3 3 1 0 1.8-.4 2.4-1 .6.6 1.4 1 2.4 1 1.7 0 3-1.3 3-3 0-1.4-.7-2.4-1.3-3 .8-1.4 1.3-3 1.3-5 0-4-2-7-6-7z"/>
+          <path d="M9 13.5c0 1.5.8 2.5 2 2.5"/>
+        </svg>
+      </div>
+      <div class="logo-name">Haircut<span>AI</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="step-indicator" id="step-indicator">Upload photo</div>
+      <span class="sep">&middot;</span>
+      <div class="offline-badge"><span class="offline-dot"></span>Runs offline</div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- VIEW 1: UPLOAD -->
+    <section class="view" id="view-upload">
+      <div class="upload-wrap">
+        <div class="surface upload-card">
+          <div class="camera-icon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 4.5 8 6H5a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 5 18h14a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 19 6h-3l-1-1.5H9Z"/>
+              <circle cx="12" cy="12" r="3.4"/>
+            </svg>
+          </div>
+          <div class="upload-title">Drop your photo here</div>
+          <div class="upload-sub">or click to browse &middot; JPG, PNG up to 10MB</div>
+          <button class="browse-btn">Choose photo</button>
+        </div>
+        <div class="privacy-line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="11" width="14" height="9" rx="2"/>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          </svg>
+          Works offline &mdash; your photo never leaves your device.
+        </div>
+        <div class="hint-line">Analysing face shape and geometry...</div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: ANALYSIS RUNNING -->
+    <section class="view" id="view-analysis">
+      <div class="surface photo-panel">
+        <div class="photo-placeholder">
+          <div class="scan-line"></div>
+          <svg class="face-guide" viewBox="0 0 120 150" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="1.2">
+            <ellipse cx="60" cy="70" rx="38" ry="52"/>
+            <line x1="22" y1="45" x2="98" y2="45" stroke-dasharray="3 3"/>
+            <line x1="26" y1="105" x2="94" y2="105" stroke-dasharray="3 3"/>
+            <circle cx="44" cy="65" r="2.2" fill="rgba(167,139,250,0.7)"/>
+            <circle cx="76" cy="65" r="2.2" fill="rgba(167,139,250,0.7)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="analysis-steps">
+        <div class="steps-title">Reading face shape...</div>
+        <div class="steps-sub">Processing entirely on-device</div>
+        <div class="step"><span class="check-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-text">Face detected</span></div>
+        <div class="step"><span class="check-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-text">Landmarks mapped (68 points)</span></div>
+        <div class="step"><span class="check-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-text">Geometry measured</span></div>
+        <div class="step final"><span class="check-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-text">Shape classified: Oval</span></div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: RESULTS -->
+    <section class="view" id="view-results">
+      <div class="surface shape-card">
+        <div class="shape-card-title">Oval face shape detected</div>
+        <div class="shape-svg-wrap">
+          <svg width="130" height="160" viewBox="0 0 120 150" fill="none" stroke="var(--brand-light)" stroke-width="1.4">
+            <ellipse cx="60" cy="72" rx="36" ry="50" fill="rgba(124,58,237,0.06)"/>
+            <line x1="24" y1="46" x2="96" y2="46" stroke-dasharray="3 3" opacity="0.6"/>
+            <line x1="28" y1="106" x2="92" y2="106" stroke-dasharray="3 3" opacity="0.6"/>
+            <line x1="60" y1="22" x2="60" y2="122" stroke-dasharray="2 4" opacity="0.35"/>
+          </svg>
+        </div>
+        <div class="measurements">
+          <div>
+            <div class="measure-row"><span class="measure-label">Face width ratio</span><span class="measure-value">0.72</span></div>
+            <div class="measure-bar"><div class="measure-fill" style="width:72%"></div></div>
+          </div>
+          <div>
+            <div class="measure-row"><span class="measure-label">Jawline score</span><span class="measure-value">0.81</span></div>
+            <div class="measure-bar"><div class="measure-fill" style="width:81%"></div></div>
+          </div>
+          <div>
+            <div class="measure-row"><span class="measure-label">Forehead width</span><span class="measure-value">0.69</span></div>
+            <div class="measure-bar"><div class="measure-fill" style="width:69%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="recs-panel">
+        <div class="recs-title">Recommended haircuts</div>
+        <div class="surface rec-card rank-1">
+          <div class="rec-rank">#1</div>
+          <div class="rec-body">
+            <div class="rec-name">Textured crop</div>
+            <div class="rec-bar"><div class="rec-fill" style="width:98%"></div></div>
+          </div>
+          <div class="rec-score">98%</div>
+        </div>
+        <div class="surface rec-card">
+          <div class="rec-rank">#2</div>
+          <div class="rec-body">
+            <div class="rec-name">Undercut fade</div>
+            <div class="rec-bar"><div class="rec-fill" style="width:91%"></div></div>
+          </div>
+          <div class="rec-score">91%</div>
+        </div>
+        <div class="surface rec-card">
+          <div class="rec-rank">#3</div>
+          <div class="rec-body">
+            <div class="rec-name">Classic side part</div>
+            <div class="rec-bar"><div class="rec-fill" style="width:84%"></div></div>
+          </div>
+          <div class="rec-score">84%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: STAR MATCHES -->
+    <section class="view" id="view-stars">
+      <div class="stars-header">Celebrity matches</div>
+      <div class="stars-sub">People who share your oval face shape</div>
+      <div class="stars-grid">
+        <div class="surface star-card">
+          <div class="star-photo"></div>
+          <div class="star-name">Brad Pitt</div>
+          <div class="star-cut">This cut on them: <strong>Fight Club crop</strong></div>
+          <div class="star-score-row"><div class="star-bar"><div class="star-fill" style="width:94%"></div></div><span class="star-pct">94%</span></div>
+          <button class="view-cut-btn">View cut</button>
+        </div>
+        <div class="surface star-card">
+          <div class="star-photo"></div>
+          <div class="star-name">Ryan Gosling</div>
+          <div class="star-cut">This cut on them: <strong>Textured quiff</strong></div>
+          <div class="star-score-row"><div class="star-bar"><div class="star-fill" style="width:91%"></div></div><span class="star-pct">91%</span></div>
+          <button class="view-cut-btn">View cut</button>
+        </div>
+        <div class="surface star-card">
+          <div class="star-photo"></div>
+          <div class="star-name">Timothee Chalamet</div>
+          <div class="star-cut">This cut on them: <strong>Curtain fringe crop</strong></div>
+          <div class="star-score-row"><div class="star-bar"><div class="star-fill" style="width:89%"></div></div><span class="star-pct">89%</span></div>
+          <button class="view-cut-btn">View cut</button>
+        </div>
+        <div class="surface star-card">
+          <div class="star-photo"></div>
+          <div class="star-name">Chris Hemsworth</div>
+          <div class="star-cut">This cut on them: <strong>Classic pompadour</strong></div>
+          <div class="star-score-row"><div class="star-bar"><div class="star-fill" style="width:86%"></div></div><span class="star-pct">86%</span></div>
+          <button class="view-cut-btn">View cut</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+<script>
+  const views = ['upload', 'analysis', 'results', 'stars'];
+  const stepLabels = ['Upload photo', 'Analysing...', 'Results ready', 'Celebrity matches'];
+  const stepIndicator = document.getElementById('step-indicator');
+  let current = 0;
+
+  function restartStepAnimations() {
+    const steps = document.querySelectorAll('#view-analysis .step');
+    steps.forEach(s => {
+      s.style.animation = 'none';
+      void s.offsetWidth;
+      s.style.animation = '';
+    });
+  }
+
+  function showView(i) {
+    views.forEach((v, idx) => {
+      document.getElementById('view-' + v).classList.toggle('active', idx === i);
+    });
+    stepIndicator.textContent = stepLabels[i];
+    current = i;
+    if (views[i] === 'analysis') {
+      restartStepAnimations();
+    }
+  }
+
+  showView(0);
+  setInterval(() => {
+    showView((current + 1) % views.length);
+  }, 3500);
+</script>
+</body>
+</html>
