@@ -4,339 +4,356 @@
 <meta charset="UTF-8">
 <title>Jagent</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg: #060A12;
-  --glass-bg: rgba(255,255,255,0.10);
-  --glass-border: rgba(255,255,255,0.12);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
-  --brand: #7C5CFF;
-  --brand-dim: rgba(124,92,255,0.15);
-  --brand-border: rgba(124,92,255,0.35);
-  --text: #F0F6FC;
-  --muted: #94A3B8;
-  --radius: 14px;
-  --gray-series: #6B7688;
+  --bg: #0d0d0d;
+  --bg-surface: #161616;
+  --bg-hover: #1e1e1e;
+  --border: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.16);
+  --brand: #22c55e;
+  --brand-dim: rgba(34,197,94,0.1);
+  --brand-border: rgba(34,197,94,0.3);
+  --text: #e4e4e7;
+  --muted: #71717a;
+  --gray-series: #52525b;
+  --cursor: #22c55e;
+  --radius: 6px;
 }
 * { box-sizing: border-box; }
-body { margin:0; background:#060A12; color:#F0F6FC; font-family:'Inter',system-ui,sans-serif; font-size:14px; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
-.glass { background:rgba(255,255,255,0.10); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.12); border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.5),inset 0 -1px 0 rgba(255,255,255,0.1); position:relative; }
-.glass::before { content:''; position:absolute; top:0; left:20px; right:20px; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); pointer-events:none; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono','SF Mono','Monaco','Consolas',monospace;
+  font-size: 13px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+/* subtle scanline overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+.surface { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); }
+
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
 
 /* ---------- Top bar ---------- */
 .topbar {
-  height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
-  padding:0 20px; background:rgba(255,255,255,0.04); backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--glass-border);
+  height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px; background: #111111; border-bottom: 1px solid var(--border);
 }
-.brand { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
-.logo-mark {
-  width:26px; height:26px; border-radius:8px; background:var(--brand); color:#fff;
-  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;
-  box-shadow:0 0 16px rgba(124,92,255,0.55);
-}
-.brand-name { font-weight:600; font-size:15px; letter-spacing:0.2px; }
-.breadcrumb { flex:1; text-align:center; color:var(--muted); font-size:13px; }
-.status-clock { flex:0 0 auto; display:flex; align-items:center; gap:18px; }
-.connected { display:flex; align-items:center; gap:6px; color:var(--brand); font-size:13px; font-weight:500; }
-.connected-dot { width:7px; height:7px; border-radius:50%; background:var(--brand); box-shadow:0 0 8px var(--brand); }
-.clock { color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; min-width:64px; }
+.brand { display: flex; align-items: baseline; gap: 2px; flex: 0 0 auto; color: var(--brand); font-weight: 600; font-size: 14px; }
+.brand .caret { color: var(--muted); margin-right: 6px; }
+.brand .cursor-blink { color: var(--brand); animation: blink 1s step-start infinite; margin-left: 1px; }
+.breadcrumb { flex: 1; text-align: center; color: var(--muted); font-size: 12.5px; }
+.status-clock { flex: 0 0 auto; display: flex; align-items: center; gap: 16px; }
+.model-info { color: var(--muted); font-size: 12px; }
+.connected { color: var(--brand); font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+.clock { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
 
 /* ---------- App body ---------- */
-.app-body { flex:1; display:flex; overflow:hidden; }
+.app-body { flex: 1; display: flex; overflow: hidden; }
 
 .sidebar {
-  width:240px; flex-shrink:0; margin:16px 0 16px 16px; padding:16px; display:flex; flex-direction:column;
+  width: 220px; flex-shrink: 0; margin: 14px 0 14px 14px; padding: 14px 10px; display: flex; flex-direction: column;
 }
-.nav { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+.nav { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
 .nav-item {
-  padding:10px 12px; border-radius:10px; color:var(--muted); font-size:14px; font-weight:500;
-  border:1px solid transparent; cursor:default; transition:all .2s ease;
-  display:flex; align-items:center; gap:10px;
+  padding: 7px 10px; border-radius: var(--radius); color: var(--muted); font-size: 13px;
+  cursor: default; display: flex; align-items: center; gap: 6px;
 }
-.nav-item .nav-dot { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.5; }
-.nav-item.active {
-  color:var(--text); background:var(--brand-dim); border-color:var(--brand-border);
-  box-shadow:0 0 18px rgba(124,92,255,0.35);
+.nav-item .prefix { width: 12px; color: var(--brand); flex-shrink: 0; }
+.nav-item.active { color: var(--text); background: var(--brand-dim); }
+.sidebar-footer {
+  margin-top: auto; color: var(--brand); font-size: 11.5px; padding-top: 12px; border-top: 1px solid var(--border);
 }
-.nav-item.active .nav-dot { background:var(--brand); opacity:1; box-shadow:0 0 6px var(--brand); }
-.sidebar-footer { margin-top:auto; display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12.5px; padding-top:14px; border-top:1px solid var(--glass-border); }
-.sidebar-footer .dot { width:7px; height:7px; border-radius:50%; background:var(--brand); box-shadow:0 0 8px var(--brand); flex-shrink:0; }
 
-.main { flex:1; display:flex; overflow:hidden; padding:16px; gap:16px; position:relative; }
+.main { flex: 1; display: flex; overflow: hidden; padding: 14px; gap: 14px; position: relative; }
 
-.screen { position:absolute; inset:16px; display:none; gap:16px; }
-.screen.active { display:flex; }
+.screen { position: absolute; inset: 14px; display: none; gap: 14px; }
+.screen.active { display: flex; }
 
 /* ---------- Chat panel ---------- */
-.chat-panel { flex:0 0 55%; display:flex; flex-direction:column; padding:18px; overflow:hidden; min-width:0; }
-.chat-messages { flex:1; overflow:hidden; display:flex; flex-direction:column; gap:14px; }
-.msg { display:flex; }
-.msg-user { justify-content:flex-end; }
-.msg-ai { justify-content:flex-start; }
-.bubble { max-width:88%; padding:12px 14px; border-radius:12px; font-size:13.5px; line-height:1.5; }
-.bubble-user { background:var(--brand-dim); border:1px solid var(--brand-border); color:var(--text); border-bottom-right-radius:4px; }
-.bubble-ai { background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); color:var(--text); border-bottom-left-radius:4px; }
-.msg.faded { opacity:.45; }
-.bubble.small { font-size:12px; padding:8px 12px; }
+.chat-panel { flex: 0 0 55%; display: flex; flex-direction: column; padding: 16px; overflow: hidden; min-width: 0; }
+.chat-messages { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+.line { font-size: 13px; line-height: 1.6; }
+.line-user { color: var(--text); }
+.line-user .prompt { color: var(--brand); margin-right: 8px; }
+.line-user.small { font-size: 12px; }
+.line-ai { color: var(--text); border-left: 2px solid var(--border); padding-left: 12px; }
+.line-ai.small { font-size: 12px; color: var(--muted); }
+.line.faded { opacity: .4; }
 
-.data-table { border-collapse:collapse; width:100%; font-size:13px; }
-.data-table th { text-align:left; color:var(--muted); font-weight:500; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; padding:0 8px 6px 0; border-bottom:1px solid var(--glass-border); }
-.data-table th:last-child, .data-table td:last-child { text-align:right; }
-.data-table td { padding:5px 8px 5px 0; color:var(--text); }
-.data-table tbody tr:not(:last-child) td { border-bottom:1px solid rgba(255,255,255,0.05); }
-.data-table tfoot td { padding-top:8px; border-top:1px solid var(--glass-border); font-weight:600; color:var(--brand); }
-.source-note { margin-top:10px; color:var(--muted); font-size:11.5px; }
+.data-table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-family: inherit; }
+.data-table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; padding: 0 10px 6px 0; border-bottom: 1px solid var(--border-strong); }
+.data-table th:last-child, .data-table td:last-child { text-align: right; }
+.data-table td { padding: 5px 10px 5px 0; color: var(--text); border-bottom: 1px solid var(--border); }
+.data-table tbody tr:last-child td { border-bottom: 1px solid var(--border); }
+.data-table tfoot td { padding-top: 8px; border-top: 1px solid var(--border-strong); border-bottom: none; font-weight: 600; color: var(--brand); }
+.source-note { margin-top: 10px; color: var(--muted); font-size: 11px; }
+.source-note .cmt { color: var(--gray-series); margin-right: 4px; }
 
-.thinking-indicator { display:none; gap:6px; padding:12px 14px; align-items:center; }
-.thinking-indicator .dot { width:8px; height:8px; border-radius:50%; background:var(--brand); animation:pulse 1.2s ease-in-out infinite; }
-.thinking-indicator .dot:nth-child(2) { animation-delay:.2s; }
-.thinking-indicator .dot:nth-child(3) { animation-delay:.4s; }
-@keyframes pulse { 0%,80%,100% { opacity:.3; transform:scale(0.75); } 40% { opacity:1; transform:scale(1); } }
+.thinking-indicator { display: none; gap: 5px; padding: 2px 0 2px 12px; align-items: center; border-left: 2px solid var(--border); }
+.thinking-indicator .blk { width: 7px; height: 7px; background: var(--brand); animation: tpulse 1.2s ease-in-out infinite; }
+.thinking-indicator .blk:nth-child(2) { animation-delay: .2s; }
+.thinking-indicator .blk:nth-child(3) { animation-delay: .4s; }
+@keyframes tpulse { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
 
-.ai-response-text { display:none; }
-#screen-2:not(.answered) .thinking-indicator { display:flex; }
-#screen-2.answered .thinking-indicator { display:none; }
-#screen-2.answered .ai-response-text { display:block; }
+.ai-response-text { display: none; }
+#screen-2:not(.answered) .thinking-indicator { display: flex; }
+#screen-2.answered .thinking-indicator { display: none; }
+#screen-2.answered .ai-response-text { display: block; }
 
-.chat-input-row { display:flex; gap:10px; margin-top:14px; flex-shrink:0; }
+.chat-input-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.chat-input-row .prompt-symbol { color: var(--brand); font-size: 14px; }
 .chat-input-row input {
-  flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:10px;
-  padding:11px 14px; color:var(--text); font-family:inherit; font-size:13.5px; outline:none;
+  flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 9px 12px; color: var(--text); font-family: inherit; font-size: 13px; outline: none;
 }
-.chat-input-row input::placeholder { color:var(--muted); }
+.chat-input-row input::placeholder { color: var(--muted); }
 .send-btn {
-  background:var(--brand); color:#fff; border:none; border-radius:10px; padding:0 18px; font-family:inherit;
-  font-size:13.5px; font-weight:600; cursor:default; box-shadow:0 0 16px rgba(124,92,255,0.4);
+  background: transparent; color: var(--brand); border: 1px solid var(--brand-border); border-radius: var(--radius);
+  padding: 0 16px; height: 34px; font-family: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; cursor: default;
 }
 
 /* ---------- Results panel ---------- */
-.results-panel { flex:0 0 45%; display:flex; flex-direction:column; padding:18px; overflow:hidden; min-width:0; }
-.results-panel.full-width { flex:1 1 100%; }
-.panel-title { font-size:13.5px; font-weight:600; color:var(--text); margin-bottom:14px; }
-.chart-legend { display:flex; gap:16px; margin-bottom:10px; font-size:12px; color:var(--muted); }
-.chart-legend .swatch { display:inline-flex; align-items:center; gap:6px; margin-right:4px; }
-.chart-legend .swatch::before { content:''; width:10px; height:10px; border-radius:3px; background:currentColor; }
-.swatch-q2 { color:var(--gray-series); }
-.swatch-q3 { color:var(--brand); }
-.results-panel svg { width:100%; flex:1; }
-.source-citation { margin-top:12px; color:var(--muted); font-size:11.5px; flex-shrink:0; }
+.results-panel { flex: 0 0 45%; display: flex; flex-direction: column; padding: 16px; overflow: hidden; min-width: 0; }
+.results-panel.full-width { flex: 1 1 100%; }
+.panel-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.panel-title .cmt { color: var(--gray-series); margin-right: 6px; font-weight: 400; }
+.chart-legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 11.5px; color: var(--muted); }
+.chart-legend .swatch { display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; }
+.chart-legend .swatch::before { content: ''; width: 9px; height: 9px; background: currentColor; }
+.swatch-q2 { color: var(--gray-series); }
+.swatch-q3 { color: var(--brand); }
+.results-panel svg { width: 100%; flex: 1; }
+.source-citation { margin-top: 12px; color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.source-citation .cmt { color: var(--gray-series); margin-right: 4px; }
 
 /* ---------- History ---------- */
-.history-panel { flex:1 1 100%; display:flex; flex-direction:column; padding:20px; overflow:hidden; }
-.history-list { display:flex; flex-direction:column; gap:10px; margin-top:8px; overflow:hidden; }
+.history-panel { flex: 1 1 100%; display: flex; flex-direction: column; padding: 18px; overflow: hidden; }
+.history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; overflow: hidden; }
 .history-card {
-  display:flex; align-items:center; justify-content:space-between; padding:14px 16px;
-  background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:12px;
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
 }
-.history-q { font-size:14px; font-weight:500; color:var(--text); margin-bottom:4px; }
-.history-meta { font-size:12px; color:var(--muted); }
+.history-q { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.history-q .caret { color: var(--brand); margin-right: 6px; }
+.history-meta { font-size: 11px; color: var(--muted); padding-left: 14px; }
 .ghost-btn {
-  background:transparent; border:1px solid var(--brand-border); color:var(--brand); border-radius:8px;
-  padding:7px 14px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:default; flex-shrink:0;
+  background: transparent; border: 1px solid var(--brand-border); color: var(--brand); border-radius: var(--radius);
+  padding: 6px 12px; font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; cursor: default; flex-shrink: 0;
 }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="brand">
-    <div class="logo-mark">J</div>
-    <div class="brand-name">Jagent</div>
-  </div>
-  <div class="breadcrumb" id="breadcrumb">Chat / Clients by office</div>
+  <div class="brand"><span class="caret">&gt;</span>jagent<span class="cursor-blink">_</span></div>
+  <div class="breadcrumb" id="breadcrumb">~/chat/clients-by-office</div>
   <div class="status-clock">
-    <div class="connected"><span class="connected-dot"></span>Connected</div>
+    <div class="model-info">model: gpt-4o &middot; 3 sources connected</div>
+    <div class="connected">[CONNECTED]</div>
     <div class="clock" id="clock">00:00:00</div>
   </div>
 </div>
 
 <div class="app-body">
-  <aside class="sidebar glass">
+  <aside class="sidebar surface">
     <nav class="nav" id="nav">
-      <div class="nav-item active" data-view="chat"><span class="nav-dot"></span>Chat</div>
-      <div class="nav-item" data-view="history"><span class="nav-dot"></span>History</div>
-      <div class="nav-item" data-view="sources"><span class="nav-dot"></span>Sources</div>
-      <div class="nav-item" data-view="settings"><span class="nav-dot"></span>Settings</div>
+      <div class="nav-item active" data-view="chat"><span class="prefix">&gt;</span>chat</div>
+      <div class="nav-item" data-view="history"><span class="prefix"></span>history</div>
+      <div class="nav-item" data-view="sources"><span class="prefix"></span>sources</div>
+      <div class="nav-item" data-view="settings"><span class="prefix"></span>settings</div>
     </nav>
-    <div class="sidebar-footer"><span class="dot"></span>3 data sources connected</div>
+    <div class="sidebar-footer">[3 sources connected]</div>
   </aside>
 
   <main class="main">
 
     <!-- SCREEN 1: CHAT — first question -->
     <section class="screen active" id="screen-1">
-      <div class="chat-panel glass">
+      <div class="chat-panel surface">
         <div class="chat-messages">
-          <div class="msg msg-user"><div class="bubble bubble-user">How many clients does each office manage?</div></div>
-          <div class="msg msg-ai">
-            <div class="bubble bubble-ai">
-              <table class="data-table">
-                <thead><tr><th>Office</th><th>Clients</th></tr></thead>
-                <tbody>
-                  <tr><td>Riyadh</td><td>2,660</td></tr>
-                  <tr><td>Khobar</td><td>920</td></tr>
-                  <tr><td>Jeddah</td><td>375</td></tr>
-                  <tr><td>Qassim</td><td>57</td></tr>
-                  <tr><td>Bahrain</td><td>19</td></tr>
-                  <tr><td>Egypt</td><td>15</td></tr>
-                </tbody>
-                <tfoot><tr><td>Total</td><td>4,081</td></tr></tfoot>
-              </table>
-              <div class="source-note">Source: client_master table, grouped by Branch</div>
-            </div>
+          <div class="line line-user"><span class="prompt">$</span>how many clients does each office manage?</div>
+          <div class="line line-ai">
+            <table class="data-table">
+              <thead><tr><th>Office</th><th>Clients</th></tr></thead>
+              <tbody>
+                <tr><td>Riyadh</td><td>2,660</td></tr>
+                <tr><td>Khobar</td><td>920</td></tr>
+                <tr><td>Jeddah</td><td>375</td></tr>
+                <tr><td>Qassim</td><td>57</td></tr>
+                <tr><td>Bahrain</td><td>19</td></tr>
+                <tr><td>Egypt</td><td>15</td></tr>
+              </tbody>
+              <tfoot><tr><td>Total</td><td>4,081</td></tr></tfoot>
+            </table>
+            <div class="source-note"><span class="cmt">#</span>source: client_master table, grouped by branch</div>
           </div>
         </div>
         <div class="chat-input-row">
-          <input type="text" placeholder="Ask anything about your data..." readonly>
-          <button class="send-btn">Send</button>
+          <span class="prompt-symbol">$</span>
+          <input type="text" placeholder="ask anything about your data..." readonly>
+          <button class="send-btn">Run</button>
         </div>
       </div>
-      <div class="results-panel glass">
-        <div class="panel-title">Clients by Office</div>
+      <div class="results-panel surface">
+        <div class="panel-title"><span class="cmt">//</span>clients_by_office.chart</div>
         <svg viewBox="0 0 400 210" preserveAspectRatio="xMidYMid meet">
           <!-- Riyadh -->
-          <text x="66" y="15" text-anchor="end" font-size="11" fill="#94A3B8">Riyadh</text>
-          <rect x="76" y="6" width="260" height="14" rx="4" fill="#7C5CFF"/>
-          <text x="342" y="17" font-size="11" fill="#F0F6FC">2,660</text>
+          <text x="66" y="15" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Riyadh</text>
+          <rect x="76" y="6" width="260" height="14" rx="1" fill="#22c55e"/>
+          <text x="342" y="17" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">2,660</text>
           <!-- Khobar -->
-          <text x="66" y="51" text-anchor="end" font-size="11" fill="#94A3B8">Khobar</text>
-          <rect x="76" y="42" width="90" height="14" rx="4" fill="#7C5CFF"/>
-          <text x="172" y="53" font-size="11" fill="#F0F6FC">920</text>
+          <text x="66" y="51" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Khobar</text>
+          <rect x="76" y="42" width="90" height="14" rx="1" fill="#22c55e"/>
+          <text x="172" y="53" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">920</text>
           <!-- Jeddah -->
-          <text x="66" y="87" text-anchor="end" font-size="11" fill="#94A3B8">Jeddah</text>
-          <rect x="76" y="78" width="37" height="14" rx="4" fill="#7C5CFF"/>
-          <text x="119" y="89" font-size="11" fill="#F0F6FC">375</text>
+          <text x="66" y="87" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Jeddah</text>
+          <rect x="76" y="78" width="37" height="14" rx="1" fill="#22c55e"/>
+          <text x="119" y="89" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">375</text>
           <!-- Qassim -->
-          <text x="66" y="123" text-anchor="end" font-size="11" fill="#94A3B8">Qassim</text>
-          <rect x="76" y="114" width="6" height="14" rx="3" fill="#7C5CFF"/>
-          <text x="88" y="125" font-size="11" fill="#F0F6FC">57</text>
+          <text x="66" y="123" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Qassim</text>
+          <rect x="76" y="114" width="6" height="14" rx="1" fill="#22c55e"/>
+          <text x="88" y="125" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">57</text>
           <!-- Bahrain -->
-          <text x="66" y="159" text-anchor="end" font-size="11" fill="#94A3B8">Bahrain</text>
-          <rect x="76" y="150" width="2" height="14" rx="1" fill="#7C5CFF"/>
-          <text x="88" y="161" font-size="11" fill="#F0F6FC">19</text>
+          <text x="66" y="159" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Bahrain</text>
+          <rect x="76" y="150" width="2" height="14" fill="#22c55e"/>
+          <text x="88" y="161" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">19</text>
           <!-- Egypt -->
-          <text x="66" y="195" text-anchor="end" font-size="11" fill="#94A3B8">Egypt</text>
-          <rect x="76" y="186" width="2" height="14" rx="1" fill="#7C5CFF"/>
-          <text x="88" y="197" font-size="11" fill="#F0F6FC">15</text>
+          <text x="66" y="195" text-anchor="end" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Egypt</text>
+          <rect x="76" y="186" width="2" height="14" fill="#22c55e"/>
+          <text x="88" y="197" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">15</text>
         </svg>
       </div>
     </section>
 
     <!-- SCREEN 2: FOLLOW-UP -->
     <section class="screen" id="screen-2">
-      <div class="chat-panel glass">
+      <div class="chat-panel surface">
         <div class="chat-messages">
-          <div class="msg msg-user faded"><div class="bubble bubble-user small">How many clients does each office manage?</div></div>
-          <div class="msg msg-ai faded"><div class="bubble bubble-ai small">Riyadh 2,660 &middot; Khobar 920 &middot; Jeddah 375 &middot; Qassim 57 &middot; Bahrain 19 &middot; Egypt 15. Total 4,081.</div></div>
-          <div class="msg msg-user"><div class="bubble bubble-user">Which office grew the most this quarter?</div></div>
-          <div class="msg msg-ai">
-            <div class="bubble bubble-ai thinking-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-            <div class="bubble bubble-ai ai-response-text">Riyadh grew by 18% this quarter: 403 new clients vs 341 in Q2. Khobar is second at +12%.</div>
+          <div class="line line-user small faded"><span class="prompt">$</span>how many clients does each office manage?</div>
+          <div class="line line-ai small faded">riyadh 2,660 &middot; khobar 920 &middot; jeddah 375 &middot; qassim 57 &middot; bahrain 19 &middot; egypt 15. total 4,081.</div>
+          <div class="line line-user"><span class="prompt">$</span>which office grew the most this quarter?</div>
+          <div class="line line-ai">
+            <div class="thinking-indicator"><span class="blk"></span><span class="blk"></span><span class="blk"></span></div>
+            <div class="ai-response-text">riyadh grew by 18% this quarter: 403 new clients vs 341 in q2. khobar is second at +12%.</div>
           </div>
         </div>
         <div class="chat-input-row">
-          <input type="text" placeholder="Ask anything about your data..." readonly>
-          <button class="send-btn">Send</button>
+          <span class="prompt-symbol">$</span>
+          <input type="text" placeholder="ask anything about your data..." readonly>
+          <button class="send-btn">Run</button>
         </div>
       </div>
-      <div class="results-panel glass">
-        <div class="panel-title">Growth by Office, Q2 vs Q3</div>
+      <div class="results-panel surface">
+        <div class="panel-title"><span class="cmt">//</span>growth_by_office.chart &middot; q2 vs q3</div>
         <div class="chart-legend">
-          <span class="swatch swatch-q2">Q2</span>
-          <span class="swatch swatch-q3">Q3</span>
+          <span class="swatch swatch-q2">q2</span>
+          <span class="swatch swatch-q3">q3</span>
         </div>
         <svg viewBox="0 0 360 210" preserveAspectRatio="xMidYMid meet">
           <line x1="40" y1="196" x2="340" y2="196" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
           <!-- Q2 line -->
-          <polyline points="60,150 190,145 320,177" fill="none" stroke="#6B7688" stroke-width="2"/>
-          <circle cx="60" cy="150" r="4" fill="#6B7688"/>
-          <circle cx="190" cy="145" r="4" fill="#6B7688"/>
-          <circle cx="320" cy="177" r="4" fill="#6B7688"/>
+          <polyline points="60,150 190,145 320,177" fill="none" stroke="#52525b" stroke-width="2"/>
+          <circle cx="60" cy="150" r="3.5" fill="#52525b"/>
+          <circle cx="190" cy="145" r="3.5" fill="#52525b"/>
+          <circle cx="320" cy="177" r="3.5" fill="#52525b"/>
           <!-- Q3 line -->
-          <polyline points="60,23 190,139 320,175" fill="none" stroke="#7C5CFF" stroke-width="2"/>
-          <circle cx="60" cy="23" r="4" fill="#7C5CFF"/>
-          <circle cx="190" cy="139" r="4" fill="#7C5CFF"/>
-          <circle cx="320" cy="175" r="4" fill="#7C5CFF"/>
-          <text x="60" y="30" text-anchor="middle" font-size="10.5" fill="#F0F6FC">+18%</text>
+          <polyline points="60,23 190,139 320,175" fill="none" stroke="#22c55e" stroke-width="2"/>
+          <circle cx="60" cy="23" r="3.5" fill="#22c55e"/>
+          <circle cx="190" cy="139" r="3.5" fill="#22c55e"/>
+          <circle cx="320" cy="175" r="3.5" fill="#22c55e"/>
+          <text x="60" y="14" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">+18%</text>
           <!-- x labels -->
-          <text x="60" y="210" text-anchor="middle" font-size="11" fill="#94A3B8">Riyadh</text>
-          <text x="190" y="210" text-anchor="middle" font-size="11" fill="#94A3B8">Khobar</text>
-          <text x="320" y="210" text-anchor="middle" font-size="11" fill="#94A3B8">Jeddah</text>
+          <text x="60" y="210" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Riyadh</text>
+          <text x="190" y="210" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Khobar</text>
+          <text x="320" y="210" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Jeddah</text>
         </svg>
       </div>
     </section>
 
     <!-- SCREEN 3: CHART VIEW expanded -->
     <section class="screen" id="screen-3">
-      <div class="results-panel glass full-width">
-        <div class="panel-title">Office Performance: Q2 vs Q3 2026</div>
+      <div class="results-panel surface full-width">
+        <div class="panel-title"><span class="cmt">//</span>office_performance.chart &middot; q2 vs q3 2026</div>
         <div class="chart-legend">
-          <span class="swatch swatch-q2">Q2</span>
-          <span class="swatch swatch-q3">Q3</span>
+          <span class="swatch swatch-q2">q2</span>
+          <span class="swatch swatch-q3">q3</span>
         </div>
         <svg viewBox="0 0 760 300" preserveAspectRatio="xMidYMid meet">
-          <line x1="40" y1="200" x2="740" y2="200" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>
+          <line x1="40" y1="200" x2="740" y2="200" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
           <line x1="40" y1="153" x2="740" y2="153" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
           <line x1="40" y1="106" x2="740" y2="106" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <text x="35" y="157" text-anchor="end" font-size="9.5" fill="#94A3B8">1,000</text>
-          <text x="35" y="110" text-anchor="end" font-size="9.5" fill="#94A3B8">2,000</text>
+          <text x="35" y="157" text-anchor="end" font-size="9.5" font-family="'JetBrains Mono',monospace" fill="#71717a">1,000</text>
+          <text x="35" y="110" text-anchor="end" font-size="9.5" font-family="'JetBrains Mono',monospace" fill="#71717a">2,000</text>
 
           <!-- Riyadh -->
-          <rect x="46" y="66" width="20" height="134" rx="3" fill="#6B7688"/>
-          <rect x="70" y="40" width="20" height="160" rx="3" fill="#7C5CFF"/>
-          <text x="80" y="32" text-anchor="middle" font-size="11" fill="#F0F6FC">2,660</text>
-          <text x="68" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Riyadh</text>
+          <rect x="46" y="66" width="20" height="134" rx="1" fill="#52525b"/>
+          <rect x="70" y="40" width="20" height="160" rx="1" fill="#22c55e"/>
+          <text x="80" y="32" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#e4e4e7">2,660</text>
+          <text x="68" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Riyadh</text>
 
           <!-- Khobar -->
-          <rect x="166" y="150" width="20" height="50" rx="3" fill="#6B7688"/>
-          <rect x="190" y="143" width="20" height="57" rx="3" fill="#7C5CFF"/>
-          <text x="188" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Khobar</text>
+          <rect x="166" y="150" width="20" height="50" rx="1" fill="#52525b"/>
+          <rect x="190" y="143" width="20" height="57" rx="1" fill="#22c55e"/>
+          <text x="188" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Khobar</text>
 
           <!-- Jeddah -->
-          <rect x="286" y="179" width="20" height="21" rx="3" fill="#6B7688"/>
-          <rect x="310" y="177" width="20" height="23" rx="3" fill="#7C5CFF"/>
-          <text x="308" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Jeddah</text>
+          <rect x="286" y="179" width="20" height="21" rx="1" fill="#52525b"/>
+          <rect x="310" y="177" width="20" height="23" rx="1" fill="#22c55e"/>
+          <text x="308" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Jeddah</text>
 
           <!-- Qassim -->
-          <rect x="406" y="196" width="20" height="4" rx="2" fill="#6B7688"/>
-          <rect x="430" y="195" width="20" height="5" rx="2" fill="#7C5CFF"/>
-          <text x="428" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Qassim</text>
+          <rect x="406" y="196" width="20" height="4" fill="#52525b"/>
+          <rect x="430" y="195" width="20" height="5" fill="#22c55e"/>
+          <text x="428" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Qassim</text>
 
           <!-- Bahrain -->
-          <rect x="526" y="199" width="20" height="1" fill="#6B7688"/>
-          <rect x="550" y="198" width="20" height="2" fill="#7C5CFF"/>
-          <text x="548" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Bahrain</text>
+          <rect x="526" y="199" width="20" height="1" fill="#52525b"/>
+          <rect x="550" y="198" width="20" height="2" fill="#22c55e"/>
+          <text x="548" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Bahrain</text>
 
           <!-- Egypt -->
-          <rect x="646" y="199" width="20" height="1" fill="#6B7688"/>
-          <rect x="670" y="198" width="20" height="2" fill="#7C5CFF"/>
-          <text x="668" y="216" text-anchor="middle" font-size="11" fill="#94A3B8">Egypt</text>
+          <rect x="646" y="199" width="20" height="1" fill="#52525b"/>
+          <rect x="670" y="198" width="20" height="2" fill="#22c55e"/>
+          <text x="668" y="216" text-anchor="middle" font-size="11" font-family="'JetBrains Mono',monospace" fill="#71717a">Egypt</text>
         </svg>
-        <div class="source-citation">Data from 2 tables &middot; 4,081 records</div>
+        <div class="source-citation"><span class="cmt">#</span>data from 2 tables &middot; 4,081 records</div>
       </div>
     </section>
 
     <!-- SCREEN 4: HISTORY -->
     <section class="screen" id="screen-4">
-      <div class="history-panel glass">
-        <div class="panel-title">History</div>
+      <div class="history-panel surface">
+        <div class="panel-title"><span class="cmt">//</span>history.log</div>
         <div class="history-list">
           <div class="history-card">
-            <div><div class="history-q">Clients by office</div><div class="history-meta">4,081 records &middot; 14 min ago</div></div>
+            <div><div class="history-q"><span class="caret">&gt;</span>clients-by-office</div><div class="history-meta">4,081 records &middot; 14 min ago</div></div>
             <button class="ghost-btn">Re-run</button>
           </div>
           <div class="history-card">
-            <div><div class="history-q">Monthly revenue breakdown</div><div class="history-meta">&pound;2.4M &middot; 1h ago</div></div>
+            <div><div class="history-q"><span class="caret">&gt;</span>monthly-revenue-breakdown</div><div class="history-meta">&pound;2.4M &middot; 1h ago</div></div>
             <button class="ghost-btn">Re-run</button>
           </div>
           <div class="history-card">
-            <div><div class="history-q">Active vs inactive staff by branch</div><div class="history-meta">1,121 staff &middot; Yesterday</div></div>
+            <div><div class="history-q"><span class="caret">&gt;</span>active-vs-inactive-staff-by-branch</div><div class="history-meta">1,121 staff &middot; yesterday</div></div>
             <button class="ghost-btn">Re-run</button>
           </div>
           <div class="history-card">
-            <div><div class="history-q">Top 10 clients by spend</div><div class="history-meta">Last 90 days &middot; 2 days ago</div></div>
+            <div><div class="history-q"><span class="caret">&gt;</span>top-10-clients-by-spend</div><div class="history-meta">last 90 days &middot; 2 days ago</div></div>
             <button class="ghost-btn">Re-run</button>
           </div>
         </div>
@@ -359,10 +376,10 @@ body { margin:0; background:#060A12; color:#F0F6FC; font-family:'Inter',system-u
   var navItems = document.querySelectorAll('.nav-item');
   var breadcrumb = document.getElementById('breadcrumb');
   var breadcrumbs = [
-    'Chat / Clients by office',
-    'Chat / Office growth',
-    'Chat / Office performance',
-    'History'
+    '~/chat/clients-by-office',
+    '~/chat/office-growth',
+    '~/chat/office-performance',
+    '~/history'
   ];
   var idx = 0;
   var thinkTimer = null;
@@ -371,7 +388,9 @@ body { margin:0; background:#060A12; color:#F0F6FC; font-family:'Inter',system-u
     screens.forEach(function(s, j) { s.classList.toggle('active', j === i); });
     navItems.forEach(function(n) {
       var isHistory = n.getAttribute('data-view') === 'history';
-      n.classList.toggle('active', (i === 3 && isHistory) || (i !== 3 && n.getAttribute('data-view') === 'chat'));
+      var active = (i === 3 && isHistory) || (i !== 3 && n.getAttribute('data-view') === 'chat');
+      n.classList.toggle('active', active);
+      n.querySelector('.prefix').textContent = active ? '>' : '';
     });
     breadcrumb.textContent = breadcrumbs[i];
 
