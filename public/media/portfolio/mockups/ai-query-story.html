@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Query Interface — Ask your data anything</title>
+<style>
+  body { background: #060A12; color: #EAF2EF; font-family: 'Google Sans', system-ui, sans-serif; margin: 0; overflow-x: hidden; }
+  .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(255,255,255,0.08); position: relative; }
+  .glass::before { content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); pointer-events: none; }
+  h1 { font-size: clamp(40px, 5vw, 72px); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 24px; }
+  h2 { font-size: clamp(28px, 3.5vw, 48px); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 20px; }
+  p { font-size: 16px; line-height: 1.7; color: rgba(234,242,239,0.65); margin: 0; }
+  .label { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #8AFFC4; display: block; margin-bottom: 20px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; width: 100%; box-sizing: border-box; }
+  section { padding: 96px 0; min-height: 100vh; display: flex; align-items: center; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 80px 80px; }
+  * { box-sizing: border-box; }
+  section > .container { position: relative; z-index: 1; }
+
+  /* ---- Hero ---- */
+  #hero .container { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  #hero .sub { max-width: 640px; margin: 0 auto 48px; font-size: 18px; }
+  .chat-widget { width: 100%; max-width: 640px; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .bubble-row { display: flex; }
+  .bubble-row.user { justify-content: flex-end; }
+  .bubble-row.ai { justify-content: flex-start; }
+  .bubble { max-width: 80%; padding: 16px 20px; border-radius: 18px; text-align: left; }
+  .bubble p { color: #EAF2EF; font-size: 15px; margin: 0; }
+  .bubble.user { background: rgba(138,255,196,0.15); border: 1px solid rgba(138,255,196,0.3); border-bottom-right-radius: 4px; }
+  .bubble.ai { border-bottom-left-radius: 4px; }
+  .chart-wrap { margin-top: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { font-size: 12px; width: 58px; color: rgba(234,242,239,0.6); flex-shrink: 0; text-align: right; }
+  .bar-track { flex: 1; height: 14px; background: rgba(255,255,255,0.06); border-radius: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, #8AFFC4, #4FD1A5); }
+  .bar-value { font-size: 12px; color: #8AFFC4; width: 44px; flex-shrink: 0; }
+
+  /* ---- Problem ---- */
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+  .problem-card { padding: 36px 30px; }
+  .problem-card h3 { font-size: 20px; font-weight: 600; margin: 0 0 12px; color: #EAF2EF; }
+  .icon-badge { width: 44px; height: 44px; border-radius: 12px; background: rgba(138,255,196,0.12); border: 1px solid rgba(138,255,196,0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 20px; }
+
+  /* ---- How it works ---- */
+  .flow-row { display: flex; align-items: stretch; gap: 0; width: 100%; }
+  .flow-step { flex: 1; padding: 36px 28px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 60px; flex-shrink: 0; color: #8AFFC4; font-size: 28px; }
+  .flow-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(138,255,196,0.15); border: 1px solid rgba(138,255,196,0.35); color: #8AFFC4; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; font-size: 15px; }
+  .flow-step h3 { font-size: 19px; font-weight: 600; margin: 0 0 10px; color: #EAF2EF; }
+
+  /* ---- Features ---- */
+  .card-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; width: 100%; }
+  .feature-card { padding: 36px 32px; }
+  .feature-card h3 { font-size: 21px; font-weight: 600; margin: 0 0 12px; color: #EAF2EF; }
+
+  /* ---- CTA ---- */
+  #cta .container { text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .cta-card { max-width: 680px; padding: 48px; margin: 32px 0 40px; }
+  .cta-card p { font-size: 18px; color: rgba(234,242,239,0.75); }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn { padding: 16px 32px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn-solid { background: #8AFFC4; color: #060A12; border: 1px solid #8AFFC4; }
+  .btn-outline { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); color: #EAF2EF; }
+
+  ::-webkit-scrollbar { display: none; }
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="container">
+    <span class="label">AI Data Assistant</span>
+    <h1>Ask your data anything.</h1>
+    <p class="sub">Type a question in plain English. Get a table, a chart, or a number back. No technical skills required. No waiting on a developer.</p>
+    <div class="chat-widget glass">
+      <div class="bubble-row user">
+        <div class="bubble user"><p>How many clients does each office manage?</p></div>
+      </div>
+      <div class="bubble-row ai">
+        <div class="bubble ai glass">
+          <p>Riyadh manages 2,660 clients. Khobar: 920. Jeddah: 375. Total: 4,081.</p>
+          <div class="chart-wrap">
+            <div class="bar-row">
+              <span class="bar-label">Riyadh</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 100%;"></div></div>
+              <span class="bar-value">2,660</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Khobar</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 35%;"></div></div>
+              <span class="bar-value">920</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Jeddah</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 14%;"></div></div>
+              <span class="bar-value">375</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="container">
+    <span class="label">The old way</span>
+    <h2>The answers exist. Getting them is the hard part.</h2>
+    <div class="card-grid-3" style="margin-top: 48px;">
+      <div class="problem-card glass">
+        <div class="icon-badge">⏳</div>
+        <h3>Every question needs a developer</h3>
+        <p>You wait days for a report someone else has to write.</p>
+      </div>
+      <div class="problem-card glass">
+        <div class="icon-badge">📉</div>
+        <h3>Exports go stale instantly</h3>
+        <p>By the time the spreadsheet arrives, the numbers have changed.</p>
+      </div>
+      <div class="problem-card glass">
+        <div class="icon-badge">🤐</div>
+        <h3>You stop asking</h3>
+        <p>After enough delays, people stop looking for answers at all.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <span class="label">How it works</span>
+    <h2>Three seconds from question to answer.</h2>
+    <div class="flow-row glass" style="margin-top: 48px;">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h3>You ask</h3>
+        <p>Type anything. How much did we bill last month? Which office is growing fastest?</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h3>It finds the data</h3>
+        <p>Reads your live records directly. No exports, no waiting.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h3>Answer arrives</h3>
+        <p>A table, a chart, or a plain number. Cited, so you can verify it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <span class="label">What it can do</span>
+    <h2>Any question. Any time.</h2>
+    <div class="card-grid-2" style="margin-top: 48px;">
+      <div class="feature-card glass">
+        <div class="icon-badge">⚖️</div>
+        <h3>Comparisons</h3>
+        <p>How did this quarter compare to last? Which region grew fastest?</p>
+      </div>
+      <div class="feature-card glass">
+        <div class="icon-badge">🏆</div>
+        <h3>Rankings</h3>
+        <p>Top 10 clients by revenue. Which product moved the most units?</p>
+      </div>
+      <div class="feature-card glass">
+        <div class="icon-badge">Σ</div>
+        <h3>Totals and breakdowns</h3>
+        <p>Total invoiced this year. Broken down by month, by team, by client.</p>
+      </div>
+      <div class="feature-card glass">
+        <div class="icon-badge">💬</div>
+        <h3>Follow-up questions</h3>
+        <p>It remembers the conversation. Ask a follow-up without repeating context.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="container">
+    <h2>Your team could be getting answers right now.</h2>
+    <div class="cta-card glass">
+      <p>Most businesses have the data. They just can not get at it. This changes that.</p>
+    </div>
+    <div class="cta-buttons">
+      <a class="btn btn-solid" href="#">Book a call</a>
+      <a class="btn btn-outline glass" href="#">See it in action</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section'));
+    var idx = 0;
+    function scrollToNext() {
+      sections[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      idx = (idx + 1) % sections.length;
+      setTimeout(scrollToNext, 3500);
+    }
+    setTimeout(scrollToNext, 2500);
+  })();
+</script>
+
+</body>
+</html>
