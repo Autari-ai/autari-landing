@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NoPhishyZeta</title>
+<style>
+  :root{
+    --bg:#070710;
+    --panel:rgba(255,255,255,0.045);
+    --panel-strong:rgba(255,255,255,0.07);
+    --border:rgba(255,255,255,0.09);
+    --text:#E9E9F2;
+    --muted:#8B8BA3;
+    --accent:#19D3A2;
+    --accent-dim:rgba(25,211,162,0.15);
+    --threat:#EF4444;
+    --threat-dim:rgba(239,68,68,0.15);
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:1280px; height:800px; overflow:hidden;
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+  }
+
+  .grid-texture{
+    position:absolute; inset:0; pointer-events:none; z-index:1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0.9), transparent 75%);
+  }
+
+  .bg-pulse{
+    position:absolute; inset:0; pointer-events:none; z-index:1;
+    background: radial-gradient(circle at 72% 32%, rgba(239,68,68,0.20), transparent 55%);
+    opacity:0;
+    transition: opacity 0.7s ease;
+  }
+  .app[data-state="2"] .bg-pulse{ opacity:1; }
+
+  .backdrop-dim{
+    position:absolute; inset:0; z-index:15; pointer-events:none;
+    background: rgba(3,3,10,0.55);
+    opacity:0;
+    transition: opacity 0.55s ease;
+  }
+  .app[data-state="4"] .backdrop-dim{ opacity:1; }
+
+  .app{
+    position:relative; width:1280px; height:800px;
+    display:flex; flex-direction:column;
+    padding:30px 44px 34px;
+  }
+
+  .header{
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .header-left{
+    font-size:23px; font-weight:650; letter-spacing:0.3px;
+  }
+  .header-right{
+    display:flex; align-items:center; gap:9px;
+    font-size:13.5px; font-weight:600; color:var(--accent);
+    letter-spacing:0.4px;
+  }
+  .shield{
+    width:15px; height:17px;
+    background: var(--accent);
+    clip-path: polygon(50% 0%, 100% 18%, 100% 55%, 50% 100%, 0% 55%, 0% 18%);
+    box-shadow: 0 0 10px rgba(25,211,162,0.65);
+  }
+
+  .stats-strip{
+    position:relative; z-index:2;
+    display:flex; gap:36px;
+    margin-bottom:18px;
+  }
+  .stat-block{ font-family:var(--mono); }
+  .stat-value{
+    font-size:26px; font-weight:700; line-height:1;
+    transition: color 0.4s ease;
+  }
+  .stat-value.threat-count{ color:var(--text); }
+  .app[data-state="3"] .stat-value.threat-count,
+  .app[data-state="4"] .stat-value.threat-count{ color:var(--threat); }
+  .stat-label{
+    margin-top:5px; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:1.2px; color:var(--muted); font-family:var(--sans);
+  }
+
+  .email-list{
+    position:relative; z-index:2;
+    flex:1;
+    display:flex; flex-direction:column;
+    background: linear-gradient(160deg, var(--panel), rgba(255,255,255,0.015));
+    border:1px solid var(--border);
+    border-radius:18px;
+    overflow:hidden;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .email-row{
+    position:relative;
+    flex:1;
+    display:flex; align-items:center; gap:18px;
+    padding:0 26px;
+    border-bottom:1px solid rgba(255,255,255,0.055);
+    border-left:3px solid transparent;
+    overflow:hidden;
+    transition: background 0.4s ease, border-color 0.4s ease, transform 0.5s cubic-bezier(.4,0,.6,1), opacity 0.5s ease;
+  }
+  .email-row:last-child{ border-bottom:none; }
+
+  .email-row::before{
+    content:"";
+    position:absolute; top:0; left:-30%; width:30%; height:100%;
+    background: linear-gradient(90deg, transparent, rgba(25,211,162,0.30), transparent);
+    opacity:0; pointer-events:none;
+  }
+  .email-row.scanning::before{
+    opacity:1;
+    animation: sweepLine 0.7s linear;
+  }
+  @keyframes sweepLine{
+    0%{ left:-30%; }
+    100%{ left:100%; }
+  }
+
+  .avatar{
+    width:38px; height:38px; border-radius:10px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:13px; font-weight:700;
+    background: linear-gradient(150deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.08);
+    color:var(--muted);
+  }
+  .email-row.threat-row .avatar{ color:var(--threat); }
+
+  .col-sender{
+    flex:0 0 210px; font-size:14px; font-weight:600; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .col-body{ flex:1; min-width:0; overflow:hidden; }
+  .subject{
+    font-size:14px; font-weight:600; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .preview{
+    margin-top:2px; font-size:12.5px; color:var(--muted);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  .col-badges{
+    flex:0 0 auto; display:flex; align-items:center; gap:8px;
+  }
+  .badge{
+    font-family:var(--mono);
+    font-size:10.5px; font-weight:600; letter-spacing:0.4px;
+    padding:5px 10px; border-radius:999px;
+    opacity:0; transform:translateY(2px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    white-space:nowrap;
+  }
+  .badge-scanning{ background:var(--accent-dim); color:var(--accent); }
+  .badge-clean{ background:var(--accent-dim); color:var(--accent); }
+  .badge-threat{ background:var(--threat-dim); color:var(--threat); }
+
+  .email-row.scanning .badge-scanning{ opacity:1; transform:translateY(0); }
+  .email-row.clean .badge-clean{ opacity:1; transform:translateY(0); }
+  .email-row.threat-active .badge-threat{ opacity:1; transform:translateY(0); }
+
+  .email-row.threat-active{
+    border-left-color: var(--threat);
+    background: rgba(239,68,68,0.08);
+  }
+
+  .email-row.sliding-out{
+    transform: translateX(70px);
+    opacity:0;
+    box-shadow: inset 0 0 50px rgba(239,68,68,0.55);
+  }
+  .email-row.row-gone{ display:none; }
+
+  /* threat overlay */
+  #threatOverlay{
+    position:absolute; z-index:10;
+    right:44px; top:132px; width:400px;
+    padding:22px 24px 24px;
+    border-radius:16px;
+    background: linear-gradient(165deg, rgba(28,10,14,0.94), rgba(16,7,11,0.94));
+    border:1px solid rgba(239,68,68,0.38);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 42px rgba(239,68,68,0.16);
+    opacity:0; transform: translateY(-14px) scale(0.97);
+    transition: opacity 0.4s cubic-bezier(.2,.8,.2,1), transform 0.4s cubic-bezier(.2,.8,.2,1);
+    pointer-events:none;
+  }
+  #threatOverlay.show{ opacity:1; transform:translateY(0) scale(1); }
+
+  .threat-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .threat-icon{
+    width:30px; height:30px; border-radius:8px; flex:0 0 auto;
+    background: var(--threat-dim);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .threat-icon::before{
+    content:"";
+    width:3px; height:11px; background:var(--threat); border-radius:2px;
+    box-shadow: 0 8px 0 -1px var(--threat);
+  }
+  .threat-title{ font-size:15px; font-weight:700; color:#FFD9D9; }
+
+  .threat-row-label{
+    font-size:10px; text-transform:uppercase; letter-spacing:1px;
+    color:var(--muted); margin-bottom:6px;
+  }
+  .threat-url-box{
+    font-family:var(--mono); font-size:13px; color:var(--threat);
+    background: rgba(239,68,68,0.10);
+    border:1px solid rgba(239,68,68,0.25);
+    border-radius:8px; padding:9px 12px; margin-bottom:14px;
+    word-break: break-all;
+  }
+  .threat-confidence{
+    font-size:12.5px; color:var(--muted); margin-bottom:16px;
+  }
+  .threat-confidence b{ color:var(--text); font-family:var(--mono); }
+
+  .trash-row{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:12px; color:var(--muted); margin-bottom:8px;
+  }
+  .trash-dots::after{
+    content:"...";
+  }
+  .trash-track{
+    height:4px; border-radius:2px; background:rgba(255,255,255,0.08); overflow:hidden;
+  }
+  .trash-fill{
+    height:100%; width:0%; background: linear-gradient(90deg, var(--threat), #ff9d9d);
+    transition: width 3.1s linear;
+  }
+  #threatOverlay.show .trash-fill{ width:100%; }
+
+  /* summary card */
+  #summaryCard{
+    position:absolute; z-index:20;
+    left:44px; right:44px; bottom:34px; height:512px;
+    padding:36px 44px;
+    border-radius:20px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.065), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.11);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+    transform: translateY(112%);
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+  #summaryCard.show{ transform:translateY(0); }
+
+  .summary-title{
+    font-size:21px; font-weight:700; margin-bottom:26px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .summary-title .shield{ width:16px; height:18px; }
+
+  .summary-stats{
+    display:flex; gap:56px; margin-bottom:38px;
+  }
+  .summary-stat .stat-value{ font-size:38px; }
+  .summary-stat .stat-label{ margin-top:8px; }
+  .summary-stat.ok .stat-value{ color:var(--accent); }
+  .summary-stat.blocked .stat-value{ color:var(--threat); }
+
+  .chart-label{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:1.2px;
+    color:var(--muted); margin-bottom:14px;
+  }
+  .chart{
+    display:flex; align-items:flex-end; gap:22px; height:100px;
+  }
+  .chart-col{ display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; height:100%; justify-content:flex-end; }
+  .bar{
+    width:100%; max-width:34px; border-radius:6px 6px 3px 3px;
+    background: linear-gradient(180deg, var(--accent), rgba(25,211,162,0.18));
+    box-shadow: 0 0 14px rgba(25,211,162,0.25);
+  }
+  .day-label{ font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+
+  .app[data-state] .fade-scope{ }
+</style>
+</head>
+<body>
+  <div class="app" id="app" data-state="1">
+    <div class="grid-texture"></div>
+    <div class="bg-pulse"></div>
+    <div class="backdrop-dim"></div>
+
+    <div class="header">
+      <div class="header-left">Inbox</div>
+      <div class="header-right"><span class="shield"></span>Protected</div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-block">
+        <div class="stat-value">8</div>
+        <div class="stat-label">emails today</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-value threat-count" id="threatCount">0</div>
+        <div class="stat-label" id="threatLabel">threats blocked</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">scan coverage</div>
+      </div>
+    </div>
+
+    <div class="email-list" id="emailList">
+      <div class="email-row" data-row="0">
+        <div class="avatar">GH</div>
+        <div class="col-sender">GitHub</div>
+        <div class="col-body">
+          <div class="subject">Pull request merged: fix auth token refresh</div>
+          <div class="preview">Your PR #482 was merged into main by dsingh</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="1">
+        <div class="avatar">SC</div>
+        <div class="col-sender">Sarah Chen</div>
+        <div class="col-body">
+          <div class="subject">Q3 roadmap review, Thursday 2pm</div>
+          <div class="preview">Hi team, attaching the updated roadmap deck for review</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row threat-row" data-row="2">
+        <div class="avatar">!</div>
+        <div class="col-sender">security@paypall-update.com</div>
+        <div class="col-body">
+          <div class="subject">Urgent: Verify your account</div>
+          <div class="preview">We detected unusual activity. Click here immediately to confirm</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-threat">Threat</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="3">
+        <div class="avatar">LN</div>
+        <div class="col-sender">Linear</div>
+        <div class="col-body">
+          <div class="subject">3 issues assigned to you</div>
+          <div class="preview">ENG-1042, ENG-1055 and ENG-1061 were assigned to you</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="4">
+        <div class="avatar">AWS</div>
+        <div class="col-sender">Amazon Web Services</div>
+        <div class="col-body">
+          <div class="subject">Your invoice for August is ready</div>
+          <div class="preview">Your monthly AWS invoice totaling $284.12 is now available</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="5">
+        <div class="avatar">FG</div>
+        <div class="col-sender">Figma</div>
+        <div class="col-body">
+          <div class="subject">New comment on Design System v3</div>
+          <div class="preview">Alex left a comment on frame Buttons/Primary</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="6">
+        <div class="avatar">SL</div>
+        <div class="col-sender">Slack</div>
+        <div class="col-body">
+          <div class="subject">Weekly workspace digest</div>
+          <div class="preview">24 messages, 3 mentions and 1 new channel this week</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+
+      <div class="email-row" data-row="7">
+        <div class="avatar">NT</div>
+        <div class="col-sender">Notion</div>
+        <div class="col-body">
+          <div class="subject">Your page was shared with 2 people</div>
+          <div class="preview">Marcus and Priya now have access to Onboarding Checklist</div>
+        </div>
+        <div class="col-badges">
+          <span class="badge badge-scanning">Scanning</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="threatOverlay">
+      <div class="threat-head">
+        <div class="threat-icon"></div>
+        <div class="threat-title">Phishing URL Detected</div>
+      </div>
+      <div class="threat-row-label">Malicious link</div>
+      <div class="threat-url-box">paypa11-secure.ru/verify</div>
+      <div class="threat-confidence">Confidence score <b>97%</b></div>
+      <div class="trash-row"><span>Moving to trash<span class="trash-dots"></span></span></div>
+      <div class="trash-track"><div class="trash-fill"></div></div>
+    </div>
+
+    <div id="summaryCard">
+      <div class="summary-title"><span class="shield"></span>Today's Summary</div>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="stat-value">247</div>
+          <div class="stat-label">emails scanned</div>
+        </div>
+        <div class="summary-stat blocked">
+          <div class="stat-value">3</div>
+          <div class="stat-label">threats blocked</div>
+        </div>
+        <div class="summary-stat ok">
+          <div class="stat-value">0</div>
+          <div class="stat-label">reached your inbox</div>
+        </div>
+      </div>
+      <div class="chart-label">Threats blocked this week</div>
+      <div class="chart">
+        <div class="chart-col"><div class="bar" style="height:26%"></div><div class="day-label">Mon</div></div>
+        <div class="chart-col"><div class="bar" style="height:42%"></div><div class="day-label">Tue</div></div>
+        <div class="chart-col"><div class="bar" style="height:16%"></div><div class="day-label">Wed</div></div>
+        <div class="chart-col"><div class="bar" style="height:34%"></div><div class="day-label">Thu</div></div>
+        <div class="chart-col"><div class="bar" style="height:22%"></div><div class="day-label">Fri</div></div>
+        <div class="chart-col"><div class="bar" style="height:30%"></div><div class="day-label">Sat</div></div>
+        <div class="chart-col"><div class="bar" style="height:14%"></div><div class="day-label">Sun</div></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var STATE_MS = 3600; // 4 states x 3.6s = 14.4s total, matches 36 frames @ 400ms for a seamless loop
+  var timers = [];
+
+  function after(fn, delay){ timers.push(setTimeout(fn, delay)); }
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+
+  function runCycle(){
+    clearTimers();
+    var app = document.getElementById('app');
+    var rows = document.querySelectorAll('.email-row');
+    var threatRow = document.querySelector('.threat-row');
+    var overlay = document.getElementById('threatOverlay');
+    var summary = document.getElementById('summaryCard');
+    var threatCount = document.getElementById('threatCount');
+
+    app.setAttribute('data-state', '1');
+    rows.forEach(function(r){
+      r.classList.remove('scanning','threat-active','sliding-out','clean','row-gone');
+    });
+    overlay.classList.remove('show');
+    summary.classList.remove('show');
+    threatCount.textContent = '0';
+
+    // State 1: sequential scan sweep, top to bottom
+    rows.forEach(function(row, i){
+      after(function(){ row.classList.add('scanning'); }, i * 360);
+      after(function(){ row.classList.remove('scanning'); }, i * 360 + 620);
+    });
+
+    // State 2: threat detected
+    after(function(){
+      app.setAttribute('data-state', '2');
+      threatRow.classList.add('threat-active');
+      overlay.classList.add('show');
+    }, STATE_MS);
+
+    // State 3: email removed
+    after(function(){
+      app.setAttribute('data-state', '3');
+      overlay.classList.remove('show');
+      threatRow.classList.add('sliding-out');
+      after(function(){
+        threatRow.classList.add('row-gone');
+        threatCount.textContent = '1';
+        rows.forEach(function(r){
+          if (r !== threatRow) r.classList.add('clean');
+        });
+      }, 480);
+    }, STATE_MS * 2);
+
+    // State 4: daily summary
+    after(function(){
+      app.setAttribute('data-state', '4');
+      summary.classList.add('show');
+    }, STATE_MS * 3);
+
+    // loop
+    after(runCycle, STATE_MS * 4);
+  }
+
+  runCycle();
+</script>
+</body>
+</html>
