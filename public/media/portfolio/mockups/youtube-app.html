@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChannelPilot</title>
+<style>
+  :root {
+    --bg: #0f0a0a;
+    --surface: #1a1010;
+    --border: rgba(239,68,68,0.12);
+    --brand: #ef4444;
+    --brand-dim: rgba(239,68,68,0.1);
+    --text: #fafaf9;
+    --muted: #78716c;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(600px 420px at 88% -10%, rgba(239,68,68,0.07), transparent 65%),
+      radial-gradient(500px 400px at 5% 100%, rgba(239,68,68,0.05), transparent 65%);
+  }
+  .topbar, .shell { position: relative; z-index: 1; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.82); }
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 54px;
+    flex: 0 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .logo-sub { color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .topbar-right .accent { color: var(--brand); font-weight: 600; }
+  .topbar-right .sep { opacity: 0.4; margin: 0 4px; }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(239,68,68,0.8);
+    animation: pulse 2s ease-in-out infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; min-height: 0; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 200px;
+    flex: 0 0 200px;
+    background: #120b0b;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+  }
+  .sidebar-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    padding: 0 10px 12px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: default;
+  }
+  .nav-item .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+  .nav-item.active {
+    color: var(--brand);
+    background: var(--brand-dim);
+    border-color: rgba(239,68,68,0.25);
+  }
+  .nav-item.active .nav-dot { opacity: 1; box-shadow: 0 0 7px rgba(239,68,68,0.8); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px 4px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sidebar-footer .sync-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(239,68,68,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .sidebar-footer .sync-label { font-size: 11.5px; color: var(--muted); }
+  .sidebar-footer .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; padding: 20px 24px; }
+  .view { display: none; animation: viewIn 0.45s ease both; height: 100%; }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .page-sub { color: var(--muted); font-size: 12.5px; }
+
+  /* ===== VIEW 1: UPLOAD QUEUE ===== */
+  .queue-list { display: flex; flex-direction: column; gap: 12px; }
+  .queue-card { display: flex; align-items: center; gap: 16px; padding: 14px 18px; }
+  .thumb-ph {
+    width: 96px; height: 54px; flex: 0 0 96px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #241414, #180d0d);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .queue-body { flex: 1; min-width: 0; }
+  .queue-title { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-meta { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .queue-status { flex: 0 0 170px; text-align: right; }
+  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 6px; }
+  .status-label.uploading { color: var(--brand); }
+  .status-label.scheduled { color: var(--muted); }
+  .status-label.drafting { color: #f59e0b; }
+  .progress-track { width: 100%; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: var(--brand);
+    border-radius: 3px;
+    animation: fillMove 6s ease-in-out infinite alternate;
+  }
+  @keyframes fillMove {
+    0% { width: 38%; }
+    100% { width: 82%; }
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .pill.grey { color: var(--muted); background: rgba(120,113,108,0.1); border: 1px solid rgba(120,113,108,0.3); }
+  .pill.amber { color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.35); }
+  .typing-dots span { animation: blinkDot 1.2s infinite; opacity: 0.3; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blinkDot { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  /* ===== VIEW 2: AI DESCRIPTION WRITER ===== */
+  .title-input-card { padding: 12px 16px; margin-bottom: 14px; }
+  .title-input-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+  .title-input-value { font-size: 15px; font-weight: 600; }
+  .desc-card { padding: 16px 18px; min-height: 150px; }
+  .desc-card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .ai-spark { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 8px rgba(239,68,68,0.8); animation: pulse 1.6s ease-in-out infinite; }
+  .desc-text { font-size: 13.5px; line-height: 1.65; color: var(--text); }
+  .cursor { display: inline-block; width: 2px; height: 15px; background: var(--brand); vertical-align: middle; margin-left: 1px; animation: blinkDot 0.9s infinite; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag-chip {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--brand);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+
+  /* ===== VIEW 3: THUMBNAIL GENERATOR ===== */
+  .thumb-shell { display: flex; gap: 16px; height: calc(100% - 56px); }
+  .thumb-preview {
+    flex: 1;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(150deg, #2a1414 0%, #170c0c 60%, #0f0a0a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .thumb-preview-text {
+    font-size: 40px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 40px rgba(239,68,68,0.35);
+    letter-spacing: -0.02em;
+    text-align: center;
+    line-height: 1.1;
+    padding: 0 30px;
+  }
+  .thumb-preview-badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--brand);
+    background: rgba(15,10,10,0.75);
+    border: 1px solid rgba(239,68,68,0.35);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .variant-col { width: 190px; flex: 0 0 190px; display: flex; flex-direction: column; gap: 10px; }
+  .variant-card {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .variant-card.selected { border-color: var(--brand); box-shadow: 0 0 0 1px rgba(239,68,68,0.4); }
+  .variant-thumb {
+    width: 56px; height: 32px; flex: 0 0 56px;
+    border-radius: 5px;
+    background: linear-gradient(150deg, #2a1414, #170c0c);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: var(--muted); font-weight: 700;
+  }
+  .variant-label { font-size: 12.5px; font-weight: 600; }
+  .variant-sub { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .variant-check { margin-left: auto; color: var(--brand); font-weight: 700; }
+
+  /* ===== VIEW 4: ANALYTICS ===== */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; padding: 14px 18px; }
+  .stat-value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .stat-value .accent { color: var(--brand); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .bar-card { padding: 16px 20px; flex: 1; }
+  .bar-card-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+  .bar-rows { display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-row-label { width: 260px; flex: 0 0 260px; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 16px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--brand), #f87171); border-radius: 4px; }
+  .bar-value { width: 60px; flex: 0 0 60px; text-align: right; font-size: 12.5px; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">CP</div>
+      <div class="logo-name">ChannelPilot</div>
+      <div class="logo-sub">Creator automation dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-dot"></span><span class="accent">847</span>&nbsp;subscribers
+      <span class="sep">&middot;</span>
+      <span class="accent">3</span>&nbsp;in queue
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Studio</div>
+      <nav class="nav">
+        <div class="nav-item" id="nav-0"><span class="nav-dot"></span>Upload Queue</div>
+        <div class="nav-item" id="nav-1"><span class="nav-dot"></span>AI Description</div>
+        <div class="nav-item" id="nav-2"><span class="nav-dot"></span>Thumbnails</div>
+        <div class="nav-item" id="nav-3"><span class="nav-dot"></span>Analytics</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Channel sync<strong>Connected</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- VIEW 1: UPLOAD QUEUE -->
+      <section class="view" id="view-0">
+        <div class="page-head">
+          <span class="page-title">Upload Queue</span>
+          <span class="page-sub">3 videos in the pipeline</span>
+        </div>
+        <div class="queue-list">
+          <div class="surface queue-card">
+            <div class="thumb-ph">1280x720</div>
+            <div class="queue-body">
+              <div class="queue-title">The $50K Mistake Every Creator Makes</div>
+              <div class="queue-meta">Scheduled &middot; Today, 6:00 PM</div>
+            </div>
+            <div class="queue-status">
+              <div class="status-label uploading">Uploading&hellip; 64%</div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+            </div>
+          </div>
+          <div class="surface queue-card">
+            <div class="thumb-ph">1280x720</div>
+            <div class="queue-body">
+              <div class="queue-title">I Tried Every Productivity App for 30 Days</div>
+              <div class="queue-meta">Scheduled &middot; Tomorrow, 9:00 AM</div>
+            </div>
+            <div class="queue-status">
+              <span class="pill grey">Scheduled</span>
+            </div>
+          </div>
+          <div class="surface queue-card">
+            <div class="thumb-ph">1280x720</div>
+            <div class="queue-body">
+              <div class="queue-title">Why Nobody Talks About This Editing Trick</div>
+              <div class="queue-meta">Scheduled &middot; Thursday, 2:00 PM</div>
+            </div>
+            <div class="queue-status">
+              <span class="pill amber">Drafting description<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: AI DESCRIPTION WRITER -->
+      <section class="view" id="view-1">
+        <div class="page-head">
+          <span class="page-title">AI Description Writer</span>
+          <span class="page-sub">Generated from video transcript</span>
+        </div>
+        <div class="surface title-input-card">
+          <div class="title-input-label">Video Title</div>
+          <div class="title-input-value">I Tried Every Productivity App for 30 Days</div>
+        </div>
+        <div class="surface desc-card">
+          <div class="desc-card-label"><span class="ai-spark"></span>AI Generated Description</div>
+          <div class="desc-text" id="typed-desc"></div>
+        </div>
+        <div class="tag-row">
+          <span class="tag-chip">#productivity</span>
+          <span class="tag-chip">#notion</span>
+          <span class="tag-chip">#dayinthelife</span>
+          <span class="tag-chip">#timemanagement</span>
+          <span class="tag-chip">#buildinpublic</span>
+        </div>
+      </section>
+
+      <!-- VIEW 3: THUMBNAIL GENERATOR -->
+      <section class="view" id="view-2">
+        <div class="page-head">
+          <span class="page-title">Thumbnail Generator</span>
+          <span class="page-sub">3 variants generated</span>
+        </div>
+        <div class="thumb-shell">
+          <div class="thumb-preview">
+            <div class="thumb-preview-badge">VARIANT B &middot; SELECTED</div>
+            <div class="thumb-preview-text">I TRIED EVERY<br>PRODUCTIVITY APP</div>
+          </div>
+          <div class="variant-col">
+            <div class="surface variant-card">
+              <div class="variant-thumb">A</div>
+              <div>
+                <div class="variant-label">Variant A</div>
+                <div class="variant-sub">Bold red overlay</div>
+              </div>
+            </div>
+            <div class="surface variant-card selected">
+              <div class="variant-thumb">B</div>
+              <div>
+                <div class="variant-label">Variant B</div>
+                <div class="variant-sub">High contrast text</div>
+              </div>
+              <div class="variant-check">&#10003;</div>
+            </div>
+            <div class="surface variant-card">
+              <div class="variant-thumb">C</div>
+              <div>
+                <div class="variant-label">Variant C</div>
+                <div class="variant-sub">Face + arrow style</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ANALYTICS -->
+      <section class="view" id="view-3">
+        <div class="page-head">
+          <span class="page-title">Analytics</span>
+          <span class="page-sub">Last 7 days</span>
+        </div>
+        <div class="stats-row">
+          <div class="surface stat-card">
+            <div class="stat-value"><span class="accent">4.2K</span></div>
+            <div class="stat-label">Views this week</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">847</div>
+            <div class="stat-label">Subscribers</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Uploads</div>
+          </div>
+        </div>
+        <div class="surface bar-card">
+          <div class="bar-card-title">Views per Video</div>
+          <div class="bar-rows">
+            <div class="bar-row"><div class="bar-row-label">Why Nobody Talks About This Editing Trick</div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><div class="bar-value">1.9K</div></div>
+            <div class="bar-row"><div class="bar-row-label">I Tried Every Productivity App for 30 Days</div><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div><div class="bar-value">1.4K</div></div>
+            <div class="bar-row"><div class="bar-row-label">The $50K Mistake Every Creator Makes</div><div class="bar-track"><div class="bar-fill" style="width:42%"></div></div><div class="bar-value">920</div></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  const views = [0, 1, 2, 3];
+  const navItems = [document.getElementById('nav-0'), document.getElementById('nav-1'), document.getElementById('nav-2'), document.getElementById('nav-3')];
+  let current = 0;
+
+  const descFull = "This week's breakdown covers three productivity apps that actually moved the needle, why most habit trackers fail by day 4, and the one Notion template that finally stuck. Full timestamps below.";
+  const typedEl = document.getElementById('typed-desc');
+  let typeTimer = null;
+
+  const runTyping = () => {
+    clearInterval(typeTimer);
+    let i = 0;
+    typedEl.innerHTML = '<span class="cursor"></span>';
+    typeTimer = setInterval(() => {
+      i++;
+      typedEl.innerHTML = descFull.slice(0, i) + '<span class="cursor"></span>';
+      if (i >= descFull.length) clearInterval(typeTimer);
+    }, 35);
+  };
+
+  const showView = (i) => {
+    views.forEach((idx) => {
+      const el = document.getElementById('view-' + idx);
+      el.style.display = idx === i ? 'block' : 'none';
+      if (idx === i) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      }
+      navItems[idx].classList.toggle('active', idx === i);
+    });
+    current = i;
+    if (i === 1) runTyping();
+  };
+
+  showView(0);
+  setInterval(() => {
+    showView((current + 1) % views.length);
+  }, 3500);
+</script>
+</body>
+</html>
