@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canopy Index</title>
+<style>
+  :root {
+    --bg: #070d10;
+    --surface: #0d1a20;
+    --border: rgba(20,184,166,0.15);
+    --brand: #14b8a6;
+    --brand-dim: rgba(20,184,166,0.1);
+    --text: #f0fdfa;
+    --muted: #64748b;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(600px 420px at 88% -10%, rgba(20,184,166,0.08), transparent 65%),
+      radial-gradient(500px 400px at 5% 100%, rgba(20,184,166,0.05), transparent 65%);
+  }
+  .topbar, .shell { position: relative; z-index: 1; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.82); }
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 54px;
+    flex: 0 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(20,184,166,0.4);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .logo-sub { color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .topbar-right .accent { color: var(--brand); font-weight: 600; }
+  .topbar-right .sep { opacity: 0.4; margin: 0 4px; }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(20,184,166,0.8);
+    animation: pulse 2s ease-in-out infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; min-height: 0; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 200px;
+    flex: 0 0 200px;
+    background: #081216;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+  }
+  .sidebar-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    padding: 0 10px 12px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: default;
+  }
+  .nav-item .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+  .nav-item.active {
+    color: var(--brand);
+    background: var(--brand-dim);
+    border-color: rgba(20,184,166,0.25);
+  }
+  .nav-item.active .nav-dot { opacity: 1; box-shadow: 0 0 7px rgba(20,184,166,0.8); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px 4px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sidebar-footer .sync-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(20,184,166,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .sidebar-footer .sync-label { font-size: 11.5px; color: var(--muted); }
+  .sidebar-footer .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; padding: 20px 24px; }
+  .view { display: none; animation: viewIn 0.45s ease both; height: 100%; }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .page-sub { color: var(--muted); font-size: 12.5px; }
+  .count-badge {
+    margin-left: auto;
+    border: 1px solid rgba(20,184,166,0.3);
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--brand-dim);
+  }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; padding: 14px 18px; }
+  .stat-value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .stat-value .accent { color: var(--brand); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* Chart card */
+  .chart-card { padding: 16px 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .chart-title { font-size: 13px; font-weight: 700; }
+  .chart-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; margin-bottom: 10px; }
+  .chart-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+  /* Tables */
+  .table-card { overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 11px 18px 9px;
+    border-bottom: 1px solid rgba(20,184,166,0.09);
+  }
+  td {
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(20,184,166,0.05);
+    font-size: 13.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .rank { color: var(--muted); font-size: 12px; width: 24px; display: inline-block; }
+  .change-pos { color: var(--brand); font-weight: 700; }
+  .county-name, .company-name { font-weight: 600; }
+  .share-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .share-bar-track { width: 70px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .share-bar-fill { height: 100%; background: var(--brand); border-radius: 3px; }
+
+  /* Export view */
+  .export-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+  .export-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--brand-dim);
+    border: 1px solid rgba(20,184,166,0.4);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .export-title { font-weight: 700; font-size: 15px; }
+  .export-sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+  .export-sub .accent { color: var(--brand); font-weight: 600; }
+
+  .download-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .download-card {
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+  .download-glyph {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .download-name { font-size: 13px; font-weight: 600; }
+  .download-meta { font-size: 11px; color: var(--muted); }
+  .download-btn {
+    margin-top: 4px;
+    width: 100%;
+    padding: 7px 0;
+    border-radius: 6px;
+    border: 1px solid rgba(20,184,166,0.35);
+    background: var(--brand-dim);
+    color: var(--brand);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">C</div>
+      <div class="logo-name">Canopy Index</div>
+      <div class="logo-sub">California Cannabis Market Analysis</div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-dot"></span><span class="accent">58 counties</span>&nbsp;analyzed
+      <span class="sep">&middot;</span>
+      <span class="accent">2018 - 2024</span>&nbsp;dataset
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Analysis</div>
+      <nav class="nav">
+        <div class="nav-item" id="nav-0"><span class="nav-dot"></span>Overview</div>
+        <div class="nav-item" id="nav-1"><span class="nav-dot"></span>Counties</div>
+        <div class="nav-item" id="nav-2"><span class="nav-dot"></span>Parent Companies</div>
+        <div class="nav-item" id="nav-3"><span class="nav-dot"></span>Export</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Dataset<strong>4,081 licenses</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- VIEW 1: OVERVIEW -->
+      <section class="view" id="view-0">
+        <div class="page-head">
+          <span class="page-title">Market Overview</span>
+          <span class="page-sub">Statewide retail licensing concentration</span>
+        </div>
+        <div class="stats-row">
+          <div class="surface stat-card">
+            <div class="stat-value"><span class="accent">1,847</span></div>
+            <div class="stat-label">HHI Index (2024)</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">58</div>
+            <div class="stat-label">Counties</div>
+          </div>
+          <div class="surface stat-card">
+            <div class="stat-value">2018 - 2024</div>
+            <div class="stat-label">Dataset Range</div>
+          </div>
+        </div>
+        <div class="surface chart-card">
+          <div class="chart-title">Herfindahl-Hirschman Index Trend</div>
+          <div class="chart-sub">Statewide market concentration, 2018 - 2024</div>
+          <div class="chart-wrap">
+            <svg width="600" height="220" viewBox="0 0 640 220">
+              <defs>
+                <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.28"/>
+                  <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <line x1="40" y1="190" x2="620" y2="190" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+              <polygon points="40,161 133,139 227,120 320,98 413,73 507,54 600,33 600,190 40,190" fill="url(#areaFill)"/>
+              <polyline points="40,161 133,139 227,120 320,98 413,73 507,54 600,33" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="40" cy="161" r="3.5" fill="#14b8a6"/>
+              <circle cx="133" cy="139" r="3.5" fill="#14b8a6"/>
+              <circle cx="227" cy="120" r="3.5" fill="#14b8a6"/>
+              <circle cx="320" cy="98" r="3.5" fill="#14b8a6"/>
+              <circle cx="413" cy="73" r="3.5" fill="#14b8a6"/>
+              <circle cx="507" cy="54" r="3.5" fill="#14b8a6"/>
+              <circle cx="600" cy="33" r="4.5" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+              <text x="600" y="22" fill="#f0fdfa" font-size="12" font-weight="700" text-anchor="end">1,847</text>
+              <text x="40" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2018</text>
+              <text x="133" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2019</text>
+              <text x="227" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2020</text>
+              <text x="320" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2021</text>
+              <text x="413" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2022</text>
+              <text x="507" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2023</text>
+              <text x="600" y="208" fill="#64748b" font-size="10.5" text-anchor="middle">2024</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: COUNTIES -->
+      <section class="view" id="view-1">
+        <div class="page-head">
+          <span class="page-title">Top Counties by Concentration</span>
+          <span class="page-sub">Ranked by HHI, 2024</span>
+          <span class="count-badge">58 COUNTIES</span>
+        </div>
+        <div class="surface table-card">
+          <table>
+            <thead>
+              <tr><th>#</th><th>County</th><th>HHI 2018</th><th>HHI 2024</th><th>Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="rank">1</td><td class="county-name">Los Angeles</td><td class="num muted">1,760</td><td class="num">2,100</td><td class="num change-pos">+340</td></tr>
+              <tr><td class="rank">2</td><td class="county-name">San Francisco</td><td class="num muted">1,680</td><td class="num">1,890</td><td class="num change-pos">+210</td></tr>
+              <tr><td class="rank">3</td><td class="county-name">San Diego</td><td class="num muted">1,540</td><td class="num">1,810</td><td class="num change-pos">+270</td></tr>
+              <tr><td class="rank">4</td><td class="county-name">Orange</td><td class="num muted">1,490</td><td class="num">1,750</td><td class="num change-pos">+260</td></tr>
+              <tr><td class="rank">5</td><td class="county-name">Sacramento</td><td class="num muted">1,420</td><td class="num">1,680</td><td class="num change-pos">+260</td></tr>
+              <tr><td class="rank">6</td><td class="county-name">Alameda</td><td class="num muted">1,380</td><td class="num">1,620</td><td class="num change-pos">+240</td></tr>
+              <tr><td class="rank">7</td><td class="county-name">Santa Clara</td><td class="num muted">1,350</td><td class="num">1,590</td><td class="num change-pos">+240</td></tr>
+              <tr><td class="rank">8</td><td class="county-name">Riverside</td><td class="num muted">1,310</td><td class="num">1,540</td><td class="num change-pos">+230</td></tr>
+              <tr><td class="rank">9</td><td class="county-name">Humboldt</td><td class="num muted">1,290</td><td class="num">1,490</td><td class="num change-pos">+200</td></tr>
+              <tr><td class="rank">10</td><td class="county-name">Mendocino</td><td class="num muted">1,240</td><td class="num">1,430</td><td class="num change-pos">+190</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PARENT COMPANIES -->
+      <section class="view" id="view-2">
+        <div class="page-head">
+          <span class="page-title">Parent Company Analysis</span>
+          <span class="page-sub">Top licensees by statewide market share</span>
+          <span class="count-badge">312 LICENSEES</span>
+        </div>
+        <div class="surface table-card">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Name</th><th>Licenses</th><th>Counties</th><th>Share</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="rank">1</td><td class="company-name">Glass House Farms</td><td class="num">210</td><td class="num">14</td><td><div class="share-bar-wrap"><span class="num">8.4%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:84%"></div></div></div></td></tr>
+              <tr><td class="rank">2</td><td class="company-name">Cookies Enterprises</td><td class="num">175</td><td class="num">12</td><td><div class="share-bar-wrap"><span class="num">6.9%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:69%"></div></div></div></td></tr>
+              <tr><td class="rank">3</td><td class="company-name">Jushi Holdings</td><td class="num">158</td><td class="num">11</td><td><div class="share-bar-wrap"><span class="num">6.1%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:61%"></div></div></div></td></tr>
+              <tr><td class="rank">4</td><td class="company-name">Catalyst Cannabis Co.</td><td class="num">142</td><td class="num">9</td><td><div class="share-bar-wrap"><span class="num">5.5%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:55%"></div></div></div></td></tr>
+              <tr><td class="rank">5</td><td class="company-name">Flow Kana</td><td class="num">128</td><td class="num">10</td><td><div class="share-bar-wrap"><span class="num">4.9%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:49%"></div></div></div></td></tr>
+              <tr><td class="rank">6</td><td class="company-name">Nug Avenue</td><td class="num">115</td><td class="num">8</td><td><div class="share-bar-wrap"><span class="num">4.3%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:43%"></div></div></div></td></tr>
+              <tr><td class="rank">7</td><td class="company-name">Emerald Perspective</td><td class="num">98</td><td class="num">7</td><td><div class="share-bar-wrap"><span class="num">3.8%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:38%"></div></div></div></td></tr>
+              <tr><td class="rank">8</td><td class="company-name">Pacific Stone</td><td class="num">90</td><td class="num">6</td><td><div class="share-bar-wrap"><span class="num">3.4%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:34%"></div></div></div></td></tr>
+              <tr><td class="rank">9</td><td class="company-name">Kiva Confections</td><td class="num">82</td><td class="num">6</td><td><div class="share-bar-wrap"><span class="num">3.1%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:31%"></div></div></div></td></tr>
+              <tr><td class="rank">10</td><td class="company-name">Sunderstorm</td><td class="num">75</td><td class="num">5</td><td><div class="share-bar-wrap"><span class="num">2.8%</span><div class="share-bar-track"><div class="share-bar-fill" style="width:28%"></div></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: EXPORT -->
+      <section class="view" id="view-3">
+        <div class="page-head">
+          <span class="page-title">Export Results</span>
+        </div>
+        <div class="surface export-status">
+          <div class="export-icon">&#10003;</div>
+          <div>
+            <div class="export-title">Analysis complete</div>
+            <div class="export-sub"><span class="accent">6 years</span> &middot; <span class="accent">58 counties</span> &middot; <span class="accent">4,081 licensees</span></div>
+          </div>
+        </div>
+        <div class="download-grid">
+          <div class="surface download-card">
+            <div class="download-glyph">CSV</div>
+            <div class="download-name">Raw Dataset</div>
+            <div class="download-meta">2.4 MB</div>
+            <div class="download-btn">Download</div>
+          </div>
+          <div class="surface download-card">
+            <div class="download-glyph">XLS</div>
+            <div class="download-name">Summary Workbook</div>
+            <div class="download-meta">890 KB</div>
+            <div class="download-btn">Download</div>
+          </div>
+          <div class="surface download-card">
+            <div class="download-glyph">PDF</div>
+            <div class="download-name">Analysis Report</div>
+            <div class="download-meta">1.1 MB</div>
+            <div class="download-btn">Download</div>
+          </div>
+          <div class="surface download-card">
+            <div class="download-glyph">{ }</div>
+            <div class="download-name">JSON Export</div>
+            <div class="download-meta">3.7 MB</div>
+            <div class="download-btn">Download</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  const views = [0, 1, 2, 3];
+  const navItems = [document.getElementById('nav-0'), document.getElementById('nav-1'), document.getElementById('nav-2'), document.getElementById('nav-3')];
+  let current = 0;
+
+  const showView = (i) => {
+    views.forEach((idx) => {
+      const el = document.getElementById('view-' + idx);
+      el.style.display = idx === i ? 'block' : 'none';
+      if (idx === i) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      }
+      navItems[idx].classList.toggle('active', idx === i);
+    });
+    current = i;
+  };
+
+  showView(0);
+  setInterval(() => {
+    showView((current + 1) % views.length);
+  }, 3500);
+</script>
+</body>
+</html>
