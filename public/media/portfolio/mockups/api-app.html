@@ -6,17 +6,20 @@
 <title>Platform Sync</title>
 <style>
   :root {
-    --bg: #060A12;
-    --brand: #38BDF8;
-    --brand-dim: rgba(56,189,248,0.12);
-    --brand-border: rgba(56,189,248,0.3);
-    --text: #F0F6FC;
-    --muted: #94A3B8;
-    --radius: 14px;
-    --glass-bg: rgba(255,255,255,0.10);
-    --glass-blur: blur(20px);
-    --glass-border: rgba(255,255,255,0.12);
-    --glass-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-2: #f4f4f5;
+    --border: #e4e7ec;
+    --brand: #2563eb;
+    --brand-light: #eff6ff;
+    --brand-text: #1d4ed8;
+    --text: #111827;
+    --muted: #6b7280;
+    --success: #16a34a;
+    --success-light: #f0fdf4;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --radius: 10px;
   }
 
   * { box-sizing: border-box; }
@@ -31,41 +34,14 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding: 12px;
-    gap: 12px;
   }
 
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: var(--glass-shadow);
-    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   }
-
-  .glass::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 20px; right: 20px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-    pointer-events: none;
-  }
-
-  .ambient {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(560px 400px at 12% -8%, rgba(56,189,248,0.14), transparent 65%),
-      radial-gradient(640px 480px at 88% 10%, rgba(56,189,248,0.10), transparent 65%),
-      radial-gradient(560px 420px at 55% 112%, rgba(56,189,248,0.08), transparent 65%);
-  }
-
-  .topbar, .shell { z-index: 1; }
 
   /* ============ TOP BAR ============ */
   .topbar {
@@ -74,20 +50,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 18px;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
   }
   .topbar-left { display: flex; align-items: center; gap: 10px; }
   .logo-mark {
     width: 26px; height: 26px;
-    border-radius: 50%;
+    border-radius: 7px;
     background: var(--brand);
-    color: #04202E;
+    color: #fff;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 16px rgba(56,189,248,0.45);
   }
-  .logo-name { font-weight: 500; font-size: 15px; color: var(--text); }
+  .logo-name { font-weight: 600; font-size: 15px; color: var(--text); }
 
   .breadcrumb {
     position: absolute;
@@ -103,13 +80,12 @@
   .topbar-right { display: flex; align-items: center; gap: 16px; }
   .platforms-connected {
     display: flex; align-items: center; gap: 7px;
-    color: var(--brand); font-size: 12.5px; font-weight: 500;
+    color: var(--brand-text); font-size: 12.5px; font-weight: 600;
   }
   .platforms-connected .dot {
-    width: 8px; height: 8px;
+    width: 7px; height: 7px;
     border-radius: 50%;
     background: var(--brand);
-    box-shadow: 0 0 8px rgba(56,189,248,0.8);
     animation: pulse 2s ease-in-out infinite;
   }
   .clock {
@@ -117,16 +93,16 @@
     color: var(--muted);
     font-size: 13px;
     padding-left: 16px;
-    border-left: 1px solid rgba(255,255,255,0.10);
+    border-left: 1px solid var(--border);
   }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 0.45; transform: scale(0.8); }
   }
 
   /* ============ SHELL ============ */
-  .shell { flex: 1; display: flex; gap: 12px; min-height: 0; }
+  .shell { flex: 1; display: flex; min-height: 0; }
 
   /* ============ SIDEBAR ============ */
   .sidebar {
@@ -135,6 +111,8 @@
     display: flex;
     flex-direction: column;
     padding: 18px 12px 16px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
   }
   .sidebar-title {
     font-variant: small-caps;
@@ -143,63 +121,62 @@
     color: var(--muted);
     padding: 0 10px 14px;
   }
-  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    color: var(--muted);
+    padding: 9px 12px 9px 9px;
+    border-radius: 8px;
+    color: var(--text);
     font-size: 13.5px;
     font-weight: 500;
-    border: 1px solid transparent;
+    border-left: 3px solid transparent;
   }
   .nav-item .nav-dot {
-    width: 7px; height: 7px;
+    width: 6px; height: 6px;
     border-radius: 50%;
-    background: currentColor;
-    opacity: 0.65;
+    background: var(--muted);
+    opacity: 0.55;
   }
   .nav-item.active {
-    color: var(--brand);
-    background: var(--brand-dim);
-    border-color: var(--brand-border);
-    box-shadow: 0 0 18px rgba(56,189,248,0.14), inset 0 1px 0 rgba(255,255,255,0.08);
+    color: var(--brand-text);
+    background: var(--brand-light);
+    border-left: 3px solid var(--brand);
+    font-weight: 600;
   }
   .nav-item.active .nav-dot {
+    background: var(--brand);
     opacity: 1;
-    box-shadow: 0 0 8px rgba(56,189,248,0.8);
   }
 
   .sidebar-footer {
     margin-top: auto;
     padding: 12px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 9px;
   }
   .sync-dot {
-    width: 8px; height: 8px;
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--brand);
-    box-shadow: 0 0 8px rgba(56,189,248,0.8);
+    background: var(--success);
     animation: pulse 1.6s ease-in-out infinite;
   }
   .sync-label { font-size: 12px; color: var(--muted); }
-  .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+  .sync-label strong { display: block; color: var(--success); font-weight: 600; font-size: 12.5px; }
 
   /* ============ MAIN ============ */
-  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; }
-  .view { display: none; height: 100%; }
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; padding: 22px 26px; }
+  .view { display: none; flex-direction: column; justify-content: center; height: 100%; }
 
-  .page-head { display: flex; align-items: center; gap: 12px; margin: 4px 2px 16px; }
-  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .page-head { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
   .count-badge {
-    background: var(--brand-dim);
-    border: 1px solid var(--brand-border);
-    color: var(--brand);
+    background: var(--brand-light);
+    border: 1px solid #dbeafe;
+    color: var(--brand-text);
     font-size: 12px;
     font-weight: 600;
     padding: 3px 10px;
@@ -220,8 +197,10 @@
     white-space: nowrap;
   }
   .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .pill.cyan { color: var(--brand); background: var(--brand-dim); border: 1px solid var(--brand-border); }
-  .pill.grey { color: var(--muted); background: rgba(148,163,184,0.10); border: 1px solid rgba(148,163,184,0.28); }
+  .pill.blue { color: var(--brand-text); background: var(--brand-light); border: 1px solid #dbeafe; }
+  .pill.green { color: var(--success); background: var(--success-light); border: 1px solid #dcfce7; }
+  .pill.grey { color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); }
+  .pill.red { color: var(--danger); background: var(--danger-light); border: 1px solid #fecaca; }
 
   /* ============ VIEW 1: OVERVIEW ============ */
   .platform-grid {
@@ -235,31 +214,30 @@
   .platform-icon {
     width: 38px; height: 38px;
     border-radius: 10px;
-    background: var(--brand-dim);
-    border: 1px solid var(--brand-border);
-    color: var(--brand);
+    background: var(--brand-light);
+    border: 1px solid #dbeafe;
+    color: var(--brand-text);
     font-weight: 700;
     font-size: 14px;
     display: flex; align-items: center; justify-content: center;
   }
-  .platform-name { font-weight: 600; font-size: 14.5px; }
+  .platform-name { font-weight: 600; font-size: 14.5px; color: var(--text); }
   .platform-type { color: var(--muted); font-size: 12px; margin-top: 1px; }
   .platform-status {
     margin-left: auto;
     display: flex; align-items: center; gap: 6px;
-    color: var(--brand); font-size: 12px; font-weight: 600;
+    color: var(--success); font-size: 12px; font-weight: 600;
   }
   .platform-status .dot {
     width: 7px; height: 7px; border-radius: 50%;
-    background: var(--brand);
-    box-shadow: 0 0 7px rgba(56,189,248,0.8);
+    background: var(--success);
     animation: pulse 1.8s ease-in-out infinite;
   }
-  .platform-meta { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .platform-meta { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
   .meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
   .meta-row .meta-label { color: var(--muted); }
   .meta-row .meta-value { color: var(--text); font-variant-numeric: tabular-nums; }
-  .meta-row .meta-value.accent { color: var(--brand); font-weight: 600; }
+  .meta-row .meta-value.accent { color: var(--brand-text); font-weight: 600; }
 
   .stat-bar {
     margin-top: 14px;
@@ -271,79 +249,79 @@
     font-size: 13.5px;
     color: var(--muted);
   }
-  .stat-bar .accent { color: var(--brand); font-weight: 700; }
+  .stat-bar .accent { color: var(--brand-text); font-weight: 700; }
   .stat-bar .sep { opacity: 0.4; }
 
   /* ============ VIEW 2: ACTIVITY FEED ============ */
-  .feed-list { display: flex; flex-direction: column; gap: 8px; overflow: hidden; height: calc(100% - 54px); }
+  .feed-list { display: flex; flex-direction: column; overflow: hidden; height: calc(100% - 52px); }
   .feed-row {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 12px 18px;
+    border-bottom: 1px solid var(--surface-2);
     transition: background 0.3s ease;
   }
+  .feed-row:last-child { border-bottom: none; }
   .feed-row.flash { animation: flashIn 1.2s ease; }
   @keyframes flashIn {
-    0% { background: rgba(56,189,248,0.22); transform: translateY(-6px); opacity: 0; }
+    0% { background: var(--brand-light); transform: translateY(-6px); opacity: 0; }
     15% { opacity: 1; transform: translateY(0); }
-    100% { background: rgba(255,255,255,0.10); }
+    100% { background: transparent; }
   }
   .feed-time { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; width: 66px; flex: 0 0 66px; }
-  .feed-platform { font-weight: 600; font-size: 13px; width: 108px; flex: 0 0 108px; }
-  .feed-event { font-size: 13px; flex: 1.4; min-width: 0; }
+  .feed-platform { font-weight: 600; font-size: 13px; width: 108px; flex: 0 0 108px; color: var(--text); }
+  .feed-event { font-size: 13px; flex: 1.4; min-width: 0; color: var(--text); }
   .feed-detail { color: var(--muted); font-size: 12.5px; flex: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .feed-status { flex: 0 0 auto; }
 
   /* ============ VIEW 3: PLATFORMS ============ */
   .platforms-shell { display: flex; gap: 14px; height: 100%; }
-  .platform-list { width: 260px; flex: 0 0 260px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .platform-list { width: 260px; flex: 0 0 260px; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
   .plat-row {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid transparent;
-    color: var(--muted);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    color: var(--text);
   }
   .plat-row .plat-mark {
     width: 26px; height: 26px; border-radius: 8px;
-    background: rgba(148,163,184,0.10);
-    border: 1px solid rgba(148,163,184,0.24);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     color: var(--muted);
     font-size: 11px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
   }
   .plat-row .plat-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .plat-row .plat-dot { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); opacity: 0.7; }
+  .plat-row .plat-dot { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--success); opacity: 0.8; }
   .plat-row.selected {
-    background: var(--brand-dim);
-    border-color: var(--brand-border);
-    box-shadow: 0 0 18px rgba(56,189,248,0.12);
+    background: var(--brand-light);
+    border-left: 3px solid var(--brand);
   }
   .plat-row.selected .plat-mark {
     background: var(--brand);
     border-color: var(--brand);
-    color: #04202E;
+    color: #fff;
   }
-  .plat-row.selected .plat-dot { box-shadow: 0 0 7px rgba(56,189,248,0.8); }
+  .plat-row.selected .plat-name { color: var(--brand-text); font-weight: 600; }
 
   .platform-detail { flex: 1; min-width: 0; padding: 20px 22px; display: flex; flex-direction: column; }
   .detail-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
   .detail-logo {
     width: 48px; height: 48px; border-radius: 12px;
-    background: var(--brand-dim);
-    border: 1px solid var(--brand-border);
-    color: var(--brand);
+    background: var(--brand-light);
+    border: 1px solid #dbeafe;
+    color: var(--brand-text);
     font-weight: 700; font-size: 15px;
     display: flex; align-items: center; justify-content: center;
   }
-  .detail-name { font-size: 17px; font-weight: 600; }
+  .detail-name { font-size: 17px; font-weight: 600; color: var(--text); }
   .detail-sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
-  .detail-sub .live { color: var(--brand); font-weight: 500; }
+  .detail-sub .live { color: var(--success); font-weight: 600; }
   .detail-sub .mini-dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: var(--brand);
-    box-shadow: 0 0 6px rgba(56,189,248,0.8);
+    background: var(--success);
     animation: pulse 1.6s ease-in-out infinite;
   }
 
@@ -352,11 +330,11 @@
     flex: 1;
     padding: 12px 14px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
   }
-  .sync-cell .sc-name { font-size: 13px; font-weight: 600; }
-  .sync-cell .sc-mode { font-size: 11px; color: var(--brand); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .sync-cell .sc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sync-cell .sc-mode { font-size: 11px; color: var(--brand-text); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
   .sync-cell.read .sc-mode { color: var(--muted); }
 
   .detail-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 600; margin: 20px 2px 10px; }
@@ -365,12 +343,12 @@
     display: flex; align-items: center; gap: 12px;
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     font-size: 12.5px;
   }
   .xa-row .xa-time { color: var(--muted); width: 60px; flex: 0 0 60px; font-variant-numeric: tabular-nums; }
-  .xa-row .xa-desc { flex: 1; }
+  .xa-row .xa-desc { flex: 1; color: var(--text); }
   .xa-row .xa-amount { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 
   /* ============ VIEW 4: LOGS ============ */
@@ -381,9 +359,9 @@
     font-size: 12.5px;
     font-weight: 500;
     color: var(--muted);
-    border: 1px solid rgba(255,255,255,0.10);
+    border: 1px solid var(--border);
   }
-  .chip.active { color: var(--brand); background: var(--brand-dim); border-color: var(--brand-border); }
+  .chip.active { color: var(--brand-text); background: var(--brand-light); border-color: #dbeafe; font-weight: 600; }
 
   .log-table { overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
@@ -395,27 +373,26 @@
     color: var(--muted);
     font-weight: 600;
     padding: 12px 18px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.09);
+    background: #f9fafb;
+    border-bottom: 1px solid var(--border);
   }
   td {
     padding: 10px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid #f3f4f6;
     font-size: 12.5px;
     color: var(--text);
     white-space: nowrap;
     font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
   }
   tr:last-child td { border-bottom: none; }
-  tr.alt td { background: rgba(255,255,255,0.02); }
   td.muted { color: var(--muted); }
   td.dur { font-variant-numeric: tabular-nums; color: var(--muted); }
 </style>
 </head>
 <body>
-  <div class="ambient"></div>
 
   <!-- TOP BAR -->
-  <header class="topbar glass">
+  <header class="topbar">
     <div class="topbar-left">
       <div class="logo-mark">S</div>
       <div class="logo-name">Platform Sync</div>
@@ -429,7 +406,7 @@
 
   <div class="shell">
     <!-- SIDEBAR -->
-    <aside class="sidebar glass">
+    <aside class="sidebar">
       <div class="sidebar-title">Platform Sync</div>
       <nav class="nav">
         <div class="nav-item active" data-view="overview"><span class="nav-dot"></span>Overview</div>
@@ -452,7 +429,7 @@
           <span class="page-title">Platform Status</span>
         </div>
         <div class="platform-grid">
-          <div class="glass platform-card">
+          <div class="surface platform-card">
             <div class="platform-head">
               <div class="platform-icon">Xe</div>
               <div>
@@ -467,7 +444,7 @@
             </div>
           </div>
 
-          <div class="glass platform-card">
+          <div class="surface platform-card">
             <div class="platform-head">
               <div class="platform-icon">W</div>
               <div>
@@ -482,7 +459,7 @@
             </div>
           </div>
 
-          <div class="glass platform-card">
+          <div class="surface platform-card">
             <div class="platform-head">
               <div class="platform-icon">G</div>
               <div>
@@ -497,7 +474,7 @@
             </div>
           </div>
 
-          <div class="glass platform-card">
+          <div class="surface platform-card">
             <div class="platform-head">
               <div class="platform-icon">A</div>
               <div>
@@ -512,7 +489,7 @@
             </div>
           </div>
 
-          <div class="glass platform-card">
+          <div class="surface platform-card">
             <div class="platform-head">
               <div class="platform-icon">J</div>
               <div>
@@ -528,7 +505,7 @@
           </div>
         </div>
 
-        <div class="glass stat-bar">
+        <div class="surface stat-bar">
           <span><span class="accent" id="stat-total">3,366</span> records synced today</span>
           <span class="sep">&middot;</span>
           <span><span class="accent">0</span> errors</span>
@@ -543,48 +520,48 @@
           <span class="page-title">Activity Feed</span>
           <span class="count-badge"><span id="event-count">847</span> events today</span>
         </div>
-        <div class="glass feed-list" id="feed-list">
+        <div class="surface feed-list" id="feed-list">
           <div class="feed-row">
             <span class="feed-time">22:41:28</span>
             <span class="feed-platform">Xero</span>
             <span class="feed-event">Invoice INV-2853 created</span>
             <span class="feed-detail">&pound;380.00 &middot; Thornwick Group</span>
-            <span class="feed-status"><span class="pill cyan">Synced</span></span>
+            <span class="feed-status"><span class="pill blue">Synced</span></span>
           </div>
           <div class="feed-row">
             <span class="feed-time">22:41:24</span>
             <span class="feed-platform">WorkflowMax</span>
             <span class="feed-event">Job JB-2849 completed</span>
             <span class="feed-detail">Fairview Care</span>
-            <span class="feed-status"><span class="pill cyan">Status updated</span></span>
+            <span class="feed-status"><span class="pill blue">Status updated</span></span>
           </div>
           <div class="feed-row">
             <span class="feed-time">22:41:19</span>
             <span class="feed-platform">Glofox</span>
             <span class="feed-event">Member #8821 renewed</span>
             <span class="feed-detail">Premium plan</span>
-            <span class="feed-status"><span class="pill cyan">Synced to Acorn</span></span>
+            <span class="feed-status"><span class="pill blue">Synced to Acorn</span></span>
           </div>
           <div class="feed-row">
             <span class="feed-time">22:41:11</span>
             <span class="feed-platform">Xero</span>
             <span class="feed-event">PO-0924 raised</span>
             <span class="feed-detail">&pound;85.00</span>
-            <span class="feed-status"><span class="pill cyan">Auto-generated</span></span>
+            <span class="feed-status"><span class="pill blue">Auto-generated</span></span>
           </div>
           <div class="feed-row">
             <span class="feed-time">22:41:05</span>
             <span class="feed-platform">JISR</span>
             <span class="feed-event">Timesheet approved</span>
             <span class="feed-detail">D. Collins &middot; 8.5 hrs</span>
-            <span class="feed-status"><span class="pill cyan">Synced</span></span>
+            <span class="feed-status"><span class="pill blue">Synced</span></span>
           </div>
           <div class="feed-row">
             <span class="feed-time">22:40:58</span>
             <span class="feed-platform">WorkflowMax</span>
             <span class="feed-event">Quote QT-441 accepted</span>
             <span class="feed-detail">Atlantic Works</span>
-            <span class="feed-status"><span class="pill cyan">Invoice triggered</span></span>
+            <span class="feed-status"><span class="pill blue">Invoice triggered</span></span>
           </div>
         </div>
       </section>
@@ -595,7 +572,7 @@
           <span class="page-title">Platforms</span>
         </div>
         <div class="platforms-shell">
-          <div class="glass platform-list">
+          <div class="surface platform-list">
             <div class="plat-row selected">
               <span class="plat-mark">Xe</span>
               <span class="plat-name">Xero</span>
@@ -623,7 +600,7 @@
             </div>
           </div>
 
-          <div class="glass platform-detail">
+          <div class="surface platform-detail">
             <div class="detail-head">
               <div class="detail-logo">Xe</div>
               <div>
@@ -672,22 +649,22 @@
             <span class="chip">Today</span>
           </div>
         </div>
-        <div class="glass log-table">
+        <div class="surface log-table">
           <table>
             <thead>
               <tr><th>Timestamp</th><th>Platform</th><th>Event</th><th>Status</th><th>Duration</th></tr>
             </thead>
             <tbody>
-              <tr><td>22:41:28</td><td>Xero</td><td class="muted">Invoice INV-2853 created</td><td><span class="pill cyan">Synced</span></td><td class="dur">12ms</td></tr>
-              <tr class="alt"><td>22:41:24</td><td>WorkflowMax</td><td class="muted">Job JB-2849 status updated</td><td><span class="pill cyan">Synced</span></td><td class="dur">34ms</td></tr>
-              <tr><td>22:41:19</td><td>Glofox</td><td class="muted">Member #8821 renewed</td><td><span class="pill cyan">Synced</span></td><td class="dur">8ms</td></tr>
-              <tr class="alt"><td>22:41:11</td><td>Xero</td><td class="muted">PO-0924 raised</td><td><span class="pill cyan">Synced</span></td><td class="dur">19ms</td></tr>
-              <tr><td>22:41:05</td><td>JISR</td><td class="muted">Timesheet approved &middot; D. Collins</td><td><span class="pill cyan">Synced</span></td><td class="dur">27ms</td></tr>
-              <tr class="alt"><td>22:40:58</td><td>WorkflowMax</td><td class="muted">Quote QT-441 accepted</td><td><span class="pill cyan">Synced</span></td><td class="dur">41ms</td></tr>
-              <tr><td>22:40:52</td><td>Acorn</td><td class="muted">Completion recorded &middot; H&amp;S Module 4</td><td><span class="pill cyan">Synced</span></td><td class="dur">15ms</td></tr>
-              <tr class="alt"><td>22:40:45</td><td>Xero</td><td class="muted">Contact updated &middot; Halberd Retail</td><td><span class="pill cyan">Synced</span></td><td class="dur">9ms</td></tr>
-              <tr><td>22:40:39</td><td>JISR</td><td class="muted">Employee record updated</td><td><span class="pill cyan">Synced</span></td><td class="dur">22ms</td></tr>
-              <tr class="alt"><td>22:40:31</td><td>Glofox</td><td class="muted">Member #8790 checked in</td><td><span class="pill cyan">Synced</span></td><td class="dur">6ms</td></tr>
+              <tr><td>22:41:28</td><td>Xero</td><td class="muted">Invoice INV-2853 created</td><td><span class="pill blue">Synced</span></td><td class="dur">12ms</td></tr>
+              <tr><td>22:41:24</td><td>WorkflowMax</td><td class="muted">Job JB-2849 status updated</td><td><span class="pill blue">Synced</span></td><td class="dur">34ms</td></tr>
+              <tr><td>22:41:19</td><td>Glofox</td><td class="muted">Member #8821 renewed</td><td><span class="pill blue">Synced</span></td><td class="dur">8ms</td></tr>
+              <tr><td>22:41:11</td><td>Xero</td><td class="muted">PO-0924 raised</td><td><span class="pill blue">Synced</span></td><td class="dur">19ms</td></tr>
+              <tr><td>22:41:05</td><td>JISR</td><td class="muted">Timesheet approved &middot; D. Collins</td><td><span class="pill blue">Synced</span></td><td class="dur">27ms</td></tr>
+              <tr><td>22:40:58</td><td>WorkflowMax</td><td class="muted">Quote QT-441 accepted</td><td><span class="pill blue">Synced</span></td><td class="dur">41ms</td></tr>
+              <tr><td>22:40:52</td><td>Acorn</td><td class="muted">Completion recorded &middot; H&amp;S Module 4</td><td><span class="pill blue">Synced</span></td><td class="dur">15ms</td></tr>
+              <tr><td>22:40:45</td><td>Xero</td><td class="muted">Contact updated &middot; Halberd Retail</td><td><span class="pill blue">Synced</span></td><td class="dur">9ms</td></tr>
+              <tr><td>22:40:39</td><td>JISR</td><td class="muted">Employee record updated</td><td><span class="pill blue">Synced</span></td><td class="dur">22ms</td></tr>
+              <tr><td>22:40:31</td><td>Glofox</td><td class="muted">Member #8790 checked in</td><td><span class="pill blue">Synced</span></td><td class="dur">6ms</td></tr>
             </tbody>
           </table>
         </div>
@@ -706,7 +683,7 @@
   const showView = (i) => {
     views.forEach((v, idx) => {
       const el = document.getElementById('view-' + v);
-      el.style.display = idx === i ? 'block' : 'none';
+      el.style.display = idx === i ? 'flex' : 'none';
       navItems[idx].classList.toggle('active', idx === i);
     });
     crumb.textContent = viewNames[i];
@@ -781,7 +758,7 @@
       '<span class="feed-platform">' + item.p + '</span>' +
       '<span class="feed-event">' + item.ev + '</span>' +
       '<span class="feed-detail">' + item.det + '</span>' +
-      '<span class="feed-status"><span class="pill cyan">' + item.st + '</span></span>';
+      '<span class="feed-status"><span class="pill blue">' + item.st + '</span></span>';
     list.insertBefore(row, list.firstChild);
     while (list.children.length > 7) {
       list.removeChild(list.lastChild);
