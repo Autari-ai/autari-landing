@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Finder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1917;
+    --sidebar-bg: #161513;
+    --topbar-bg: #141311;
+    --row-alt: #1e1c19;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --brand: #f97316;
+    --brand-dim: rgba(249,115,22,0.12);
+    --brand-border: rgba(249,115,22,0.35);
+    --text: #fafaf9;
+    --muted: #78716c;
+    --success: #22c55e;
+    --success-dim: rgba(34,197,94,0.12);
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 56px; flex: 0 0 56px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px; background: var(--topbar-bg); border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 7px; background: var(--brand); color: #1a0d02;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+  }
+  .brand-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12.5px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-dim); }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; overflow: hidden; }
+
+  .sidebar {
+    width: 220px; flex: 0 0 220px; background: var(--sidebar-bg); border-right: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 12px; display: flex; flex-direction: column;
+  }
+  .sidebar-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 0 10px 10px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius);
+    color: var(--muted); font-size: 13.5px; font-weight: 500; cursor: default;
+  }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .nav-item.active { background: var(--brand-dim); color: var(--text); }
+  .nav-item.active svg { color: var(--brand); }
+  .sidebar-footer {
+    margin-top: auto; padding: 12px 10px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 11.5px;
+  }
+  .sidebar-footer strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
+
+  .main { flex: 1; position: relative; overflow: hidden; padding: 24px; }
+  .view { position: absolute; inset: 24px; display: none; flex-direction: column; opacity: 0; transition: opacity .35s ease; }
+  .view.active { display: flex; opacity: 1; }
+
+  .view-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
+  .view-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .view-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .head-btn {
+    background: var(--brand); color: #1a0d02; border: none; border-radius: var(--radius);
+    padding: 9px 16px; font-size: 12.5px; font-weight: 700; cursor: default;
+  }
+  .ghost-btn {
+    background: transparent; border: 1px dashed var(--border-strong); color: var(--muted); border-radius: var(--radius);
+    padding: 10px; font-size: 12.5px; font-weight: 600; cursor: default; text-align: center; width: 100%;
+  }
+
+  /* ============ DATA TABLE (shared) ============ */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    text-align: left; color: var(--muted); font-weight: 600; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .05em; padding: 0 14px 10px 0; border-bottom: 1px solid var(--border-strong);
+  }
+  .data-table td { padding: 12px 14px 12px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr.highlight td { background: var(--brand-dim); }
+  .data-table tbody tr.highlight td:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .data-table tbody tr.highlight td:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+
+  .job-title { font-weight: 600; color: var(--text); }
+  .job-client { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .muted { color: var(--muted); }
+
+  .score-cell { display: flex; flex-direction: column; gap: 5px; width: 64px; }
+  .score-num { font-size: 20px; font-weight: 800; color: var(--brand); line-height: 1; }
+  .score-num.dim { color: #c2703f; opacity: .75; }
+  .score-track { width: 56px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; }
+  .score-fill { height: 100%; background: var(--brand); border-radius: 2px; }
+
+  /* ============ VIEW 1: JOB FEED ============ */
+  #view-feed .table-wrap { flex: 1; overflow: hidden; }
+
+  /* ============ VIEW 2: JOB DETAIL ============ */
+  .detail-grid { flex: 1; display: flex; gap: 18px; overflow: hidden; }
+  .detail-left { flex: 1.4; display: flex; flex-direction: column; padding: 20px; overflow: hidden; }
+  .detail-right { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; }
+
+  .job-badges { display: flex; gap: 6px; margin: 10px 0 16px; flex-wrap: wrap; }
+  .pill {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    padding: 4px 9px; border-radius: 20px; border: 1px solid var(--brand-border); color: var(--brand); background: var(--brand-dim);
+  }
+  .detail-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .detail-meta { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-bottom: 4px; flex-wrap: wrap; }
+  .job-desc { font-size: 13px; line-height: 1.7; color: #d6d3d1; margin-top: 4px; overflow: hidden; }
+  .client-card {
+    margin-top: auto; display: flex; gap: 22px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .client-stat .v { font-weight: 700; font-size: 14px; }
+  .client-stat .l { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 14px; }
+  .rule-list { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow: hidden; }
+  .rule-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .rule-row:last-of-type { border-bottom: none; }
+  .rule-points { font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
+  .score-total { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--border-strong); }
+  .score-total .label { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .score-total .value { font-size: 30px; font-weight: 800; color: var(--brand); }
+  .score-total .value span { font-size: 15px; color: var(--muted); font-weight: 600; }
+
+  /* ============ VIEW 3: RULES ============ */
+  .rules-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .rules-table-wrap { flex: 1; overflow: hidden; }
+  .op-badge {
+    font-size: 11px; font-weight: 600; color: var(--muted); background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 5px; padding: 3px 8px; font-family: 'SF Mono', Consolas, monospace;
+  }
+  .pts-badge { font-weight: 700; color: var(--success); }
+  .add-rule-row { margin-top: 16px; flex-shrink: 0; }
+
+  /* ============ VIEW 4: CONTRACTS ============ */
+  .status-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding: 3px 9px; border-radius: 20px; }
+  .status-tag.active { color: var(--success); background: var(--success-dim); }
+  .status-tag.completed { color: var(--muted); background: rgba(255,255,255,0.05); }
+  .earned { font-weight: 700; }
+  .earned.dim { color: var(--muted); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">U</div>
+    <div class="brand-name">Job Finder</div>
+  </div>
+  <div class="topbar-right">
+    <span class="sync-dot"></span>
+    <span>Last synced: 2m ago</span>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-label">Workspace</div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-nav="feed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        Job Feed
+      </div>
+      <div class="nav-item" data-nav="rules">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="14" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="8" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="16" cy="18" r="2"/></svg>
+        Rules
+      </div>
+      <div class="nav-item" data-nav="contracts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>
+        Contracts
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <strong>47 jobs scored</strong>
+      12 rules active &middot; synced every 15 min
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- VIEW 1: JOB FEED -->
+    <section class="view active" id="view-feed">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Job Feed</div>
+          <div class="view-sub">8 new jobs synced &middot; ranked by score</div>
+        </div>
+        <div class="head-btn">Sync Now</div>
+      </div>
+      <div class="surface table-wrap">
+        <table class="data-table" style="padding:4px 18px;">
+          <thead>
+            <tr><th style="padding-left:18px;">Score</th><th>Title</th><th>Client</th><th>Budget</th><th>Posted</th></tr>
+          </thead>
+          <tbody>
+            <tr class="highlight">
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num">94</span><div class="score-track"><div class="score-fill" style="width:94%;"></div></div></div></td>
+              <td><div class="job-title">Automation Engineer &mdash; UK SaaS Company</div></td>
+              <td class="muted">Northbeam Ltd</td>
+              <td class="num">$50&ndash;100/hr</td>
+              <td class="muted">2h ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num">87</span><div class="score-track"><div class="score-fill" style="width:87%;"></div></div></div></td>
+              <td><div class="job-title">Python Developer &mdash; Internal Tooling</div></td>
+              <td class="muted">Fintra Inc</td>
+              <td class="num">$65/hr</td>
+              <td class="muted">4h ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num">82</span><div class="score-track"><div class="score-fill" style="width:82%;"></div></div></div></td>
+              <td><div class="job-title">Zapier &amp; Make Integration Specialist</div></td>
+              <td class="muted">Meridian Goods</td>
+              <td class="num">$45&ndash;70/hr</td>
+              <td class="muted">6h ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num">71</span><div class="score-track"><div class="score-fill" style="width:71%;"></div></div></div></td>
+              <td><div class="job-title">Backend Engineer (Django, DRF)</div></td>
+              <td class="muted">CarePath Health</td>
+              <td class="num">$60/hr</td>
+              <td class="muted">9h ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num dim">68</span><div class="score-track"><div class="score-fill" style="width:68%;"></div></div></div></td>
+              <td><div class="job-title">Workflow Automation Consultant</div></td>
+              <td class="muted">Wrenlake Media</td>
+              <td class="num">$3,200 fixed</td>
+              <td class="muted">12h ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num dim">55</span><div class="score-track"><div class="score-fill" style="width:55%;"></div></div></div></td>
+              <td><div class="job-title">API Integration Developer</div></td>
+              <td class="muted">Austral Freight Co</td>
+              <td class="num">$40/hr</td>
+              <td class="muted">1d ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num dim">43</span><div class="score-track"><div class="score-fill" style="width:43%;"></div></div></div></td>
+              <td><div class="job-title">Junior Python Scripter, Short-term</div></td>
+              <td class="muted">QuickTasks LLC</td>
+              <td class="num">$25/hr</td>
+              <td class="muted">1d ago</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;"><div class="score-cell"><span class="score-num dim">31</span><div class="score-track"><div class="score-fill" style="width:31%;"></div></div></div></td>
+              <td><div class="job-title">Data Entry Automation</div></td>
+              <td class="muted">Unverified Client</td>
+              <td class="num">$15/hr</td>
+              <td class="muted">2d ago</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 2: JOB DETAIL -->
+    <section class="view" id="view-detail">
+      <div class="view-head">
+        <div>
+          <div class="view-sub" style="margin-bottom:4px;">&larr; Job Feed</div>
+          <div class="detail-title">Automation Engineer &mdash; UK SaaS Company</div>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="surface detail-left">
+          <div class="detail-meta">
+            <span>Northbeam Ltd &middot; United Kingdom</span>
+            <span>Posted 2h ago</span>
+            <span>8 proposals</span>
+          </div>
+          <div class="job-badges">
+            <span class="pill">Payment Verified</span>
+            <span class="pill">Long-term</span>
+            <span class="pill">$50&ndash;100/hr</span>
+          </div>
+          <div class="job-desc">
+            We're looking for an experienced automation engineer to streamline our internal operations. You'll connect our CRM, billing system, and support desk using Zapier, Make, and custom Python scripts. Strong experience with Django REST APIs and webhook-based integrations required.
+            <br><br>
+            This is an ongoing, long-term engagement at 20&ndash;30 hrs/week. You'll work directly with our founding team and have full ownership over the automation stack.
+          </div>
+          <div class="client-card">
+            <div class="client-stat"><div class="v">4.9&#9733;</div><div class="l">Client rating</div></div>
+            <div class="client-stat"><div class="v">$340k</div><div class="l">Total spent</div></div>
+            <div class="client-stat"><div class="v">98%</div><div class="l">Hire rate</div></div>
+          </div>
+        </div>
+        <div class="surface detail-right">
+          <div class="panel-title">Score Breakdown</div>
+          <div class="rule-list">
+            <div class="rule-row"><span>Payment verified</span><span class="rule-points">+20</span></div>
+            <div class="rule-row"><span>Long-term contract</span><span class="rule-points">+15</span></div>
+            <div class="rule-row"><span>Budget $50&ndash;100/hr</span><span class="rule-points">+18</span></div>
+            <div class="rule-row"><span>Django mentioned</span><span class="rule-points">+8</span></div>
+            <div class="rule-row"><span>Client rating 4.9/5</span><span class="rule-points">+12</span></div>
+            <div class="rule-row"><span>98% hire rate</span><span class="rule-points">+11</span></div>
+            <div class="rule-row"><span>US/UK/EU client</span><span class="rule-points">+10</span></div>
+          </div>
+          <div class="score-total">
+            <span class="label">Total Score</span>
+            <span class="value">94<span>/100</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: RULES EDITOR -->
+    <section class="view" id="view-rules">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Scoring Rules</div>
+          <div class="view-sub">12 rules active &middot; scoring 47 jobs</div>
+        </div>
+      </div>
+      <div class="rules-body">
+        <div class="surface rules-table-wrap">
+          <table class="data-table" style="padding:4px 18px;">
+            <thead>
+              <tr><th style="padding-left:18px;">Field</th><th>Operator</th><th>Value</th><th>Points</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding-left:18px;">Payment Verified</td>
+                <td><span class="op-badge">equals</span></td>
+                <td class="muted">Yes</td>
+                <td class="pts-badge">+20</td>
+              </tr>
+              <tr>
+                <td style="padding-left:18px;">Contract Length</td>
+                <td><span class="op-badge">equals</span></td>
+                <td class="muted">Long-term</td>
+                <td class="pts-badge">+15</td>
+              </tr>
+              <tr>
+                <td style="padding-left:18px;">Hourly Rate</td>
+                <td><span class="op-badge">between</span></td>
+                <td class="muted">$50 &ndash; $100</td>
+                <td class="pts-badge">+18</td>
+              </tr>
+              <tr>
+                <td style="padding-left:18px;">Skills</td>
+                <td><span class="op-badge">contains</span></td>
+                <td class="muted">Django</td>
+                <td class="pts-badge">+8</td>
+              </tr>
+              <tr>
+                <td style="padding-left:18px;">Client Rating</td>
+                <td><span class="op-badge">&gt;=</span></td>
+                <td class="muted">4.5</td>
+                <td class="pts-badge">+12</td>
+              </tr>
+              <tr>
+                <td style="padding-left:18px;">Client Hire Rate</td>
+                <td><span class="op-badge">&gt;=</span></td>
+                <td class="muted">90%</td>
+                <td class="pts-badge">+11</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="add-rule-row">
+          <div class="ghost-btn">+ Add rule</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: CONTRACTS -->
+    <section class="view" id="view-contracts">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Contracts</div>
+          <div class="view-sub">6 contracts &middot; 4 active</div>
+        </div>
+      </div>
+      <div class="surface table-wrap">
+        <table class="data-table" style="padding:4px 18px;">
+          <thead>
+            <tr><th style="padding-left:18px;">Client</th><th>Title</th><th>Started</th><th>Status</th><th>Total Earned</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding-left:18px;">Northbeam Ltd</td>
+              <td>Automation Engineer</td>
+              <td class="muted">Jun 12, 2026</td>
+              <td><span class="status-tag active">Active</span></td>
+              <td class="earned">$8,420</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;">Fintra Inc</td>
+              <td>Python Developer</td>
+              <td class="muted">Apr 3, 2026</td>
+              <td><span class="status-tag active">Active</span></td>
+              <td class="earned">$14,180</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;">Meridian Goods</td>
+              <td>Integration Specialist</td>
+              <td class="muted">Jul 22, 2026</td>
+              <td><span class="status-tag active">Active</span></td>
+              <td class="earned">$3,150</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;">Wrenlake Media</td>
+              <td>Workflow Consultant</td>
+              <td class="muted">May 8, 2026</td>
+              <td><span class="status-tag active">Active</span></td>
+              <td class="earned">$6,900</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;" class="muted">CarePath Health</td>
+              <td class="muted">Backend Engineer</td>
+              <td class="muted">Jan 15, 2026</td>
+              <td><span class="status-tag completed">Completed</span></td>
+              <td class="earned dim">$11,300</td>
+            </tr>
+            <tr>
+              <td style="padding-left:18px;" class="muted">Austral Freight Co</td>
+              <td class="muted">API Developer</td>
+              <td class="muted">Nov 2, 2025</td>
+              <td><span class="status-tag completed">Completed</span></td>
+              <td class="earned dim">$5,640</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  var views = ['view-feed', 'view-detail', 'view-rules', 'view-contracts'];
+  var navMap = { 'view-feed': 'feed', 'view-detail': 'feed', 'view-rules': 'rules', 'view-contracts': 'contracts' };
+  var idx = 0;
+
+  function show(i) {
+    var id = views[i];
+    views.forEach(function(v) {
+      document.getElementById(v).classList.toggle('active', v === id);
+    });
+    var navKey = navMap[id];
+    document.querySelectorAll('.nav-item').forEach(function(n) {
+      n.classList.toggle('active', n.getAttribute('data-nav') === navKey);
+    });
+  }
+
+  show(0);
+  setInterval(function() {
+    idx = (idx + 1) % views.length;
+    show(idx);
+  }, 3500);
+</script>
+
+</body>
+</html>
