@@ -513,8 +513,9 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2024–25" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/query-app.gif", caption: "Schema explorer, query planner, SQL execution, and results — one tool" },
                 { src: "/media/portfolio/mcp-query/nlq-demo.gif", caption: "Type a question, watch the answer arrive" },
-                { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "The system watches itself — every question tracked live as it runs" },
+                { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "Every query tracked live as it runs" },
               ]}
               cols={[
                 { title: "What it does", body: "It learns how your data is organised, works out exactly what to look up, checks the real numbers, and reports back in the chat." },
