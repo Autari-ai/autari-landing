@@ -832,15 +832,17 @@ export default function PortfolioPage() {
             />
 
             <ProjectEntry
-              name="A Searchable Malware Archive"
-              hook="Fresh malware samples arrive every day — collected, unpacked, fingerprinted, and filed automatically."
+              name="A Searchable File Archive"
+              hook="Fresh samples arrive every day — collected, unpacked, fingerprinted, and filed automatically."
               meta={[
-                { label: "What", value: "Security Research Archive" },
-                { label: "Source", value: "Daily public threat feeds" },
+                { label: "What", value: "Research Archive" },
+                { label: "Source", value: "Daily public feeds" },
                 { label: "Verified by", value: "Fingerprints, not guesses" },
                 { label: "Year", value: "2024" },
               ]}
-              noImage={true}
+              carouselImages={[
+                { src: "/media/portfolio/mockups/malware-app.gif", caption: "File archive browser — daily downloads, fingerprinted and searchable" },
+              ]}
               cols={[
                 { title: "What it does", body: "Collects new malware samples every day, unpacks them, gives every file a unique fingerprint, and files it all into a searchable archive." },
                 { title: "Who it helped", body: "Security researchers who need a local collection of samples for analysis and pattern matching." },
