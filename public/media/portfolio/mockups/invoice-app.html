@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing OS</title>
+<style>
+  :root {
+    --bg: #060A12;
+    --glass-bg: rgba(255,255,255,0.10);
+    --glass-blur: blur(20px);
+    --glass-border: rgba(255,255,255,0.12);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
+    --brand: #8AFFC4;
+    --text: #F0F6FC;
+    --muted: #94A3B8;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+  }
+
+  .glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    pointer-events: none;
+    border-radius: 0;
+  }
+
+  /* Ambient background glow so the glass has something to blur */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(520px 380px at 12% -8%, rgba(138,255,196,0.14), transparent 65%),
+      radial-gradient(640px 480px at 88% 12%, rgba(76,110,245,0.16), transparent 65%),
+      radial-gradient(560px 420px at 55% 110%, rgba(138,255,196,0.08), transparent 65%);
+  }
+
+  .topbar, .shell, .toast { z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 56px;
+    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #06281B;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(138,255,196,0.35);
+  }
+  .logo-name { font-weight: 500; font-size: 15px; color: var(--text); }
+
+  .breadcrumb {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+  .breadcrumb .crumb-current { color: var(--text); font-weight: 500; }
+  .breadcrumb .crumb-sep { margin: 0 8px; opacity: 0.5; }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .live-status { display: flex; align-items: center; gap: 7px; color: var(--brand); font-size: 12.5px; font-weight: 500; }
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(138,255,196,0.8);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .clock {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    font-size: 13px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255,255,255,0.10);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.85); }
+  }
+
+  /* ============ SHELL ============ */
+  .shell {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 220px;
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 12px 16px;
+  }
+  .sidebar-title {
+    font-variant: small-caps;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 10px 14px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.4s ease;
+    cursor: default;
+  }
+  .nav-item .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.65;
+    transition: all 0.4s ease;
+  }
+  .nav-item.active {
+    color: var(--brand);
+    background: rgba(138,255,196,0.08);
+    border-color: rgba(138,255,196,0.22);
+    box-shadow: 0 0 18px rgba(138,255,196,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .nav-item.active .nav-dot {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(138,255,196,0.8);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(138,255,196,0.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .sync-label { font-size: 12px; color: var(--muted); }
+  .sync-label strong { display: block; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .view {
+    display: none;
+    animation: viewIn 0.45s ease both;
+    height: 100%;
+  }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 2px 16px;
+  }
+  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .count-badge {
+    background: rgba(138,255,196,0.12);
+    border: 1px solid rgba(138,255,196,0.3);
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  /* Tables */
+  .table-card { padding: 6px 0; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.muted, .muted { color: var(--muted); }
+  td.num { font-variant-numeric: tabular-nums; }
+  .ref { font-weight: 600; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Status pills */
+  .status, .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    transition: all 0.5s ease;
+    white-space: nowrap;
+  }
+  .status::before, .pill.dotted::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .status.in-progress, .pill.amber {
+    color: var(--warning);
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.32);
+  }
+  .status.completing {
+    color: var(--warning);
+    background: rgba(245,158,11,0.18);
+    border: 1px solid rgba(245,158,11,0.5);
+    animation: pulse 0.9s ease-in-out infinite;
+  }
+  .status.complete, .pill.green {
+    color: var(--brand);
+    background: rgba(138,255,196,0.10);
+    border: 1px solid rgba(138,255,196,0.32);
+  }
+  .status.scheduled, .pill.grey {
+    color: var(--muted);
+    background: rgba(148,163,184,0.10);
+    border: 1px solid rgba(148,163,184,0.28);
+  }
+  .sub-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--brand);
+    background: rgba(138,255,196,0.08);
+    border: 1px solid rgba(138,255,196,0.22);
+    margin-left: 6px;
+  }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; padding: 14px 18px; }
+  .stat-value { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .stat-value .accent { color: var(--brand); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-left: 10px; }
+  .tab {
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid transparent;
+  }
+  .tab.active {
+    color: var(--brand);
+    background: rgba(138,255,196,0.10);
+    border-color: rgba(138,255,196,0.28);
+  }
+
+  /* Invoice list */
+  .invoice-list { display: flex; flex-direction: column; gap: 10px; }
+  .invoice-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    gap: 16px;
+  }
+  .inv-id { font-weight: 600; font-size: 13.5px; width: 84px; font-variant-numeric: tabular-nums; }
+  .inv-client { font-size: 13.5px; width: 170px; }
+  .inv-meta { color: var(--muted); font-size: 12.5px; flex: 1; }
+  .inv-amount { font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; margin-right: 14px; }
+
+  .check {
+    display: inline-flex;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #06281B;
+    font-size: 10px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* Accounts view */
+  .sync-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .xero-mark {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(19,181,234,0.16);
+    border: 1px solid rgba(19,181,234,0.4);
+    color: #6BD5F5;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.02em;
+  }
+  .sync-info .sync-name { font-weight: 600; font-size: 15px; }
+  .sync-info .sync-sub { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .sync-sub .mini-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 7px rgba(138,255,196,0.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .sync-sub .just-now { color: var(--brand); font-weight: 500; }
+
+  .ledger-row { opacity: 0; animation: rowIn 0.5s ease forwards; }
+  .ledger-row:nth-child(1) { animation-delay: 0.25s; }
+  .ledger-row:nth-child(2) { animation-delay: 0.75s; }
+  .ledger-row:nth-child(3) { animation-delay: 1.25s; }
+  .ledger-row:nth-child(4) { animation-delay: 1.75s; }
+  .ledger-row:nth-child(5) { animation-delay: 2.25s; }
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .footnote {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 12.5px;
+    padding: 0 4px;
+  }
+  .footnote .accent { color: var(--brand); font-weight: 500; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    right: 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px 14px 14px;
+    min-width: 300px;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+    z-index: 50;
+    background: rgba(16,24,38,0.82);
+  }
+  .toast.visible { transform: translateX(0); opacity: 1; }
+  .toast-check {
+    width: 26px; height: 26px;
+    flex: 0 0 26px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #06281B;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 14px rgba(138,255,196,0.45);
+  }
+  .toast-title { font-weight: 600; font-size: 13.5px; }
+  .toast-sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar glass">
+    <div class="topbar-left">
+      <div class="logo-mark">B</div>
+      <div class="logo-name">Billing OS</div>
+    </div>
+    <div class="breadcrumb">Billing OS<span class="crumb-sep">/</span><span class="crumb-current" id="crumb">Active Jobs</span></div>
+    <div class="topbar-right">
+      <div class="live-status"><span class="live-dot"></span>Live<span style="color: var(--brand); opacity: 0.85;">&middot;</span>Connected</div>
+      <div class="clock" id="clock">09:41:12</div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar glass">
+      <div class="sidebar-title">Billing OS</div>
+      <nav class="nav">
+        <div class="nav-item active"><span class="nav-dot"></span>Jobs</div>
+        <div class="nav-item"><span class="nav-dot"></span>Invoices</div>
+        <div class="nav-item"><span class="nav-dot"></span>Purchase Orders</div>
+        <div class="nav-item"><span class="nav-dot"></span>Accounts</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Auto-sync<strong>Running</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- VIEW 1: JOBS -->
+      <section class="view" id="view-jobs">
+        <div class="page-head">
+          <span class="page-title">Active Jobs</span>
+          <span class="count-badge">14</span>
+        </div>
+        <div class="glass table-card">
+          <table>
+            <thead>
+              <tr><th>Ref</th><th>Client</th><th>Type</th><th>Engineer</th><th>Started</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ref">JB-2851</td><td>Meridian Heating</td><td class="muted">Boiler service</td><td>G. Macdonald</td><td class="num muted">09:14</td>
+                <td><span class="status in-progress">In Progress</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2850</td><td>Stackhouse Ltd</td><td class="muted">Electrical inspection</td><td>E. Hayes</td><td class="num muted">08:45</td>
+                <td><span class="status in-progress">In Progress</span></td>
+              </tr>
+              <tr id="row-2849">
+                <td class="ref">JB-2849</td><td>Fairview Care</td><td class="muted">HVAC maintenance</td><td>M. Howard</td><td class="num muted">08:30</td>
+                <td><span class="status in-progress">In Progress</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2848</td><td>Thornwick Group</td><td class="muted">Fire safety check</td><td>D. Collins</td><td class="num muted">07:55</td>
+                <td><span class="status complete">Complete</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2847</td><td>Atlantic Works</td><td class="muted">Plumbing repair</td><td>S. West</td><td class="num muted">07:30</td>
+                <td><span class="status complete">Complete</span><span class="sub-pill">Invoice Sent</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2846</td><td>Halberd Retail</td><td class="muted">Gas safety inspection</td><td>R. Osei</td><td class="num muted">07:05</td>
+                <td><span class="status complete">Complete</span><span class="sub-pill">Invoice Sent</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2845</td><td>Northgate Schools</td><td class="muted">Emergency callout</td><td>T. Brennan</td><td class="num muted">06:48</td>
+                <td><span class="status complete">Complete</span></td>
+              </tr>
+              <tr>
+                <td class="ref">JB-2844</td><td>Crestline Property</td><td class="muted">Boiler installation</td><td>L. Ferris</td><td class="num muted">06:20</td>
+                <td><span class="status scheduled">Scheduled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 2: INVOICES -->
+      <section class="view" id="view-invoices">
+        <div class="page-head">
+          <span class="page-title">Invoices</span>
+          <div class="tabs">
+            <span class="tab">All</span>
+            <span class="tab active">Sent</span>
+            <span class="tab">Pending</span>
+            <span class="tab">Overdue</span>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="glass stat-card">
+            <div class="stat-value"><span class="accent">&pound;1,695</span></div>
+            <div class="stat-label">sent today</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">12</div>
+            <div class="stat-label">invoices this week</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">manual entries</div>
+          </div>
+        </div>
+        <div class="invoice-list">
+          <div class="glass invoice-row">
+            <span class="inv-id">INV-2853</span><span class="inv-client">Thornwick Group</span>
+            <span class="inv-meta">Raised automatically &middot; 2 min ago</span>
+            <span class="inv-amount">&pound;380.00</span>
+            <span class="pill green">Sent <span class="check">&#10003;</span></span>
+          </div>
+          <div class="glass invoice-row">
+            <span class="inv-id">INV-2852</span><span class="inv-client">Atlantic Works</span>
+            <span class="inv-meta">Raised automatically &middot; 1h ago</span>
+            <span class="inv-amount">&pound;420.00</span>
+            <span class="pill green">Sent <span class="check">&#10003;</span></span>
+          </div>
+          <div class="glass invoice-row">
+            <span class="inv-id">INV-2851</span><span class="inv-client">Meridian Heating</span>
+            <span class="inv-meta">Raised automatically &middot; 3h ago</span>
+            <span class="inv-amount">&pound;215.00</span>
+            <span class="pill green">Sent <span class="check">&#10003;</span></span>
+          </div>
+          <div class="glass invoice-row">
+            <span class="inv-id">INV-2850</span><span class="inv-client">Fairview Care</span>
+            <span class="inv-meta">Raised automatically &middot; Yesterday</span>
+            <span class="inv-amount">&pound;680.00</span>
+            <span class="pill green">Sent <span class="check">&#10003;</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PURCHASE ORDERS -->
+      <section class="view" id="view-pos">
+        <div class="page-head">
+          <span class="page-title">Purchase Orders</span>
+        </div>
+        <div class="stats-row">
+          <div class="glass stat-card">
+            <div class="stat-value"><span class="accent">8</span></div>
+            <div class="stat-label">raised today</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">all from job completion</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">manual</div>
+          </div>
+        </div>
+        <div class="glass table-card">
+          <table>
+            <thead>
+              <tr><th>Ref</th><th>Client</th><th>Description</th><th>Amount</th><th>Source</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ref">PO-0924</td><td>Thornwick Group</td><td class="muted">Parts &amp; materials</td><td class="num">&pound;85.00</td><td class="muted">Raised automatically</td>
+                <td><span class="status in-progress">Pending approval</span></td>
+              </tr>
+              <tr>
+                <td class="ref">PO-0923</td><td>Atlantic Works</td><td class="muted">Specialist parts</td><td class="num">&pound;120.00</td><td class="muted">Raised automatically</td>
+                <td><span class="status complete">Approved</span></td>
+              </tr>
+              <tr>
+                <td class="ref">PO-0922</td><td>Fairview Care</td><td class="muted">HVAC components</td><td class="num">&pound;340.00</td><td class="muted">Raised automatically</td>
+                <td><span class="status complete">Approved</span></td>
+              </tr>
+              <tr>
+                <td class="ref">PO-0921</td><td>Meridian Heating</td><td class="muted">Copper piping</td><td class="num">&pound;64.50</td><td class="muted">Raised automatically</td>
+                <td><span class="status complete">Approved</span></td>
+              </tr>
+              <tr>
+                <td class="ref">PO-0920</td><td>Halberd Retail</td><td class="muted">Filter cartridges</td><td class="num">&pound;48.00</td><td class="muted">Raised automatically</td>
+                <td><span class="status complete">Approved</span></td>
+              </tr>
+              <tr>
+                <td class="ref">PO-0919</td><td>Northgate Schools</td><td class="muted">Safety valves</td><td class="num">&pound;152.00</td><td class="muted">Raised automatically</td>
+                <td><span class="status in-progress">Pending approval</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ACCOUNTS -->
+      <section class="view" id="view-accounts">
+        <div class="page-head">
+          <span class="page-title">Accounting Sync</span>
+        </div>
+        <div class="glass sync-card">
+          <div class="xero-mark">Xero</div>
+          <div class="sync-info">
+            <div class="sync-name">Xero</div>
+            <div class="sync-sub"><span class="mini-dot"></span>Last synced: <span class="just-now">just now</span></div>
+          </div>
+        </div>
+        <div class="glass table-card">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Status</th></tr>
+            </thead>
+            <tbody id="ledger">
+              <tr class="ledger-row">
+                <td class="muted">Today</td><td>INV-2853 Thornwick Group</td><td class="num muted">-</td><td class="num">&pound;380.00</td>
+                <td><span class="pill green">Synced <span class="check">&#10003;</span></span></td>
+              </tr>
+              <tr class="ledger-row">
+                <td class="muted">Today</td><td>INV-2852 Atlantic Works</td><td class="num muted">-</td><td class="num">&pound;420.00</td>
+                <td><span class="pill green">Synced <span class="check">&#10003;</span></span></td>
+              </tr>
+              <tr class="ledger-row">
+                <td class="muted">Today</td><td>PO-0924 Parts &amp; materials</td><td class="num">&pound;85.00</td><td class="num muted">-</td>
+                <td><span class="pill green">Synced <span class="check">&#10003;</span></span></td>
+              </tr>
+              <tr class="ledger-row">
+                <td class="muted">Today</td><td>INV-2851 Meridian Heating</td><td class="num muted">-</td><td class="num">&pound;215.00</td>
+                <td><span class="pill green">Synced <span class="check">&#10003;</span></span></td>
+              </tr>
+              <tr class="ledger-row">
+                <td class="muted">Today</td><td>PO-0923 Specialist parts</td><td class="num">&pound;120.00</td><td class="num muted">-</td>
+                <td><span class="pill green">Synced <span class="check">&#10003;</span></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footnote">All entries sync within <span class="accent">30 seconds</span> of being raised. No manual reconciliation required.</div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast glass" id="toast">
+    <div class="toast-check">&#10003;</div>
+    <div>
+      <div class="toast-title">Invoice raised automatically</div>
+      <div class="toast-sub">INV-2853 &middot; &pound;380.00 &middot; Thornwick Group &rarr; Sent</div>
+    </div>
+  </div>
+
+<script>
+  const views = ['jobs', 'invoices', 'pos', 'accounts'];
+  const viewNames = ['Active Jobs', 'Invoices', 'Purchase Orders', 'Accounting Sync'];
+  const navItems = document.querySelectorAll('.nav-item');
+  const crumb = document.getElementById('crumb');
+  let current = 0;
+
+  const showView = (i) => {
+    views.forEach((v, idx) => {
+      const el = document.getElementById('view-' + v);
+      el.style.display = idx === i ? 'block' : 'none';
+      // Restart the entry animation on each activation
+      if (idx === i) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      }
+      navItems[idx].classList.toggle('active', idx === i);
+    });
+    crumb.textContent = viewNames[i];
+    current = i;
+  };
+
+  // JB-2849 completing animation in jobs view
+  const triggerJobComplete = () => {
+    const row = document.getElementById('row-2849');
+    if (!row) return;
+    const s = row.querySelector('.status');
+    s.className = 'status in-progress';
+    s.textContent = 'In Progress';
+    setTimeout(() => {
+      s.className = 'status completing';
+      s.textContent = 'Completing...';
+    }, 800);
+    setTimeout(() => {
+      s.className = 'status complete';
+      s.textContent = 'Complete';
+      showToast('Invoice raised automatically', 'INV-2853 · £380.00 · Thornwick Group → Sent');
+    }, 2000);
+  };
+
+  const showToast = (title, sub) => {
+    const t = document.getElementById('toast');
+    t.querySelector('.toast-title').textContent = title;
+    t.querySelector('.toast-sub').textContent = sub;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2800);
+  };
+
+  // Live clock
+  const clock = document.getElementById('clock');
+  const tick = () => {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    clock.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  };
+  tick();
+  setInterval(tick, 1000);
+
+  // Cycle views
+  showView(0);
+  triggerJobComplete();
+  setInterval(() => {
+    const next = (current + 1) % views.length;
+    showView(next);
+    if (next === 0) setTimeout(triggerJobComplete, 500);
+  }, 3500);
+</script>
+</body>
+</html>
