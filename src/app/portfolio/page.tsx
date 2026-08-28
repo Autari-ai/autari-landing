@@ -371,6 +371,7 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/field-app.gif", caption: "Field Ops — live job schedule, auto-invoicing, map view, and accounting sync" },
                 { src: "/media/portfolio/bigchange-xero/bigchange-scheduling.png", caption: "Job scheduling — every engineer and job in one view" },
                 { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoices raised automatically when the job is complete" },
                 { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "The books update themselves as jobs flow through" },
