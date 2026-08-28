@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Monitor</title>
+<style>
+  :root {
+    --bg: #060A12;
+    --brand: #F59E0B;
+    --brand-dim: rgba(245,158,11,0.12);
+    --brand-border: rgba(245,158,11,0.3);
+    --text: #F0F6FC;
+    --muted: #94A3B8;
+    --danger: #EF4444;
+    --safe: #22C55E;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    pointer-events: none;
+  }
+
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(560px 400px at 14% -8%, rgba(245,158,11,0.13), transparent 65%),
+      radial-gradient(620px 460px at 88% 10%, rgba(245,158,11,0.08), transparent 65%),
+      radial-gradient(560px 420px at 55% 112%, rgba(239,68,68,0.06), transparent 65%);
+  }
+
+  .topbar, .shell, .toast { z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    height: 56px;
+    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: var(--brand);
+    color: #241503;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(245,158,11,0.4);
+  }
+  .logo-name { font-weight: 600; font-size: 15px; color: var(--text); }
+
+  .breadcrumb {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+  .breadcrumb .crumb-current { color: var(--text); font-weight: 500; }
+  .breadcrumb .crumb-sep { margin: 0 8px; opacity: 0.5; }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-stat { color: var(--brand); font-size: 13px; font-weight: 600; }
+  .clock {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    font-size: 13px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255,255,255,0.10);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.85); }
+  }
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* ============ SHELL ============ */
+  .shell { flex: 1; display: flex; gap: 12px; min-height: 0; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 220px;
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 12px 16px;
+  }
+  .sidebar-title {
+    font-variant: small-caps;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 10px 14px;
+  }
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.4s ease;
+    cursor: default;
+  }
+  .nav-item .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.65;
+    transition: all 0.4s ease;
+  }
+  .nav-item.active {
+    color: var(--brand);
+    background: var(--brand-dim);
+    border-color: var(--brand-border);
+    box-shadow: 0 0 18px rgba(245,158,11,0.14), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .nav-item.active .nav-dot {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(245,158,11,0.8);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--safe);
+    box-shadow: 0 0 8px rgba(34,197,94,0.8);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .sync-label { font-size: 12px; color: var(--muted); }
+  .sync-label strong { display: block; color: var(--text); font-weight: 600; font-size: 12.5px; }
+
+  /* ============ MAIN ============ */
+  .main { flex: 1; min-width: 0; overflow: hidden; position: relative; }
+  .view { display: none; animation: viewIn 0.45s ease both; height: 100%; overflow: hidden; }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-head { display: flex; align-items: center; gap: 12px; margin: 4px 2px 16px; }
+  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .count-badge {
+    background: var(--brand-dim);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .count-badge.danger {
+    background: rgba(239,68,68,0.14);
+    border-color: rgba(239,68,68,0.4);
+    color: var(--danger);
+  }
+
+  /* Alert banner */
+  .alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    color: var(--brand);
+    font-size: 13.5px;
+    font-weight: 600;
+    border-color: var(--brand-border) !important;
+  }
+  .alert-banner .adot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 8px rgba(245,158,11,0.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .stat-card { flex: 1; padding: 14px 18px; }
+  .stat-value { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .stat-value.accent { color: var(--brand); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* Store grid */
+  .store-grid-card { padding: 14px; overflow: auto; }
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .store-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .store-cell.flagged-red { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.06); }
+  .store-cell.flagged-amber { border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
+  .store-cell-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .store-name { font-size: 13px; font-weight: 600; }
+  .store-skus { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .stock-bar { height: 5px; border-radius: 999px; background: rgba(255,255,255,0.07); overflow: hidden; margin-bottom: 6px; }
+  .stock-fill { height: 100%; border-radius: 999px; }
+  .stock-fill.green { background: var(--safe); }
+  .stock-fill.amber { background: var(--brand); }
+  .stock-fill.red { background: var(--danger); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .badge.red { color: var(--danger); background: rgba(239,68,68,0.14); border: 1px solid rgba(239,68,68,0.4); }
+  .badge.amber { color: var(--brand); background: var(--brand-dim); border: 1px solid var(--brand-border); }
+  .badge.pulse { animation: pulseSoft 1.4s ease-in-out infinite; }
+
+  /* Alerts view */
+  .alert-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+  .alert-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-left: 4px solid;
+  }
+  .alert-card.red { border-left-color: var(--danger); }
+  .alert-card.amber { border-left-color: var(--brand); }
+  .alert-icon {
+    width: 40px; height: 40px; flex: 0 0 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .alert-card.red .alert-icon { background: rgba(239,68,68,0.14); color: var(--danger); }
+  .alert-card.amber .alert-icon { background: var(--brand-dim); color: var(--brand); }
+  .alert-body { flex: 1; }
+  .alert-title { font-size: 14.5px; font-weight: 600; margin-bottom: 4px; }
+  .alert-meta { font-size: 12.5px; color: var(--muted); }
+  .alert-meta strong { color: var(--text); font-weight: 600; }
+  .alert-btn {
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .alert-card.red .alert-btn { background: var(--danger); color: #2b0a0a; }
+  .alert-card.amber .alert-btn { background: var(--brand); color: #241503; }
+
+  .section-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin: 4px 2px 10px; }
+  .resolved-list { display: flex; flex-direction: column; gap: 8px; }
+  .resolved-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .resolved-check {
+    width: 18px; height: 18px; flex: 0 0 18px;
+    border-radius: 50%;
+    background: rgba(148,163,184,0.15);
+    color: #cbd5e1;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .resolved-row .rtitle { color: var(--text); font-weight: 500; flex: 1; }
+
+  /* Chips */
+  .chips { display: flex; gap: 8px; margin-left: 12px; }
+  .chip {
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid transparent;
+  }
+  .chip.active { color: var(--brand); background: var(--brand-dim); border-color: var(--brand-border); }
+
+  /* Tables */
+  .table-card { padding: 6px 0; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.muted, .muted { color: var(--muted); }
+  td.num { font-variant-numeric: tabular-nums; }
+  .sku { font-weight: 600; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .pill.red { color: var(--danger); background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); }
+  .pill.amber { color: var(--brand); background: var(--brand-dim); border: 1px solid var(--brand-border); }
+  .pill.green { color: var(--safe); background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.32); }
+
+  /* Store detail */
+  .store-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .store-header-title { font-size: 18px; font-weight: 600; }
+  .store-header-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+  .detail-grid { display: flex; gap: 12px; margin-top: 14px; }
+  .detail-col { flex: 1; min-width: 0; }
+  .chart-card { padding: 16px 18px; }
+  .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .chart-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 90px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .chart-bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--brand), var(--danger)); }
+  .chart-bar-label { font-size: 10px; color: var(--muted); }
+
+  .reorder-card { padding: 14px 18px; margin-top: 12px; display: flex; align-items: center; gap: 14px; }
+  .reorder-icon {
+    width: 36px; height: 36px; flex: 0 0 36px;
+    border-radius: 9px;
+    background: rgba(148,163,184,0.1);
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .reorder-title { font-size: 13px; font-weight: 600; }
+  .reorder-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar glass">
+    <div class="topbar-left">
+      <div class="logo-mark">S</div>
+      <div class="logo-name">Stock Monitor</div>
+    </div>
+    <div class="breadcrumb">Stock Monitor<span class="crumb-sep">/</span><span class="crumb-current" id="crumb">Dashboard</span></div>
+    <div class="topbar-right">
+      <span class="topbar-stat">20 stores &middot; 2 alerts</span>
+      <div class="clock" id="clock">09:41:12</div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar glass">
+      <div class="sidebar-title">Stock Monitor</div>
+      <nav class="nav">
+        <div class="nav-item" data-nav="dashboard"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item" data-nav="alerts"><span class="nav-dot"></span>Alerts</div>
+        <div class="nav-item" data-nav="stores"><span class="nav-dot"></span>Stores</div>
+        <div class="nav-item" data-nav="products"><span class="nav-dot"></span>Products</div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sync-dot"></span>
+        <span class="sync-label">Feed status<strong>All stores synced</strong></span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section class="view" id="view-dashboard">
+        <div class="glass alert-banner"><span class="adot"></span>2 products need attention</div>
+        <div class="stats-row">
+          <div class="glass stat-card">
+            <div class="stat-value">20</div>
+            <div class="stat-label">stores</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">847</div>
+            <div class="stat-label">SKUs tracked</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value accent">2</div>
+            <div class="stat-label">active alerts</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">stockouts this week</div>
+          </div>
+        </div>
+        <div class="glass store-grid-card">
+          <div class="store-grid" id="store-grid"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: ALERTS -->
+      <section class="view" id="view-alerts">
+        <div class="page-head">
+          <span class="page-title">Alerts</span>
+          <span class="count-badge danger">2 active</span>
+        </div>
+        <div class="alert-list">
+          <div class="glass alert-card red">
+            <div class="alert-icon">!</div>
+            <div class="alert-body">
+              <div class="alert-title">Store 07 &mdash; HDMI Cable 2M 4K</div>
+              <div class="alert-meta"><strong>3 units remaining</strong> &middot; Threshold: 10 &middot; Since 2h ago</div>
+            </div>
+            <div class="alert-btn">Reorder Now</div>
+          </div>
+          <div class="glass alert-card amber">
+            <div class="alert-icon">!</div>
+            <div class="alert-body">
+              <div class="alert-title">Store 14 &mdash; USB-C Hub 7-in-1</div>
+              <div class="alert-meta"><strong>8 units remaining</strong> &middot; Threshold: 15 &middot; Since 45m ago</div>
+            </div>
+            <div class="alert-btn">Review</div>
+          </div>
+        </div>
+        <div class="section-label">All clear</div>
+        <div class="glass table-card">
+          <div class="resolved-list" style="padding: 6px 4px;">
+            <div class="resolved-row"><span class="resolved-check">&#10003;</span><span class="rtitle">Store 03 &mdash; Wireless Charger Pad</span><span>Resolved 2h ago</span></div>
+            <div class="resolved-row"><span class="resolved-check">&#10003;</span><span class="rtitle">Store 11 &mdash; Phone Case Clear</span><span>Resolved 5h ago</span></div>
+            <div class="resolved-row"><span class="resolved-check">&#10003;</span><span class="rtitle">Store 19 &mdash; Screen Protector Glass</span><span>Resolved yesterday</span></div>
+            <div class="resolved-row"><span class="resolved-check">&#10003;</span><span class="rtitle">Store 02 &mdash; Car Mount Universal</span><span>Resolved yesterday</span></div>
+            <div class="resolved-row"><span class="resolved-check">&#10003;</span><span class="rtitle">Store 16 &mdash; Cable Organizer 5-Pack</span><span>Resolved 2 days ago</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PRODUCTS -->
+      <section class="view" id="view-products">
+        <div class="page-head">
+          <span class="page-title">Products</span>
+          <div class="chips">
+            <span class="chip">All</span>
+            <span class="chip active">Low Stock</span>
+            <span class="chip">Watch</span>
+            <span class="chip">Healthy</span>
+          </div>
+        </div>
+        <div class="glass table-card">
+          <table>
+            <thead>
+              <tr><th>SKU</th><th>Name</th><th>Category</th><th>Stores Affected</th><th>Lowest Stock</th><th>Threshold</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sku">HDMI-4K-2M</td><td>HDMI Cable 2M 4K</td><td class="muted">Cables</td><td class="num">1</td><td class="num">3</td><td class="num muted">10</td>
+                <td><span class="pill red">Alert</span></td>
+              </tr>
+              <tr>
+                <td class="sku">USBC-HUB-7</td><td>USB-C Hub 7-in-1</td><td class="muted">Hubs</td><td class="num">1</td><td class="num">8</td><td class="num muted">15</td>
+                <td><span class="pill amber">Watch</span></td>
+              </tr>
+              <tr>
+                <td class="sku">PWR-BANK-10K</td><td>Power Bank 10000mAh</td><td class="muted">Chargers</td><td class="num">2</td><td class="num">12</td><td class="num muted">15</td>
+                <td><span class="pill amber">Watch</span></td>
+              </tr>
+              <tr>
+                <td class="sku">USBC-CBL-2M</td><td>USB-C Cable 2M</td><td class="muted">Cables</td><td class="num">1</td><td class="num">9</td><td class="num muted">12</td>
+                <td><span class="pill amber">Watch</span></td>
+              </tr>
+              <tr>
+                <td class="sku">WL-MOUSE-B1</td><td>Wireless Mouse B1</td><td class="muted">Peripherals</td><td class="num">1</td><td class="num">11</td><td class="num muted">15</td>
+                <td><span class="pill amber">Watch</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: STORE DETAIL -->
+      <section class="view" id="view-storedetail">
+        <div class="glass store-header">
+          <div>
+            <div class="store-header-title">Store 07 &mdash; East London</div>
+            <div class="store-header-sub">847 SKUs tracked &middot; last synced 2 min ago</div>
+          </div>
+          <span class="count-badge danger">2 alerts</span>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-col" style="flex: 1.3;">
+            <div class="glass table-card">
+              <table>
+                <thead>
+                  <tr><th>SKU</th><th>Name</th><th>Stock</th><th>Threshold</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="sku">HDMI-4K-2M</td><td>HDMI Cable 2M 4K</td><td class="num">3</td><td class="num muted">10</td>
+                    <td><span class="pill red">Alert</span></td>
+                  </tr>
+                  <tr>
+                    <td class="sku">USBC-CBL-2M</td><td>USB-C Cable 2M</td><td class="num">9</td><td class="num muted">12</td>
+                    <td><span class="pill amber">Watch</span></td>
+                  </tr>
+                  <tr>
+                    <td class="sku">PWR-BANK-10K</td><td>Power Bank 10000mAh</td><td class="num">34</td><td class="num muted">15</td>
+                    <td><span class="pill green">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td class="sku">WL-MOUSE-B1</td><td>Wireless Mouse B1</td><td class="num">41</td><td class="num muted">15</td>
+                    <td><span class="pill green">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td class="sku">BT-SPKR-M1</td><td>Bluetooth Speaker Mini</td><td class="num">19</td><td class="num muted">10</td>
+                    <td><span class="pill green">Healthy</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="glass reorder-card">
+              <div class="reorder-icon">&#8635;</div>
+              <div>
+                <div class="reorder-title">Reorder history</div>
+                <div class="reorder-sub">Last reorder for this store was 3 weeks ago &middot; 50 units &middot; Supplier: TechSupply Co.</div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-col">
+            <div class="glass chart-card">
+              <div class="chart-title">HDMI Cable 2M 4K &mdash; 7 day stock trend</div>
+              <div class="chart-sub">Declining toward threshold (10)</div>
+              <div class="chart-bars">
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 96%;"></div><div class="chart-bar-label">Mon</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 80%;"></div><div class="chart-bar-label">Tue</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 68%;"></div><div class="chart-bar-label">Wed</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 56%;"></div><div class="chart-bar-label">Thu</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 44%;"></div><div class="chart-bar-label">Fri</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 28%;"></div><div class="chart-bar-label">Sat</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height: 12%;"></div><div class="chart-bar-label">Sun</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  const stores = [
+    { n: 1, skus: 94 }, { n: 2, skus: 101 }, { n: 3, skus: 87 }, { n: 4, skus: 76 },
+    { n: 5, skus: 112 }, { n: 6, skus: 99 }, { n: 7, skus: 64 }, { n: 8, skus: 105 },
+    { n: 9, skus: 88 }, { n: 10, skus: 91 }, { n: 11, skus: 97 }, { n: 12, skus: 84 },
+    { n: 13, skus: 79 }, { n: 14, skus: 58 }, { n: 15, skus: 103 }, { n: 16, skus: 96 },
+    { n: 17, skus: 90 }, { n: 18, skus: 85 }, { n: 19, skus: 100 }, { n: 20, skus: 93 }
+  ];
+
+  const grid = document.getElementById('store-grid');
+  stores.forEach(s => {
+    const num = String(s.n).padStart(2, '0');
+    let cls = 'green', width = 78 + (s.n % 5) * 3, cellCls = '', badge = '';
+    if (s.n === 7) { cls = 'red'; width = 14; cellCls = 'flagged-red'; badge = '<span class="badge red pulse">Low Stock</span>'; }
+    else if (s.n === 14) { cls = 'amber'; width = 46; cellCls = 'flagged-amber'; badge = '<span class="badge amber">Watch</span>'; }
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="store-cell ${cellCls}">
+        <div class="store-cell-top">
+          <span class="store-name">Store ${num}</span>
+          <span class="store-skus">${s.skus} SKUs</span>
+        </div>
+        <div class="stock-bar"><div class="stock-fill ${cls}" style="width:${width}%"></div></div>
+        ${badge}
+      </div>
+    `);
+  });
+
+  const views = ['dashboard', 'alerts', 'products', 'storedetail'];
+  const viewNames = ['Dashboard', 'Alerts', 'Products', 'Stores / Store 07'];
+  const navMap = ['dashboard', 'alerts', 'products', 'stores'];
+  const navItems = document.querySelectorAll('.nav-item');
+  const crumb = document.getElementById('crumb');
+  let current = 0;
+
+  const showView = (i) => {
+    views.forEach((v, idx) => {
+      const el = document.getElementById('view-' + v);
+      el.style.display = idx === i ? 'block' : 'none';
+      if (idx === i) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      }
+    });
+    navItems.forEach(item => item.classList.toggle('active', item.dataset.nav === navMap[i]));
+    crumb.textContent = viewNames[i];
+    current = i;
+  };
+
+  const clock = document.getElementById('clock');
+  const tick = () => {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    clock.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  };
+  tick();
+  setInterval(tick, 1000);
+
+  showView(0);
+  setInterval(() => {
+    showView((current + 1) % views.length);
+  }, 3500);
+</script>
+</body>
+</html>
