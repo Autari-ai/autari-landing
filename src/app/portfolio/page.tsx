@@ -309,7 +309,7 @@ export default function PortfolioPage() {
                 num: "01",
                 name: "Telecom Portal Automation",
                 hook: "2.4 million line checks. 99.7% success rate. Zero manual work.",
-                image: "/media/portfolio/et-system/dashboard.png",
+                image: "/media/portfolio/mockups/et-system-slideshow.gif",
                 meta: [
                   { label: "What", value: "Telecom Automation" },
                   { label: "Scale", value: "2.4M operations" },
@@ -411,6 +411,7 @@ cols={[
                 { label: "Success", value: "99.7%" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/et-system-slideshow.gif", caption: "ET System: login, dashboard, modules, scrape, proxy pool, and admin cycling" },
                 { src: "/media/portfolio/et-system/dashboard.png", caption: "Dashboard: 2.4M numbers processed at 99.7% success rate" },
                 { src: "/media/portfolio/et-system/modules.png", caption: "Every task type tracked — successes and errors, live" },
                 { src: "/media/portfolio/et-system/scrape.png", caption: "Queue numbers and watch results arrive live" },
@@ -433,6 +434,7 @@ cols={[
                 { label: "Year", value: "2023" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/ps-slideshow.gif", caption: "Rooms, devices, kitchen, store, reports, and stock — cycling" },
                 { src: "/media/portfolio/ps-platform/ps-012448.png", caption: "Room booking — live session timers, single and multiplayer modes" },
                 { src: "/media/portfolio/ps-platform/ps-012504.png", caption: "Device inventory — PS4 and PS5 with per-room pricing" },
                 { src: "/media/portfolio/ps-platform/ps-012539.png", caption: "Daily financial reports — one button to close the day" },
@@ -661,6 +663,7 @@ cols={[
                 { label: "Year", value: "2025" },
               ]}
               carouselImages={[
+                { src: "/media/portfolio/mockups/grafana-slideshow.gif", caption: "All 5 Grafana dashboards cycling: platform health, request rates, and errors" },
                 { src: "/media/portfolio/grafana/grafana-013857.png", caption: "The billing connection — health, speed, and errors at a glance" },
                 { src: "/media/portfolio/grafana/grafana-013848.png", caption: "The membership connection — watched live, around the clock" },
                 { src: "/media/portfolio/grafana/grafana-013914.png", caption: "Every connection on one screen — nothing runs unwatched" },
@@ -704,7 +707,10 @@ cols={[
                 { label: "AI", value: "Strategic posture analysis" },
                 { label: "Year", value: "2025" },
               ]}
-              image="/media/portfolio/worldmonitor/dashboard.png"
+              carouselImages={[
+                { src: "/media/portfolio/mockups/worldmonitor-slideshow.gif", caption: "Global intelligence dashboard — live map, conflict zones, AI analysis" },
+                { src: "/media/portfolio/worldmonitor/dashboard.png", caption: "Full dashboard: conflict zones, AI strategic posture, country instability index" },
+              ]}
                             videoSrc="/media/portfolio/videos/worldmonitor.mp4"
 cols={[
                 { title: "What it does", body: "A real-time geopolitical intelligence dashboard that aggregates live news, maps conflict zones and military activity, tracks country stability scores, and surfaces AI-generated insights." },
