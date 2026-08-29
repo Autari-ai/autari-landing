@@ -304,7 +304,7 @@ export default function PortfolioPage() {
                 num: "02",
                 name: "Enterprise AI Agent",
                 hook: "Ask your data a question. Get the answer in the chat — with charts.",
-                image: "/media/portfolio/jagent/jagent-dashboard-chat.png",
+                image: "/media/portfolio/mockups/jagent-app.gif",
                 meta: [
                   { label: "What", value: "AI Agent Platform" },
                   { label: "For", value: "Enterprise teams" },
@@ -316,7 +316,7 @@ export default function PortfolioPage() {
                 num: "03",
                 name: "Field Service Automation",
                 hook: "Every job, invoice, and purchase order — done automatically.",
-                image: "/media/portfolio/bigchange-xero/bigchange-scheduling.png",
+                image: "/media/portfolio/mockups/field-app.gif",
                 meta: [
                   { label: "What", value: "Operations Automation" },
                   { label: "Client", value: "UK Field Service Co" },
