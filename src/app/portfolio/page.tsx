@@ -189,6 +189,7 @@ function ProjectEntry({
   noImage,
   cols,
   accent = "#19D3A2",
+  videoSrc,
 }: {
   name: string;
   hook: string;
@@ -199,6 +200,7 @@ function ProjectEntry({
   noImage?: boolean;
   cols: { title: string; body: string }[];
   accent?: string;
+  videoSrc?: string;
 }) {
   return (
     <motion.div
@@ -236,6 +238,21 @@ function ProjectEntry({
       {noImage && (
         <div className="mt-8 rounded-xl bg-ink-800 h-48 flex items-center justify-center">
           <span className="font-display text-2xl font-bold text-fga/20">{name}</span>
+        </div>
+      )}
+
+      {/* Video explainer */}
+      {videoSrc && (
+        <div className="mt-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] mb-3" style={{ color: accent }}>Explainer</p>
+          <video
+            src={videoSrc}
+            controls
+            playsInline
+            preload="metadata"
+            className="w-full rounded-xl bg-ink-800"
+            style={{ maxHeight: "500px" }}
+          />
         </div>
       )}
 
@@ -376,7 +393,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoices raised automatically when the job is complete" },
                 { src: "/media/portfolio/bigchange-xero/xero-dashboard.jpg", caption: "The books update themselves as jobs flow through" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/field_service.mp4"
+cols={[
                 { title: "What it does", body: "Every job flows automatically from booking through quoting, invoicing, and purchase orders — with the accounts updated the moment anything changes." },
                 { title: "Who it helped", body: "A UK field service company managing dozens of engineers and hundreds of jobs a month. The back-office was drowning in manual work." },
                 { title: "What changed", body: "Billing happens the moment a job is marked complete. Purchase orders raise themselves. The office team stopped chasing paperwork." },
@@ -397,7 +415,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/et-system/modules.png", caption: "Every task type tracked — successes and errors, live" },
                 { src: "/media/portfolio/et-system/scrape.png", caption: "Queue numbers and watch results arrive live" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/et_system.mp4"
+cols={[
                 { title: "What it does", body: "Checks whether service is available on a line and files the lead — for a major Egyptian internet provider, at a scale and speed no human team could match." },
                 { title: "Who it helped", body: "A telecom operations team manually running thousands of searches a day, copying results, and filing leads one by one." },
                 { title: "What changed", body: "2.4 million operations processed at 99.7% success. Multiple teams each run their own workspace. Results export to Excel whenever they're ready." },
@@ -418,7 +437,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/ps-platform/ps-012504.png", caption: "Device inventory — PS4 and PS5 with per-room pricing" },
                 { src: "/media/portfolio/ps-platform/ps-012539.png", caption: "Daily financial reports — one button to close the day" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/ps_platform.mp4"
+cols={[
                 { title: "What it does", body: "Manages a PlayStation gaming cafe from a single screen — room booking, live session timers, a cafe menu, stock levels, invoicing, and daily financial reports." },
                 { title: "Who it helped", body: "A gaming cafe operator tracking everything manually — writing down session times, calculating bills, managing stock with spreadsheets." },
                 { title: "What changed", body: "Every session is tracked live with a countdown. Food and drinks add to the tab. The invoice generates itself. Daily reports close with one button." },
@@ -438,7 +458,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/api-app.gif", caption: "Platform Sync — five business platforms connected and updating in real time" },
                 { src: "/media/portfolio/api-integrations/automation-trigger-action.jpg", caption: "Every integration follows the same logic: something happens in one system, something happens automatically in another" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/api_connections.mp4"
+cols={[
                 { title: "What it does", body: "Connects five business platforms so data moves on its own — no copy-paste, no re-entry, no waiting for things to catch up." },
                 { title: "Who it helped", body: "Businesses running multiple tools that didn't talk to each other. Every update meant opening another tab and doing the same thing twice." },
                 { title: "What changed", body: "Invoices land in the accounts the moment they're raised anywhere else. Member records update everywhere at once. Reports pull from live numbers." },
@@ -458,7 +479,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/invoice-app.gif", caption: "Jobs, invoices, purchase orders, and accounts — the full billing cycle running automatically" },
                 { src: "/media/portfolio/bigchange-xero/bigchange-invoices.png", caption: "Invoice raised the moment a job is marked complete" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/billing_autopilot.mp4"
+cols={[
                 { title: "What it does", body: "The moment a job is marked done, an invoice raises in the accounting system. Purchase orders generate from approved quotes. Nothing needs a human to push it through." },
                 { title: "Who it helped", body: "Operations and finance teams spending hours each week manually matching jobs to bills." },
                 { title: "What changed", body: "Billing backlog cleared. Late invoices stopped. Finance team redirected to actual analysis." },
@@ -495,7 +517,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/jagent/jagent-charts.png", caption: "Plain English in, charts out — the agent picks the right visualisation" },
                 { src: "/media/portfolio/jagent/jagent-tables.png", caption: "Every answer shows exactly where the numbers came from — no guessing" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/jagent.mp4"
+cols={[
                 { title: "What it does", body: "A conversational AI that talks directly to your database. Ask a question in plain English — it finds the right records, pulls the answer, and adds charts when they help." },
                 { title: "Who it helped", body: "Teams drowning in data they couldn't get answers from — waiting on a developer every time they wanted a business insight." },
                 { title: "What changed", body: "Managers get answers in seconds. No technical skills needed. No tickets raised. It remembers what you've asked before and builds on it." },
@@ -517,7 +540,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mcp-query/nlq-demo.gif", caption: "Type a question, watch the answer arrive" },
                 { src: "/media/portfolio/mcp-query/pgadmin-dashboard.webp", caption: "Every query tracked live as it runs" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/query_planner.mp4"
+cols={[
                 { title: "What it does", body: "It learns how your data is organised, works out exactly what to look up, checks the real numbers, and reports back in the chat." },
                 { title: "Who it helped", body: "Any business where the answers exist somewhere in the data — but nobody can get at them without a developer." },
                 { title: "What changed", body: "Business questions get answered without waiting on anyone. Every answer shows exactly which data it used." },
@@ -538,7 +562,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/auronexus-app.gif", caption: "Auronexus — AI agents working together in channels, each with their own role" },
                 { src: "/media/portfolio/auronexus/auronexus-agents-chat.png", caption: "Real conversation between Claude, Codex, and Gemini agents debugging a login issue" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/auronexus.mp4"
+cols={[
                 { title: "What it does", body: "A platform for building teams of AI agents — each with a role, a set of skills, and a channel to work in. They collaborate, complete tasks, and escalate when they need a human." },
                 { title: "Who it helped", body: "Teams looking to run AI at scale without wiring up agents from scratch every time." },
                 { title: "What changed", body: "New agent 'employees' can be created and deployed in minutes. Tasks that used to require constant human prompting now run autonomously." },
@@ -559,7 +584,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/gigcopilot-app.gif", caption: "Gig Copilot — AI drafts, you approve on Telegram before anything lands" },
                 { src: "/media/portfolio/gig-copilot/telegram-inline-keyboard.png", caption: "Inline Telegram buttons: Approve, Revise, or Reject in one tap" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/gig_copilot.mp4"
+cols={[
                 { title: "What it does", body: "An AI assistant that watches your work as it happens, drafts case studies and task summaries, then sends them to your Telegram for review — with Approve, Revise, and Reject buttons." },
                 { title: "Who it helped", body: "Freelancers and founders who want AI doing the drafting but still want to stay in control." },
                 { title: "What changed", body: "Portfolio case studies write themselves. Task outputs get captured automatically. Nothing is published without a deliberate human approval." },
@@ -579,7 +605,8 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/mockups/haircut-app.gif", caption: "AI face shape analysis — landmarks mapped, geometry measured, haircuts ranked" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/haircut_ai.mp4"
+cols={[
                 { title: "What it does", body: "A desktop app that studies your face shape, takes real measurements, and ranks haircut styles by how well they'd suit you — with celebrity examples so you can see each cut on a real face." },
                 { title: "Who it helped", body: "Anyone tired of guessing at a haircut. Runs entirely on your laptop, no internet needed, no data shared." },
                 { title: "What changed", body: "Real hair advice without a subscription, an account, or an internet connection. Download, run, find out." },
@@ -615,7 +642,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/cannabis-app.gif", caption: "Canopy Index — six years of California cannabis market concentration, mapped" },
                 { src: "/media/portfolio/analytics/metabase-dashboard.webp", caption: "BI dashboard: revenue trends and market data" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/cannabis_market.mp4"
+cols={[
                 { title: "What it does", body: "Tracks retail market concentration across every California county from 2018 to 2024 — measuring whether the cannabis industry is becoming dominated by a few large players or staying diverse." },
                 { title: "Who it helped", body: "Researchers and policymakers who needed hard data on market structure, not guesswork." },
                 { title: "What changed", body: "Six years of licensing and sales data — mapped, measured, and visualised. An analysis that once took weeks of hand-work now reruns at the press of a button." },
@@ -637,7 +665,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/grafana/grafana-013848.png", caption: "The membership connection — watched live, around the clock" },
                 { src: "/media/portfolio/grafana/grafana-013914.png", caption: "Every connection on one screen — nothing runs unwatched" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/grafana.mp4"
+cols={[
                 { title: "What it does", body: "Dashboards that show the health of every business connection in real time — how much is flowing, how fast it's moving, and what's failing." },
                 { title: "Who it helped", body: "Engineering and operations teams who needed to know immediately when something broke, not an hour later when a client complained." },
                 { title: "What changed", body: "Issues get spotted and fixed before customers notice. Error patterns become visible. Performance problems get diagnosed in minutes." },
@@ -657,7 +686,8 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/mockups/stock-app.gif", caption: "Stock Monitor — 20 stores, live inventory levels, alerts firing the moment stock drops" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/stock_monitor.mp4"
+cols={[
                 { title: "What it does", body: "Watches inventory levels across 20+ e-commerce stores simultaneously. Fires an alert the moment stock drops below your threshold — before the shelf is empty." },
                 { title: "Who it helped", body: "E-commerce businesses with multiple stores who found out stock had run out when a customer couldn't find the product." },
                 { title: "What changed", body: "Stockouts stopped happening unnoticed. Reorders trigger before anything runs out. The whole operation runs without anyone checking dashboards manually." },
@@ -675,7 +705,8 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/worldmonitor/dashboard.png"
-              cols={[
+                            videoSrc="/media/portfolio/videos/worldmonitor.mp4"
+cols={[
                 { title: "What it does", body: "A real-time geopolitical intelligence dashboard that aggregates live news, maps conflict zones and military activity, tracks country stability scores, and surfaces AI-generated insights." },
                 { title: "Who it helped", body: "Analysts, researchers, or anyone who wants to understand global events faster than the news cycle." },
                 { title: "What changed", body: "Instead of checking six different news sources and a government risk portal, everything is in one place with AI already doing the analysis." },
@@ -713,7 +744,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/gamepass/screenshot-browse.png", caption: "Browse 626 games with filters that actually work" },
                 { src: "/media/portfolio/gamepass/screenshot-filter.png", caption: "Include or exclude genres and themes simultaneously" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/gamepass_search.mp4"
+cols={[
                 { title: "What it does", body: "A desktop app that pulls in the full Xbox Game Pass library, sorts every game by genre and theme, and lets you filter the way a proper game store should." },
                 { title: "Who it helped", body: "Anyone who subscribes to Game Pass and gets lost in the catalog. The official app doesn't have real filters." },
                 { title: "What changed", body: "Finding something to actually play takes seconds. No internet needed after the first sync. Everything runs on your own machine." },
@@ -732,7 +764,8 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/mockups/upwork-app.gif", caption: "Upwork Job Finder — jobs scored, ranked, and explained automatically" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/upwork_finder.mp4"
+cols={[
                 { title: "What it does", body: "Signs in to your Upwork account securely, pulls in jobs, profiles, and contract history, and scores every job against rules you set — field by field, rule by rule." },
                 { title: "Who it helped", body: "Freelancers spending hours filtering through job listings to find the ones worth applying to." },
                 { title: "What changed", body: "The best-fit jobs surface immediately. Each job shows a receipt of exactly which rules made it score high or low. Nothing hidden." },
@@ -749,7 +782,8 @@ export default function PortfolioPage() {
                 { label: "Year", value: "2025" },
               ]}
               image="/media/portfolio/formforge/demo.gif"
-              cols={[
+                            videoSrc="/media/portfolio/videos/formforge.mp4"
+cols={[
                 { title: "What it does", body: "You give it a scanned paper form and mark where each field is. It fills in the data from your spreadsheet and generates a complete, print-ready copy for every row — handling Arabic and English in the same form." },
                 { title: "Who it helped", body: "Anyone who processes paper forms at volume — registration forms, applications, official documents — and was filling them out one by one." },
                 { title: "What changed", body: "What took hours became a single click. Arabic right-to-left text is handled automatically, no manual adjustment needed." },
@@ -769,7 +803,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/mockups/youtube-app.gif", caption: "ChannelPilot — upload queue, AI descriptions, thumbnail generation, and analytics" },
                 { src: "/media/portfolio/youtube/demo.gif", caption: "YouTube automation in action" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/youtube_automation.mp4"
+cols={[
                 { title: "What it does", body: "Automates the full production and publishing workflow for a YouTube channel — scheduling, AI-written descriptions, thumbnail creation, and automated uploads." },
                 { title: "Who it helped", body: "Content creators and businesses who wanted a consistent YouTube presence without the hours of admin that comes with it." },
                 { title: "What changed", body: "The channel posts on schedule without anyone logging in. Descriptions are consistent and optimised. The creator focuses on content, not operations." },
@@ -790,7 +825,8 @@ export default function PortfolioPage() {
                 { src: "/media/portfolio/pycaps/demo-1.gif", caption: "Animated styled subtitles on a vertical video" },
                 { src: "/media/portfolio/pycaps/demo-2.gif", caption: "Different subtitle style on the same video" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/pycaps.mp4"
+cols={[
                 { title: "What it does", body: "Adds styled, animated captions to any video. Choose a look, hand over the video, and get back a file ready to post — captions moving in time with the speech." },
                 { title: "Who it helped", body: "Creators making short-form content who want professional-looking captions without editing software." },
                 { title: "What changed", body: "Captions that used to require an editor now generate automatically in seconds." },
@@ -824,7 +860,8 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/mockups/email-app.gif", caption: "Inbox Guard — phishing emails detected, blocked, and logged before you see them" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/inbox_guard.mp4"
+cols={[
                 { title: "What it does", body: "Watches incoming email, checks every link against what it has learned about phishing, and moves anything malicious to trash before it can do harm." },
                 { title: "Who it helped", body: "Anyone who gets phishing emails and can't always spot them — which is everyone." },
                 { title: "What changed", body: "Phishing emails stop reaching the inbox. And it keeps getting sharper — learning what's legitimate and what isn't." },
@@ -844,7 +881,8 @@ export default function PortfolioPage() {
               carouselImages={[
                 { src: "/media/portfolio/mockups/malware-app.gif", caption: "File archive browser — daily downloads, fingerprinted and searchable" },
               ]}
-              cols={[
+                            videoSrc="/media/portfolio/videos/file_archive.mp4"
+cols={[
                 { title: "What it does", body: "Collects new malware samples every day, unpacks them, gives every file a unique fingerprint, and files it all into a searchable archive." },
                 { title: "Who it helped", body: "Security researchers who need a local collection of samples for analysis and pattern matching." },
                 { title: "What changed", body: "Building a research-grade sample collection went from days of manual work to something that simply happens overnight." },
